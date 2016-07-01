@@ -7,16 +7,11 @@
 
 
 
-    <com.powyin.nestscroll.freshCombine.NestScrollCombine
+    <com.powyin.scroll.freshCombine.NestScrollCombine
         android:id="@+id/nest_combine"
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-
-
-
-
 
         >
 
@@ -64,7 +59,7 @@
 
 
 
-    </com.powyin.nestscroll.freshCombine.NestScrollCombine>
+    </com.powyin.scroll.freshCombine.NestScrollCombine>
 
 
     <Button

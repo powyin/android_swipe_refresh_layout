@@ -39,7 +39,6 @@ public class NestScrollCombine extends ViewGroup implements NestedScrollingParen
     private final NestedScrollingChildHelper mChildHelper;
 
     private ScrollerCompat mScroller;
-
     private SwipeListener mSwipeListener;
 
     private int scrollY_Up_Max;
@@ -48,7 +47,6 @@ public class NestScrollCombine extends ViewGroup implements NestedScrollingParen
     private int scrollY_Down_Max;
 
 
-    private boolean isRefreshCompleteDo = false;
 
     private ViewHolderHeaderProgress mHeaderProgressView;
 
@@ -87,7 +85,6 @@ public class NestScrollCombine extends ViewGroup implements NestedScrollingParen
 
 
     public void reFreshCompleteDo(){
-        isRefreshCompleteDo = true;
         tryReBackToCenter();
     }
 
@@ -767,8 +764,5 @@ public class NestScrollCombine extends ViewGroup implements NestedScrollingParen
         void onPullProgress(NestScrollCombine view, int state, float progress);
 
         void onRefreshHeader();
-
-        void onRefreshButton();
-
     }
 }

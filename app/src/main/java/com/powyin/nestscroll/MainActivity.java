@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.powyin.nestscroll.freshCombine.NestScrollCombine;
+import com.powyin.scroll.freshCombine.NestScrollCombine;
 
 
 /**

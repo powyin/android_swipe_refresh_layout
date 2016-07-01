@@ -36,6 +36,7 @@ dependencies {
 def siteUrl = 'https://github.com/powyin/nest-scroll'    // 项目的主页
 def gitUrl = 'git@github.com:powyin/nest-scroll.git'     // Git仓库的url
 group = 'com.github.powyin'                              // Maven Group ID for the artifact，一般填你唯一的包名
+
 install {
     repositories.mavenInstaller {
         pom {
@@ -67,6 +68,7 @@ install {
         }
     }
 }
+
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -76,16 +78,20 @@ task javadoc(type: Javadoc) {
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     options.encoding = "UTF-8"
 }
+
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
+
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
