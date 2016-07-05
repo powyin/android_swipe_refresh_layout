@@ -5,66 +5,31 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.powyin.scroll.freshCombine.NestScrollCombine;
+import com.powyin.scroll.widget.ScrollCombine;
 
 
 /**
  * Created by MT3020 on 2016/3/10.
  */
 public class MainActivity extends Activity {
-
-
-    NestScrollCombine combine;
-
-
+    ScrollCombine combine;
     RecyclerView mRecyclerView;
-
     Button buttonDown;
-    FrameLayout head;
+
+//    FrameLayout head;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        char c = 78;
-
-        System.out.println(".................................................."+c);
-
-        c = 4588;
-
-        System.out.println(".................................................."+c);
-
-        c = 0xfff1;
-
-        System.out.println(".................................................."+c);
-
-
         findView();
-
         init();
-
-        head.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("cccccccccccccccccccccccccccccccccccc");
-            }
-        });
-
-
-
-
-
-
-
-
     }
 
 
@@ -113,9 +78,9 @@ public class MainActivity extends Activity {
 
     private void findView(){
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
-        head = (FrameLayout)findViewById(R.id.my_head);
+      //  head = (FrameLayout)findViewById(R.id.my_head);
         buttonDown = (Button)findViewById(R.id.click_me_to_bottom);
-        combine = (NestScrollCombine)findViewById(R.id.nest_combine);
+        combine = (ScrollCombine)findViewById(R.id.nest_combine);
     }
 
 
