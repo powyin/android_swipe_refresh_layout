@@ -11,44 +11,45 @@
         android:id="@+id/nest_combine"
 
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent">
 
-        >
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never">
 
-        <!--<android.support.v4.widget.NestedScrollView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
+            <FrameLayout
+                android:id="@+id/my_head"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#b7b7b7"
+                android:clickable="true">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+                    android:text="fuck" />
+            </FrameLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+
+
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/my_recycle"-->
+            <!--android:background="#ff00ffff"-->
             <!--android:overScrollMode="never"-->
-            <!--&gt;-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
 
-            <!--<FrameLayout-->
-                <!--android:id="@+id/my_head"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:background="#b7b7b7"-->
-                <!--android:clickable="true">-->
-                <!---->
-                <!--<Space-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="300dp" />-->
-                <!---->
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-
-                    <!--android:gravity="center"-->
-                    <!--android:text="fuck"-->
-                    <!--/>-->
-            <!--</FrameLayout>-->
-        <!--</android.support.v4.widget.NestedScrollView>-->
-
-
-
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/my_recycle"
-            android:background="#ff00ffff"
-            android:overScrollMode="never"
+        <ListView
+            android:id="@+id/my_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

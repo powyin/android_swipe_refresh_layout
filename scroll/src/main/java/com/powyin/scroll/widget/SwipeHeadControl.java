@@ -7,10 +7,10 @@ import android.view.View;
  */
 public interface SwipeHeadControl {
     enum SwipeStatus{
-        SWIPE_PRE,                    //拉升状态
-        SWIPE_TOAST,                  //松开刷新
-        SWIPE_LOADING,                //刷新中
-        SWIPE_COMPLITE                //刷新完成
+        SWIPE_OVER_PRE,                    //提示: 松开刷新
+        SWIPE_TOAST,                       //提示: 下拉刷新
+        SWIPE_LOADING,                     //提示: 刷新中
+        SWIPE_COMPLETE                     //提示: 刷新完成
     }
 
     View getSwipeView();
