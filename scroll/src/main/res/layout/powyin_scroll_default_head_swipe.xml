@@ -5,20 +5,41 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="5dp" />
+        android:layout_height="8dp" />
 
-    <com.powyin.scroll.widget.CircleViewBac
-        android:id="@+id/swipe_image_info"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_horizontal"
-        android:background="#ff9999ff"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+        <com.powyin.scroll.widget.CircleViewBac
+            android:id="@+id/swipe_image_info"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/swipe_refresh"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
+            android:src="@drawable/powyin_scroll_progress_circle"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/swipe_ok"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/powyin_scroll_progress_ok"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
     <TextView
         android:id="@+id/swipe_text_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#44000000"
+        android:textColor="#525252"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
         android:text="松开刷新"
+        android:textSize="14sp"
         android:layout_gravity="center_horizontal"
         />
 

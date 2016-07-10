@@ -1,5 +1,4 @@
 package com.powyin.scroll.widget;
-
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -10,50 +9,42 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 
 
 /**
- * Created by MT3020 on 2016/3/10.
+ * Created by powyin on 2016/3/10.
  */
-public class ScrollCombine extends ViewGroup implements NestedScrollingParent,NestedScrollingChild{
-    public ScrollCombine(Context context) {
+public class SwipeNest extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
+    public SwipeNest(Context context) {
         this(context, null);
     }
 
-    public ScrollCombine(Context context, AttributeSet attrs) {
+    public SwipeNest(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ScrollCombine(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SwipeNest(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mParentHelper = new NestedScrollingParentHelper(this);
         mChildHelper = new NestedScrollingChildHelper(this);
         setNestedScrollingEnabled(true);
     }
 
-//        final ViewConfiguration configuration = ViewConfiguration.get(getContext());
-//        mTouchSlop = configuration.getScaledTouchSlop();
-//        mTouchSlop = 5;
-//        mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
-//        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
-
-
-    private static final String TAG = ScrollCombine.class.getCanonicalName();
+    private static final String TAG = SwipeNest.class.getCanonicalName();
     private final NestedScrollingParentHelper mParentHelper;
     private final NestedScrollingChildHelper mChildHelper;
     private int isInScrollCircle = 3;                                              //辅助nestScrollParent 计算周期
     private boolean isFly = false;                                                 //辅助nestScrollParent 停止fly
-    private SwipeHeadControl mSwipeControl;                                        //刷新头部控制器
+    private SwipeControl mSwipeControl;                                        //刷新头部控制器
     private ValueAnimator animationReBackToRefreshing;                             //滚动 显示正在刷新状态
     private ValueAnimator animationReBackToTop;                                    //滚动 回到正常显示
     private ScrollerCompat mScroller;                                              //滚动 滑动
 
     boolean isFreshContinue = false;                                               //正在刷新
     boolean isFreshComplete = false;                                               //刷新完成
-
     private int scrollY_Up;
     private int scrollY_Down;
 
@@ -61,15 +52,14 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
     protected void onFinishInflate() {
         super.onFinishInflate();
         mScroller = ScrollerCompat.create(getContext());
-        mSwipeControl = new DefalutHeadControlerIMP(getContext());
+        mSwipeControl = new DefalutSwipeControl(getContext());
         addView(mSwipeControl.getSwipeView(), 0);
+        View lastView = getChildAt(getChildCount() - 1);
+        if (lastView instanceof AbsListView) {
+            AbsListView absListView = (AbsListView) lastView;
+            absListView.setOverScrollMode(AbsListView.OVER_SCROLL_NEVER);
+        }
     }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
-    }
-
 
 
 
@@ -126,14 +116,14 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
 
     @Override
     public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-        return   (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
+        return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
     public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes) {
         mParentHelper.onNestedScrollAccepted(child, target, nestedScrollAxes);
         startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
-        isFly=false;
+        isFly = false;
         isInScrollCircle = 3;
         stopAllScroll();
     }
@@ -141,9 +131,9 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
     @Override
     public void onStopNestedScroll(View target) {
         mParentHelper.onStopNestedScroll(target);
-        if(!isFly){
+        if (!isFly) {
             stopNestedScroll();
-            if(!tryBackToRefreshing() && isInScrollCircle<0){
+            if (!tryBackToRefreshing() && isInScrollCircle < 0) {
                 tryBackToFreshFinish();
             }
         }
@@ -151,7 +141,7 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
 
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        isInScrollCircle --;
+        isInScrollCircle--;
         int myConsumed = offSetChildrenLasLocation(dyUnconsumed);
         dyUnconsumed = dyUnconsumed - myConsumed;
         dispatchNestedScroll(0, myConsumed, 0, dyUnconsumed, null);
@@ -159,7 +149,7 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-        isInScrollCircle --;
+        isInScrollCircle--;
         int delta = offSetChildrenPreLocation(dy);
         consumed[1] = delta;
     }
@@ -171,13 +161,13 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
 
     @Override
     public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-        if(getScrollY() < scrollY_Down - getHeight()){
-            if(!(tryBackToRefreshing() || tryBackToFreshFinish())){
-                fling((int)velocityY);
+        if (getScrollY() < scrollY_Down - getHeight()) {
+            if (!(tryBackToRefreshing() || tryBackToFreshFinish())) {
+                fling((int) velocityY);
                 isFly = true;
             }
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -191,17 +181,17 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        for(int i= 0;i<getChildCount();i++){
+        for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             int speWid = getChildMeasureSpec(widthMeasureSpec, 0, ViewGroup.LayoutParams.MATCH_PARENT);
-            int speHei = getChildMeasureSpec(heightMeasureSpec,0,ViewGroup.LayoutParams.WRAP_CONTENT);
-            child.measure(speWid,speHei);
+            int speHei = getChildMeasureSpec(heightMeasureSpec, 0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            child.measure(speWid, speHei);
         }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int childLeft= getPaddingLeft();
+        int childLeft = getPaddingLeft();
         int childRight = right - left - getPaddingRight();
         int childTop = 0;
         final int count = getChildCount();
@@ -211,11 +201,11 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
         scrollY_Up = -mSwipeControl.getSwipeView().getMeasuredHeight();
 
         // 中间显示View(上部分);
-        for (int i = 1; i < count -1; i++) {
+        for (int i = 1; i < count - 1; i++) {
             final View child = getChildAt(i);
-            if(child.getVisibility()==GONE) break;
+            if (child.getVisibility() == GONE) break;
             int childHeight = child.getMeasuredHeight();
-            ScrollCombine.LayoutParams lp = (ScrollCombine.LayoutParams) child.getLayoutParams();
+            SwipeNest.LayoutParams lp = (SwipeNest.LayoutParams) child.getLayoutParams();
             childTop += lp.topMargin;
             child.layout(childLeft, childTop, childRight, childTop + childHeight);
             childTop += childHeight + lp.bottomMargin;
@@ -223,10 +213,10 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
         }
 
         // 中间显示View(下部分);
-        View lastIndexView =  getChildAt(getChildCount()-1);
-        if(lastIndexView!=null){
-            ScrollCombine.LayoutParams lp = (ScrollCombine.LayoutParams) lastIndexView.getLayoutParams();
-            lastIndexView.layout(childLeft, childTop, childRight, childTop+bottom);
+        View lastIndexView = getChildAt(getChildCount() - 1);
+        if (lastIndexView != null) {
+            SwipeNest.LayoutParams lp = (SwipeNest.LayoutParams) lastIndexView.getLayoutParams();
+            lastIndexView.layout(childLeft, childTop, childRight, childTop + bottom);
             childTop += bottom + lp.bottomMargin;
         }
         scrollY_Down = childTop;
@@ -237,83 +227,86 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
         super.computeScroll();
         if (mScroller.computeScrollOffset()) {
             int y = mScroller.getCurrY();
-            scrollTo(0,y);
+            scrollTo(0, y);
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
 
-    public void finishRefresh(){
+    public void finishRefresh() {
         isFreshContinue = false;
         isFreshComplete = true;
-        mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_COMPLETE,-getScrollY());
+        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_COMPLETE, -getScrollY(),mSwipeControl.getSwipeView().getHeight());
         tryBackToFreshFinish();
     }
 
     private int offSetChildrenPreLocation(int deltaY) {
-        if(deltaY==0) return 0;
+        if (deltaY == 0) return 0;
 
-        int maxScrollY = scrollY_Down - getHeight() ;
+        int maxScrollY = scrollY_Down - getHeight();
         int minScrollY = scrollY_Up - mSwipeControl.getOverScrollHei();
         int currentScrollY = getScrollY();
 
-        if(deltaY<0 && currentScrollY<scrollY_Up && currentScrollY>minScrollY){                                                  //平滑过度下拉刷新的进度变化
-            deltaY = (int) ( deltaY * Math.pow ((currentScrollY - minScrollY)*1f/mSwipeControl.getOverScrollHei(),2.5) );
+        if (deltaY < 0 && currentScrollY < scrollY_Up && currentScrollY > minScrollY) {                                              //平滑过度下拉刷新的进度变化
+            deltaY = (int) (deltaY * Math.pow((currentScrollY - minScrollY) * 1f / mSwipeControl.getOverScrollHei(), 2.5));
         }
 
-        if((currentScrollY>=minScrollY && currentScrollY<maxScrollY) ||                                                          //提供对多个View的支持
-                (getChildCount()==2 && currentScrollY==0 && !getChildAt(1).canScrollVertically(deltaY))){                        //提供对单个View的支持
-            int willTo = currentScrollY+deltaY;
-            willTo=Math.min(willTo,maxScrollY);
-            willTo = Math.max(willTo,minScrollY);
+        if ((currentScrollY >= minScrollY && currentScrollY < maxScrollY) ||                                                          //提供对多个View的支持
+                (getChildCount() == 2 && currentScrollY == 0 && !getChildAt(1).canScrollVertically(deltaY))) {                        //提供对单个View的支持
+
+
+            int willTo = currentScrollY + deltaY;
+            willTo = Math.min(willTo, maxScrollY);
+            willTo = Math.max(willTo, minScrollY);
             scrollTo(0, willTo);
 
-            if(willTo<0 && isFreshComplete && !isFreshContinue){                                                                      //刷新内部状态
+            if (willTo < 0 && isFreshComplete && !isFreshContinue) {                                                                 //刷新内部状态
                 isFreshComplete = false;
             }
 
-            int swipeViewVisibilityHei = 0 -willTo;
-            if(swipeViewVisibilityHei>0){                                                                                       //更新刷新状态
-                if(isFreshContinue){
-                    mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_LOADING,swipeViewVisibilityHei);
-                }else if(isFreshComplete){
-                    mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_COMPLETE,swipeViewVisibilityHei);
-                }else if(willTo < -mSwipeControl.getSwipeView().getHeight()){
-                    mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_OVER_PRE, swipeViewVisibilityHei);
-                }else {
-                    mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_TOAST, swipeViewVisibilityHei);
+            int swipeViewVisibilityHei = 0 - willTo;
+            if (swipeViewVisibilityHei > 0) {                                                                                        //更新刷新状态
+                if (isFreshContinue) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_LOADING, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                } else if (isFreshComplete) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_COMPLETE, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                } else if (willTo < -mSwipeControl.getSwipeView().getHeight()) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_OVER, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                } else {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_TOAST, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
                 }
             }
 
-            return (willTo-currentScrollY);
+            return (willTo - currentScrollY);
         }
 
         return 0;
     }
 
     private int offSetChildrenLasLocation(int deltaY) {
-        if(deltaY==0) return 0;
+
+        if (deltaY == 0) return 0;
 
         int maxScrollY = scrollY_Down - getHeight();
         int currentScrollY = getScrollY();
 
-        if(currentScrollY>=0){
-            int willTo = currentScrollY+deltaY;
-            willTo=Math.min(willTo,maxScrollY);
-            willTo = Math.max(willTo,0);
+        if (currentScrollY >= 0) {
+            int willTo = currentScrollY + deltaY;
+            willTo = Math.min(willTo, maxScrollY);
+            willTo = Math.max(willTo, 0);
             scrollTo(0, willTo);
-            return  (willTo-currentScrollY);
+            return (willTo - currentScrollY);
         }
 
         return 0;
     }
 
-    private boolean tryBackToRefreshing(){
+    private boolean tryBackToRefreshing() {
         int scrollY = getScrollY();
         stopAllScroll();
-        boolean isOverProgress = scrollY<-mSwipeControl.getSwipeView().getHeight();
-        if(isOverProgress){
+        boolean isOverProgress = scrollY < -mSwipeControl.getSwipeView().getHeight();
+        if (isOverProgress) {
             int animationTarget = -(mSwipeControl.getSwipeView().getHeight());
-            animationReBackToRefreshing = ValueAnimator.ofInt(scrollY,animationTarget);
+            animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, animationTarget);
             animationReBackToRefreshing.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -323,32 +316,34 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
                     }
                 }
             });
-            animationReBackToRefreshing.addListener(new AnimationStatus(){
+            animationReBackToRefreshing.addListener(new AnimationStatus() {
                 boolean isCancel = false;
+
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if(!isCancel){
+                    if (!isCancel) {
                         isFreshContinue = true;
-                        mSwipeControl.onSwipeStatue(SwipeHeadControl.SwipeStatus.SWIPE_LOADING,mSwipeControl.getSwipeView().getHeight());
+                        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_LOADING, mSwipeControl.getSwipeView().getHeight(),mSwipeControl.getSwipeView().getHeight());
                     }
                 }
+
                 @Override
                 public void onAnimationCancel(Animator animation) {
                     isCancel = true;
                 }
             });
-            animationReBackToRefreshing.setDuration(Math.abs(400* (animationTarget-scrollY) / mSwipeControl.getSwipeView().getHeight()));
+            animationReBackToRefreshing.setDuration(Math.abs(400 * (animationTarget - scrollY) / mSwipeControl.getSwipeView().getHeight()));
             animationReBackToRefreshing.start();
         }
 
         return isOverProgress;
     }
 
-    private boolean tryBackToFreshFinish(){
+    private boolean tryBackToFreshFinish() {
         stopAllScroll();
         int scrollY = getScrollY();
-        if(scrollY<0){
-            animationReBackToTop = ValueAnimator.ofInt(scrollY,0);
+        if (scrollY < 0) {
+            animationReBackToTop = ValueAnimator.ofInt(scrollY, 0);
             animationReBackToTop.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -356,9 +351,9 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
                     scrollTo(0, value);
                 }
             });
-            animationReBackToTop.setDuration(Math.abs(250*(0-scrollY)/mSwipeControl.getSwipeView().getHeight()));
-            if(scrollY<= -mSwipeControl.getSwipeView().getHeight() + 10){
-                animationReBackToTop.setStartDelay(300);
+            animationReBackToTop.setDuration(Math.abs(250 * (0 - scrollY) / mSwipeControl.getSwipeView().getHeight()));
+            if (scrollY <= -mSwipeControl.getSwipeView().getHeight() + 10) {
+                animationReBackToTop.setStartDelay(350);
             }
             animationReBackToTop.start();
 
@@ -370,22 +365,21 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
 
     private void fling(int velocityY) {
         mScroller.abortAnimation();
-        mScroller.fling(0,getScrollY(),0,(int)( velocityY * 1f ),0,0,0,scrollY_Down-getHeight());
+        mScroller.fling(0, getScrollY(), 0, (int) (velocityY * 1f), 0, 0, 0, scrollY_Down - getHeight());
         ViewCompat.postInvalidateOnAnimation(this);
     }
 
-    private void stopAllScroll(){
-        if(animationReBackToRefreshing !=null && animationReBackToRefreshing.isRunning()){
+    private void stopAllScroll() {
+        if (animationReBackToRefreshing != null && animationReBackToRefreshing.isRunning()) {
             animationReBackToRefreshing.cancel();
         }
-        if(animationReBackToTop!=null && animationReBackToTop.isRunning()){
+        if (animationReBackToTop != null && animationReBackToTop.isRunning()) {
             animationReBackToTop.cancel();
         }
-        if(mScroller!=null&& !mScroller.isFinished()){
+        if (mScroller != null && !mScroller.isFinished()) {
             mScroller.abortAnimation();
         }
     }
-
 
 
     @Override
@@ -428,7 +422,7 @@ public class ScrollCombine extends ViewGroup implements NestedScrollingParent,Ne
     }
 
 
-    class AnimationStatus implements  Animator.AnimatorListener{
+    class AnimationStatus implements Animator.AnimatorListener {
         @Override
         public void onAnimationStart(Animator animation) {
         }

@@ -1,70 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-
-    <com.powyin.scroll.widget.ScrollCombine
+    <com.powyin.scroll.widget.SwipeNest
         android:id="@+id/nest_combine"
-
+        android:background="#e5e5e5"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never">
-
-            <FrameLayout
-                android:id="@+id/my_head"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#b7b7b7"
-                android:clickable="true">
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-
-                    android:gravity="center"
-                    android:text="fuck" />
-            </FrameLayout>
-        </android.support.v4.widget.NestedScrollView>
-
-
-
-
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/my_recycle"-->
-            <!--android:background="#ff00ffff"-->
-            <!--android:overScrollMode="never"-->
+        <!--<android.support.v4.widget.NestedScrollView-->
             <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:overScrollMode="never">-->
 
-        <ListView
-            android:id="@+id/my_list"
+            <!--<FrameLayout-->
+                <!--android:id="@+id/my_head"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:background="#b7b7b7"-->
+                <!--android:clickable="true">-->
+
+                <!--<Space-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="300dp" />-->
+
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+
+                    <!--android:gravity="center"-->
+                    <!--android:text="fuck" />-->
+            <!--</FrameLayout>-->
+        <!--</android.support.v4.widget.NestedScrollView>-->
+
+
+
+
+        <android.support.v7.widget.RecyclerView
+            android:background="#ffffff"
+            android:id="@+id/my_recycle"
+            android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
 
 
 
-    </com.powyin.scroll.widget.ScrollCombine>
+
+
+    </com.powyin.scroll.widget.SwipeNest>
+
+
+    <!--<com.powyin.scroll.widget.SwipeRefresh-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<ListView-->
+        <!--android:id="@+id/my_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"/>-->
+        <!---->
+    <!--</com.powyin.scroll.widget.SwipeRefresh>-->
+
 
 
     <Button
         android:id="@+id/click_me_to_bottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="30dp"
         android:layout_gravity="center"
-        android:layout_marginRight="100dp"
+        android:text="停止刷新"
         />
 
 
