@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.powyin.scroll.widget.SwipeNest
-        android:id="@+id/nest_combine"
-        android:background="#e5e5e5"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<com.powyin.scroll.widget.SwipeNest-->
+        <!--android:id="@+id/nest_combine"-->
+        <!--android:background="#e5e5e5"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
         <!--<android.support.v4.widget.NestedScrollView-->
             <!--android:layout_width="match_parent"-->
@@ -34,35 +34,25 @@
                     <!--android:text="fuck" />-->
             <!--</FrameLayout>-->
         <!--</android.support.v4.widget.NestedScrollView>-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:background="#ffffff"-->
+            <!--android:id="@+id/my_recycle"-->
+            <!--android:overScrollMode="never"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+    <!--</com.powyin.scroll.widget.SwipeNest>-->
 
 
+    <com.powyin.scroll.widget.SwipeRefresh
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <ListView
+        android:id="@+id/my_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:background="#ffffff"
-            android:id="@+id/my_recycle"
-            android:overScrollMode="never"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-
-
-
-
-
-    </com.powyin.scroll.widget.SwipeNest>
-
-
-    <!--<com.powyin.scroll.widget.SwipeRefresh-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-        <!--<ListView-->
-        <!--android:id="@+id/my_list"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-        <!---->
-    <!--</com.powyin.scroll.widget.SwipeRefresh>-->
+    </com.powyin.scroll.widget.SwipeRefresh>
 
 
 

@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,14 +34,16 @@ public class MainActivity extends Activity {
     }
 
     private void findView(){
-        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
-        //    listView = (ListView)findViewById(R.id.my_list);
+
+        listView = (ListView)findViewById(R.id.my_list);
         buttonDown = (Button)findViewById(R.id.click_me_to_bottom);
-        combine = (SwipeNest)findViewById(R.id.nest_combine);
+        //  mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
+        // combine = (SwipeNest)findViewById(R.id.nest_combine);
     }
 
     private void init(){
-        initRecycle();
+      //  initRecycle();
+        initListView();
         buttonDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,34 +53,32 @@ public class MainActivity extends Activity {
 
     }
 
+    private void initListView(){
+        listView.setAdapter(new BaseAdapter() {
+            @Override
+            public int getCount() {
+                return 30;
+            }
 
+            @Override
+            public Object getItem(int i) {
+                return null;
+            }
 
-//    private void initListView(){
-//        listView.setAdapter(new BaseAdapter() {
-//            @Override
-//            public int getCount() {
-//                return 30;
-//            }
-//
-//            @Override
-//            public Object getItem(int i) {
-//                return null;
-//            }
-//
-//            @Override
-//            public long getItemId(int i) {
-//                return i;
-//            }
-//
-//            @Override
-//            public View getView(int i, View view, ViewGroup viewGroup) {
-//                if(view==null){
-//                    return getLayoutInflater().inflate(R.layout.header,viewGroup,false);
-//                }
-//                return view;
-//            }
-//        });
-//    }
+            @Override
+            public long getItemId(int i) {
+                return i;
+            }
+
+            @Override
+            public View getView(int i, View view, ViewGroup viewGroup) {
+                if(view==null){
+                    return getLayoutInflater().inflate(R.layout.header,viewGroup,false);
+                }
+                return view;
+            }
+        });
+    }
 
     private void initRecycle(){
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -22,7 +22,7 @@ import com.powyin.scroll.R;
 /**
  * Created by powyin on 2016/7/2.
  */
-public class DefalutSwipeControl implements SwipeControl {
+public class DefaultSwipeControl implements SwipeControl {
 
     private Context mContent;
     private View rootView;
@@ -32,7 +32,7 @@ public class DefalutSwipeControl implements SwipeControl {
     private ImageView statusComplete;
     private TextView textInfo;
 
-    DefalutSwipeControl(Context context) {
+    DefaultSwipeControl(Context context) {
         this.mContent = context;
         rootView = LayoutInflater.from(context).inflate(R.layout.powyin_scroll_default_head_swipe, null);
         statusPre = (CircleViewBac) rootView.findViewById(R.id.swipe_image_info);

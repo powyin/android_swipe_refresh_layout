@@ -36,9 +36,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     private static final String TAG = SwipeNest.class.getCanonicalName();
     private final NestedScrollingParentHelper mParentHelper;
     private final NestedScrollingChildHelper mChildHelper;
-    private int isInScrollCircle = 3;                                              //辅助nestScrollParent 计算周期
+    private boolean mNestedScrollInProgress = false;                                //辅助nestScrollParent 计算周期
     private boolean isFly = false;                                                 //辅助nestScrollParent 停止fly
-    private SwipeControl mSwipeControl;                                        //刷新头部控制器
+    private SwipeControl mSwipeControl;                                            //刷新头部控制器
     private ValueAnimator animationReBackToRefreshing;                             //滚动 显示正在刷新状态
     private ValueAnimator animationReBackToTop;                                    //滚动 回到正常显示
     private ScrollerCompat mScroller;                                              //滚动 滑动
@@ -52,7 +52,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     protected void onFinishInflate() {
         super.onFinishInflate();
         mScroller = ScrollerCompat.create(getContext());
-        mSwipeControl = new DefalutSwipeControl(getContext());
+        mSwipeControl = new DefaultSwipeControl(getContext());
         addView(mSwipeControl.getSwipeView(), 0);
         View lastView = getChildAt(getChildCount() - 1);
         if (lastView instanceof AbsListView) {
@@ -124,16 +124,17 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
         mParentHelper.onNestedScrollAccepted(child, target, nestedScrollAxes);
         startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
         isFly = false;
-        isInScrollCircle = 3;
+        mNestedScrollInProgress = true;
         stopAllScroll();
     }
 
     @Override
     public void onStopNestedScroll(View target) {
         mParentHelper.onStopNestedScroll(target);
+        mNestedScrollInProgress = false;
         if (!isFly) {
             stopNestedScroll();
-            if (!tryBackToRefreshing() && isInScrollCircle < 0) {
+            if (!tryBackToRefreshing() && mNestedScrollInProgress) {
                 tryBackToFreshFinish();
             }
         }
@@ -141,7 +142,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
 
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        isInScrollCircle--;
         int myConsumed = offSetChildrenLasLocation(dyUnconsumed);
         dyUnconsumed = dyUnconsumed - myConsumed;
         dispatchNestedScroll(0, myConsumed, 0, dyUnconsumed, null);
@@ -149,7 +149,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-        isInScrollCircle--;
         int delta = offSetChildrenPreLocation(dy);
         consumed[1] = delta;
     }
