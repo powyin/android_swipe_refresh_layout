@@ -1,5 +1,5 @@
 
-### compile 'com.github.powyin:scroll\\:1.0.9'
+### compile 'com.github.powyin:scroll\:1.0.9'
 
 Hello,大家好，我是果冻虾仁。
 
