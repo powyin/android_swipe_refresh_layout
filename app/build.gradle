@@ -28,4 +28,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:design:24.0.0'
     compile project(path: ':scroll')
+
+//    compile 'com.github.powyin:scroll:1.1.0'
+
 }

@@ -45,7 +45,6 @@ public class DefaultSwipeControl implements SwipeControl {
     public View getSwipeView() {
         return rootView;
     }
-
     @Override
     public int getOverScrollHei() {
         return 300;
@@ -53,14 +52,13 @@ public class DefaultSwipeControl implements SwipeControl {
 
     @Override
     public void onSwipeStatue(SwipeStatus status, int visibleHei, int wholeHei) {
-
         switch (status) {
             case SWIPE_OVER:
                 statusPre.setVisibility(View.VISIBLE);
+                statusPre.setProgress(1);
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
                 statusComplete.setVisibility(View.INVISIBLE);
-
                 textInfo.setText("松开刷新");
                 break;
             case SWIPE_TOAST:
@@ -79,7 +77,6 @@ public class DefaultSwipeControl implements SwipeControl {
                     statusLoad.setAnimation(AnimationUtils.loadAnimation(mContent, R.anim.powyin_scroll_rotale));
                 }
                 statusComplete.setVisibility(View.INVISIBLE);
-
                 textInfo.setText("正在拼命刷新中");
                 break;
             case SWIPE_COMPLETE:
@@ -87,7 +84,6 @@ public class DefaultSwipeControl implements SwipeControl {
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
                 statusComplete.setVisibility(View.VISIBLE);
-
                 textInfo.setText("刷新成功");
                 break;
         }
@@ -113,8 +109,10 @@ class CircleViewBac extends View {
     int hei;
     float progress;
     public void setProgress(float progress) {
-        this.progress = progress;
-        invalidate();
+        if(this.progress!=progress){
+            this.progress = progress;
+            invalidate();
+        }
     }
 
 

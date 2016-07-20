@@ -42,7 +42,7 @@ public class MultiAdapter<T> implements ListAdapter {
         return new MultiAdapter<>(activity, arrClass);
     }
 
-    private ViewHolder[] holderInstances;                                                                        // viewHolder 类实现实例
+    private ViewHolder[] holderInstances;                                                                          // viewHolder 类实现实例
     private Class<? extends ViewHolder>[] holderClasses;                                                           // viewHolder class类
     private Class[] holderGenericDataClass;                                                                        // viewHolder 携带泛型
 
@@ -408,8 +408,8 @@ public class MultiAdapter<T> implements ListAdapter {
             return 0;
         }
 
-        // @Override
-        protected View gextItemView() {
+        @Override
+        protected View getItemView() {
             FrameLayout frameLayout = new FrameLayout(mActivity);
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
             layoutParams.gravity = Gravity.CENTER;

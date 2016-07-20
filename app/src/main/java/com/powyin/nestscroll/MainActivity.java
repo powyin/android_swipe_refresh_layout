@@ -7,22 +7,34 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.powyin.nestscroll.adapter.TypeViewHolder_Pic_4;
+import com.powyin.nestscroll.adapter.TypeViewHolder_Text;
+import com.powyin.nestscroll.adapter.TypeViewHolder_Pic_1;
+import com.powyin.nestscroll.net.DataModel;
+import com.powyin.scroll.adapter.base.MultiAdapter;
 import com.powyin.scroll.widget.SwipeNest;
+import com.powyin.scroll.widget.SwipeRefresh;
+
+import java.util.Date;
 
 
 /**
  * Created by MT3020 on 2016/3/10.
  */
 public class MainActivity extends Activity {
-    SwipeNest combine;
-    RecyclerView mRecyclerView;
     Button buttonDown;
+
+    SwipeNest swipeNest;
+    SwipeRefresh swipeRefresh;
+    RecyclerView mRecyclerView;
+
     ListView listView;
+
+    MultiAdapter<DataModel> multiAdapter;
 
 
     @Override
@@ -34,50 +46,41 @@ public class MainActivity extends Activity {
     }
 
     private void findView(){
-
-        listView = (ListView)findViewById(R.id.my_list);
         buttonDown = (Button)findViewById(R.id.click_me_to_bottom);
-        //  mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
-        // combine = (SwipeNest)findViewById(R.id.nest_combine);
+        listView = (ListView)findViewById(R.id.my_list);
+        swipeRefresh = (SwipeRefresh)findViewById(R.id.re);
     }
 
     private void init(){
-      //  initRecycle();
+    //    initRecycle();
         initListView();
         buttonDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                combine.finishRefresh();
+             //   swipeNest.finishRefresh();
+                buttonDown.setText("刷新结束");
+                swipeRefresh.finishRefresh();
+            }
+        });
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                System.out.println("------------------------------------------------loading----------------------->>>>>>>>");
+                buttonDown.setText("开始刷新---》 点击结束");
             }
         });
 
     }
 
     private void initListView(){
-        listView.setAdapter(new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return 30;
-            }
-
-            @Override
-            public Object getItem(int i) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int i) {
-                return i;
-            }
-
-            @Override
-            public View getView(int i, View view, ViewGroup viewGroup) {
-                if(view==null){
-                    return getLayoutInflater().inflate(R.layout.header,viewGroup,false);
-                }
-                return view;
-            }
-        });
+        multiAdapter = MultiAdapter.getByClass(this, TypeViewHolder_Text.class, TypeViewHolder_Pic_1.class , TypeViewHolder_Pic_4.class);
+        listView.setAdapter(multiAdapter);
+        for(int i=0;i<20;i++){
+            int rad = (int)(Math.random()*10)%3+1;
+            System.out.println(rad+":::::::::::");
+            multiAdapter.addLast(new DataModel(rad));
+        }
     }
 
     private void initRecycle(){
@@ -108,7 +111,7 @@ public class MainActivity extends Activity {
 
     class Holder extends RecyclerView.ViewHolder {
         public Holder() {
-            super(getLayoutInflater().inflate(R.layout.view_holder_item,null));
+            super(getLayoutInflater().inflate(R.layout.recycler_view_holder_item,null));
         }
     }
 

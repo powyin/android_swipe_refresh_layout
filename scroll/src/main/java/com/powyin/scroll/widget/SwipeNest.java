@@ -15,7 +15,7 @@ import android.widget.AbsListView;
 
 
 /**
- * Created by powyin on 2016/3/10.
+ * Created by powyin on 2016/7/10.
  */
 public class SwipeNest extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
     public SwipeNest(Context context) {
@@ -36,7 +36,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     private static final String TAG = SwipeNest.class.getCanonicalName();
     private final NestedScrollingParentHelper mParentHelper;
     private final NestedScrollingChildHelper mChildHelper;
-    private boolean mNestedScrollInProgress = false;                                //辅助nestScrollParent 计算周期
+    private boolean mNestedScrollInProgress = false;                               //辅助nestScrollParent 计算周期
     private boolean isFly = false;                                                 //辅助nestScrollParent 停止fly
     private SwipeControl mSwipeControl;                                            //刷新头部控制器
     private ValueAnimator animationReBackToRefreshing;                             //滚动 显示正在刷新状态
