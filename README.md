@@ -2,8 +2,9 @@
 # SwipeNest 实现多个NestScrollChilder子类实现下拉刷新 
 # MuilpAdapter 自带上啦加载
 
-### SwipeRefresh效果图
+### SwipeRefresh 下拉刷新效果图
 ![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif "github")  
+
       <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
         android:layout_width="match_parent"
@@ -24,7 +25,9 @@
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="match_parent"/>-->
     </com.powyin.scroll.widget.SwipeRefresh>
-
+    
+### MuilpAdapter 上拉加载更多 效果图
+![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif "github")  
 
 
 
