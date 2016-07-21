@@ -12,7 +12,7 @@ dependencies {
 
 
 
-# How to use
+### How to use
 
       <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
@@ -37,7 +37,6 @@ dependencies {
 **设置支持4种刷新模式**   
 
 ```
-通过Xml app:fresh_model   或者  SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)
          (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
          (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH)) 只支持下拉刷新 
          (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
@@ -46,6 +45,7 @@ dependencies {
 **note**  
 ```
   只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
+  通过Xml app:fresh_model或者SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 定义刷新模式
   
 ```
 
