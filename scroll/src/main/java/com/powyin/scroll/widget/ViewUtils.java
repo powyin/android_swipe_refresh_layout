@@ -5,7 +5,7 @@ import android.content.Context;
 /**
  * Created by powyin on 2016/4/26.
  */
-public class ViewUtils {
+class ViewUtils {
 
     // sp : dp : xp 互转
     public static int px2dip(Context context, float pxValue) {

@@ -4,8 +4,8 @@ import android.app.Activity;
 
 import com.powyin.nestscroll.R;
 import com.powyin.nestscroll.net.DataModel;
-import com.powyin.scroll.adapter.base.MultiAdapter;
-import com.powyin.scroll.adapter.base.ViewHolder;
+import com.powyin.scroll.adapter.MultiAdapter;
+import com.powyin.scroll.adapter.ViewHolder;
 
 /**
  * Created by powyin on 2016/7/21.

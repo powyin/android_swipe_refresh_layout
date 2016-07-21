@@ -52,8 +52,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     protected void onFinishInflate() {
         super.onFinishInflate();
         mScroller = ScrollerCompat.create(getContext());
-        mSwipeControl = new DefaultSwipeControl(getContext());
-        addView(mSwipeControl.getSwipeView(), 0);
+        mSwipeControl = new SwipeControlImp(getContext());
+        addView(mSwipeControl.getSwipeHead(), 0);
         View lastView = getChildAt(getChildCount() - 1);
         if (lastView instanceof AbsListView) {
             AbsListView absListView = (AbsListView) lastView;
@@ -176,6 +176,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
         return mParentHelper.getNestedScrollAxes();
     }
 
+
+
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -196,8 +199,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
         final int count = getChildCount();
 
         // 下拉刷新 view
-        mSwipeControl.getSwipeView().layout(childLeft, -mSwipeControl.getSwipeView().getMeasuredHeight(), childRight, 0);
-        scrollY_Up = -mSwipeControl.getSwipeView().getMeasuredHeight();
+        mSwipeControl.getSwipeHead().layout(childLeft, -mSwipeControl.getSwipeHead().getMeasuredHeight(), childRight, 0);
+        scrollY_Up = -mSwipeControl.getSwipeHead().getMeasuredHeight();
 
         // 中间显示View(上部分);
         for (int i = 1; i < count - 1; i++) {
@@ -234,7 +237,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     public void finishRefresh() {
         isFreshContinue = false;
         isFreshComplete = true;
-        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_COMPLETE, -getScrollY(),mSwipeControl.getSwipeView().getHeight());
+        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE, -getScrollY(),mSwipeControl.getSwipeHead().getHeight());
         tryBackToFreshFinish();
     }
 
@@ -265,13 +268,13 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
             int swipeViewVisibilityHei = 0 - willTo;
             if (swipeViewVisibilityHei > 0) {                                                                                        //更新刷新状态
                 if (isFreshContinue) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_LOADING, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei,mSwipeControl.getSwipeHead().getHeight());
                 } else if (isFreshComplete) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_COMPLETE, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
-                } else if (willTo < -mSwipeControl.getSwipeView().getHeight()) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_OVER, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE, swipeViewVisibilityHei,mSwipeControl.getSwipeHead().getHeight());
+                } else if (willTo < -mSwipeControl.getSwipeHead().getHeight()) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei,mSwipeControl.getSwipeHead().getHeight());
                 } else {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_TOAST, swipeViewVisibilityHei,mSwipeControl.getSwipeView().getHeight());
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei,mSwipeControl.getSwipeHead().getHeight());
                 }
             }
 
@@ -302,9 +305,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     private boolean tryBackToRefreshing() {
         int scrollY = getScrollY();
         stopAllScroll();
-        boolean isOverProgress = scrollY < -mSwipeControl.getSwipeView().getHeight();
+        boolean isOverProgress = scrollY < -mSwipeControl.getSwipeHead().getHeight();
         if (isOverProgress) {
-            int animationTarget = -(mSwipeControl.getSwipeView().getHeight());
+            int animationTarget = -(mSwipeControl.getSwipeHead().getHeight());
             animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, animationTarget);
             animationReBackToRefreshing.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -322,7 +325,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
                 public void onAnimationEnd(Animator animation) {
                     if (!isCancel) {
                         isFreshContinue = true;
-                        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_LOADING, mSwipeControl.getSwipeView().getHeight(),mSwipeControl.getSwipeView().getHeight());
+                        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_LOADING, mSwipeControl.getSwipeHead().getHeight(),mSwipeControl.getSwipeHead().getHeight());
                     }
                 }
 
@@ -331,7 +334,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
                     isCancel = true;
                 }
             });
-            animationReBackToRefreshing.setDuration(Math.abs(400 * (animationTarget - scrollY) / mSwipeControl.getSwipeView().getHeight()));
+            animationReBackToRefreshing.setDuration(Math.abs(400 * (animationTarget - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
             animationReBackToRefreshing.start();
         }
 
@@ -350,8 +353,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
                     scrollTo(0, value);
                 }
             });
-            animationReBackToTop.setDuration(Math.abs(250 * (0 - scrollY) / mSwipeControl.getSwipeView().getHeight()));
-            if (scrollY <= -mSwipeControl.getSwipeView().getHeight() + 10) {
+            animationReBackToTop.setDuration(Math.abs(250 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
+            if (scrollY <= -mSwipeControl.getSwipeHead().getHeight() + 10) {
                 animationReBackToTop.setStartDelay(350);
             }
             animationReBackToTop.start();

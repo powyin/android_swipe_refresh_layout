@@ -1,7 +1,9 @@
-package com.powyin.scroll.adapter.base;
+package com.powyin.scroll.adapter;
 
 import android.app.Activity;
 import android.view.View;
+
+import com.powyin.scroll.adapter.MultiAdapter;
 
 /**
  * Created by powyin on 2016/6/16.
@@ -19,7 +21,7 @@ public abstract class ViewHolder<T> {
         this.mainView = itemView==null ? activity.getLayoutInflater().inflate(getItemViewRes(),null) : itemView;
     }
     protected abstract int getItemViewRes();
-    public abstract void loadData( MultiAdapter<? super T> adapter, T data);
+    public abstract void loadData(MultiAdapter<? super T> adapter, T data);
     protected View getItemView(){ return null; }
     protected boolean acceptData(T data){
         return true;

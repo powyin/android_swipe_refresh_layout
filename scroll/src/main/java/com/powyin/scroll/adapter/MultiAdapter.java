@@ -1,23 +1,15 @@
-package com.powyin.scroll.adapter.base;
+package com.powyin.scroll.adapter;
 
-import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -48,7 +40,7 @@ public class MultiAdapter<T> implements ListAdapter {
 
     private Activity mActivity;
 
-    private RefreshView refreshView;
+   // private SwipeControl mSwipeControl;
 
     private List<T> mDataList = new ArrayList<>();
 
@@ -80,7 +72,6 @@ public class MultiAdapter<T> implements ListAdapter {
             try {
                 holderInstances[i] = holderClasses[i].getConstructor(Activity.class).newInstance(mActivity);         //赋值 holder实例
             } catch (Exception e) {
-                System.out.println(holderClasses[i].getSimpleName() + "::" + i);
                 e.printStackTrace();
                 throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法");
             }
@@ -88,138 +79,8 @@ public class MultiAdapter<T> implements ListAdapter {
 
 
 
-        refreshView = new RefreshView(mActivity);
-        refreshView.setBackgroundColor(0x08000000);
-
-
-
-
-
     }
 
-
-    private class RefreshView extends View{
-
-        public RefreshView(Context context) {
-            super(context);
-            getViewTreeObserver().addOnPreDrawListener(onPreDrawListener);
-
-            ProgressBar bar = null;
-        }
-
-        private int mFixedHei=120;
-
-        ViewTreeObserver.OnPreDrawListener onPreDrawListener = new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                ListView listView = (ListView) refreshView.getParent();
-                if(listView==null) return true;                                                                   //view未绑定 什么都不做
-                int firstPosition = listView.getFirstVisiblePosition();
-                View firstView = listView.getChildAt(0);
-                if(firstPosition!=0 || firstView.getTop()!=0){
-                    if(mFixedHei!=120){
-                        mFixedHei = 120;
-                        requestLayout();
-                        return false;
-                    }
-                }else {
-                    if(mFixedHei!=0) {
-                        mFixedHei = 0;
-                        requestLayout();
-                        return false;
-                    }
-                }
-                return true;
-            }
-        };
-
-
-        @Override
-        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec,heightMeasureSpec);
-            setMeasuredDimension(getMeasuredWidth(), mFixedHei);
-        }
-
-        ValueAnimator animator;
-        Paint circlePaint;
-        int canvasWei;
-        int canvasHei;
-
-        int ballCount = 8;
-        float divide;
-
-        @Override
-        protected void onAttachedToWindow() {
-            super.onAttachedToWindow();
-            if(animator!=null && animator.isRunning()){
-                animator.cancel();
-            }
-            circlePaint = new Paint();
-            circlePaint.setColor(0x99000000);
-            circlePaint.setStrokeWidth(4);
-
-            animator = ValueAnimator.ofFloat(0,1);
-            animator.setDuration(2000);
-            animator.setRepeatCount(30);
-
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    divide = 8*((System.currentTimeMillis()%3000)-1500)/3000f;
-                    invalidate();
-                }
-            });
-            animator.start();
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-
-            for(int i =0 ;i <ballCount;i++){
-                float wei = 4*(1f*i/ballCount -0.5f) + divide;
-                wei =  canvasWei/2 +getSplit(wei)*canvasWei*0.08f ;
-                canvas.drawCircle(wei,canvasHei/2,8,circlePaint);
-            }
-        }
-
-
-        private float getSplit(float value){
-            int positive = value>=0 ? 1 : -1;                                 //保存符号 判断正负
-            value = Math.abs(value);
-            if(value<=1) return value*positive;
-            return (float)Math.pow(value,2) * positive;
-        }
-
-
-
-        @Override
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            super.onLayout(changed, left, top, right, bottom);
-            canvasWei = right-left;
-            canvasHei = bottom-top;
-        }
-
-
-
-
-
-
-    }
-
-
-    private class  my extends ProgressBar{
-        @Override
-        public void setProgressDrawable(Drawable d) {
-            super.setProgressDrawable(d);
-        }
-
-        public my(Context context) {
-            super(context);
-        }
-
-
-    }
 
 
     @Override
@@ -240,18 +101,18 @@ public class MultiAdapter<T> implements ListAdapter {
 
     @Override
     public int getCount() {
-        return mDataList.size() + 1;
+        return mDataList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        if (position == mDataList.size()) return refreshView;
+     //   if (position == mDataList.size()) return mSwipeControl;
         return mDataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        if (position == mDataList.size()) return refreshView.hashCode();
+     //   if (position == mDataList.size()) return mSwipeControl.hashCode();
         return mDataList.get(position).hashCode();
     }
 
@@ -263,8 +124,7 @@ public class MultiAdapter<T> implements ListAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        if (position == mDataList.size()) return refreshView;
+    //    if (position == mDataList.size()) return mSwipeControl.getSwipeHead();
 
         ViewHolder holder;
         if (convertView == null) {
