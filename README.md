@@ -37,10 +37,10 @@ dependencies {
 **设置支持4种刷新模式**   
 
 ```
-         (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
-         (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH)) 只支持下拉刷新 
-         (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
-         (SWIPE_NONE == SwipeModel.SWIPE_NONE）都不支持
+(BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
+(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH)) 只支持下拉刷新 
+(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
+(SWIPE_NONE == SwipeModel.SWIPE_NONE）都不支持
 ```
 **note**  
 ```
@@ -50,4 +50,5 @@ dependencies {
 ```
 
 ### SwipeRefresh 下拉刷新效果图
+![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif "github")  
 ![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif "github")  
