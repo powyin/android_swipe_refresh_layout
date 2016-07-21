@@ -34,7 +34,7 @@ dependencies {
             <!--android:layout_height="match_parent"/>-->
     </com.powyin.scroll.widget.SwipeRefresh>
     
-**设置支持4种模式**  (&#x0020 (&#x0020 Xml app:fresh_model</tag></tag>SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)
+**设置支持4种模式**  (&#x0020) (&#x0020 Xml app:fresh_model</tag></tag>SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)
 
 ```
        (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
