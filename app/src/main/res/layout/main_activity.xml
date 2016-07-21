@@ -49,7 +49,7 @@
         android:id = "@+id/re"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
+        app:fresh_model="SWIPE_NONE"
         >
         <ListView
             android:id="@+id/my_list"
