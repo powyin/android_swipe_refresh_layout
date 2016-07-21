@@ -39,9 +39,9 @@ dependencies {
             <!--android:layout_height="match_parent"/>-->
     </com.powyin.scroll.widget.SwipeRefresh>
     
-#### app:fresh_model=“BOTH”  定义4种支持类型  
-#### (BOTH) 同时支持下拉刷新与上拉加载  (ONLY_REFRESH) 只支持下拉刷新 
-#### (ONLY_REFRESH) 只支持上拉加载 （SWIPE_NONE）都不支持
+#### Xml 设置支持4种模式 或者 SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 设置支持模式
+(BOTH) 同时支持下拉刷新与上拉加载  (ONLY_REFRESH) 只支持下拉刷新 
+(ONLY_REFRESH) 只支持上拉加载 （SWIPE_NONE）都不支持
 #### note : 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
 ### MuilpAdapter 上拉加载更多 效果图
 
