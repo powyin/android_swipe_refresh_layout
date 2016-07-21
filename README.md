@@ -35,7 +35,7 @@ dependencies {
             <!--android:layout_height="match_parent"/>-->
     </com.powyin.scroll.widget.SwipeRefresh>
     
-*设置支持4种模式      Xml app:fresh_model  SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)
+设置支持4种模式          Xml app:fresh_model            SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)
 
 ```
        (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
@@ -43,7 +43,7 @@ dependencies {
        (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
        (SWIPE_NONE == SwipeModel.SWIPE_NONE）都不支持
 ```
-*note: 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
+note: 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
 
 
 ### MuilpAdapter   ListView 多种类型快速展示 
