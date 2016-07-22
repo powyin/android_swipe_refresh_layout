@@ -7,7 +7,7 @@ dependencies {
 
 
 # SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-# SwipeNest 垂直布局多个NestScrollChilder子类并实现下拉刷新 
+# SwipeNest 垂直布局多个NestScrollChilder 实现下拉刷新 
 # MuilpAdapter 快速实现 ListView 多种类型展示 
 
 
