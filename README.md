@@ -6,7 +6,7 @@
 # MuilpAdapter 快速实现 ListView 多种类型展示 
 
 
-### SwipeRefresh 
+
 |刷新|下拉加载获取新数据|上拉加载数据全部获得|
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
