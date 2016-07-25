@@ -12,10 +12,11 @@ import com.powyin.scroll.R;
 /**
  * Created by powyin on 2016/7/2.
  */
-public class SwipeControlImp implements SwipeControl {
+public class SwipeControlStyleNormal implements SwipeControl {
     private Context mContent;
 
     private View headView;
+    private View overHead;
     private CircleViewBac statusPre;
     private ImageView statusLoad;
     private ImageView statusComplete;
@@ -25,16 +26,17 @@ public class SwipeControlImp implements SwipeControl {
     private LoadProgressBar loadProgressBar;
     private TextView textLoad;
 
-    SwipeControlImp(Context context) {
+    SwipeControlStyleNormal(Context context) {
         this.mContent = context;
         LayoutInflater inflater = LayoutInflater.from(mContent);
-        this.headView = inflater.inflate(R.layout.powyin_scroll_default_head_swipe, null);
+        this.headView = inflater.inflate(R.layout.powyin_scroll_style_normal_head_swipe, null);
+        overHead = headView.findViewById(R.id.swipe_over_head);
         statusPre = (CircleViewBac) headView.findViewById(R.id.swipe_image_info);
         statusLoad = (ImageView) headView.findViewById(R.id.swipe_refresh);
         statusComplete = (ImageView) headView.findViewById(R.id.swipe_ok);
         textInfo = (TextView) headView.findViewById(R.id.swipe_text_info);
 
-        this.footView = inflater.inflate(R.layout.powyin_scroll_default_loading_more,null);
+        this.footView = inflater.inflate(R.layout.powyin_scroll_style_normal_loading_more,null);
         loadProgressBar = (LoadProgressBar) footView.findViewById(R.id.powyin_scroll_load_bar);
         textLoad = (TextView)footView.findViewById(R.id.powyin_scroll_load_more);
     }
@@ -51,7 +53,7 @@ public class SwipeControlImp implements SwipeControl {
 
     @Override
     public int getOverScrollHei() {
-        return 300;
+        return overHead.getHeight();
     }
 
     @Override

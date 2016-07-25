@@ -27,7 +27,6 @@ class CircleViewBac extends View {
     BitmapDrawable bitmapDrawablePre;
     Paint arcPaint;
     RectF arcRectF;
-    int padding = 2;
     int wei;
     int hei;
     float progress;
@@ -45,7 +44,7 @@ class CircleViewBac extends View {
         wei = w;
         hei = h;
         bitmapDrawablePre.setBounds(0, 0, wei, hei);
-        arcRectF = new RectF(padding, padding, w - padding, h - padding);
+        arcRectF = new RectF(0, 0, w , h );
         arcPaint = new Paint();
         arcPaint.setStrokeWidth(2);
         arcPaint.setStyle(Paint.Style.STROKE);
@@ -67,7 +66,7 @@ class CircleViewBac extends View {
 
     // 画图
     private void drawImage(Canvas canvas) {
-        int sweepAngle = progress <= 0.61f ? 0 : progress >= 1 ? 180 : Math.min(180, (int) (180 * (progress - 0.61f) * 2.4f));
+        int sweepAngle = progress <= 0 ? 0 : progress >= 1 ? 180 : Math.min(180, (int) (180 * progress - 0.61f));
         bitmapDrawablePre.setBounds(0, 0, wei, hei);
         canvas.save();
         canvas.rotate(sweepAngle, wei / 2, hei / 2);

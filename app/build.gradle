@@ -27,8 +27,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
 
-//    compile project(path: ':scroll')
+    compile project(path: ':scroll')
 
-    compile 'com.github.powyin:scroll:1.1.3'
+//    compile 'com.github.powyin:scroll:1.1.3'
 
 }

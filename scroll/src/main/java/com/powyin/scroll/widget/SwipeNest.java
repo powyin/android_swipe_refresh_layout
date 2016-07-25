@@ -52,7 +52,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     protected void onFinishInflate() {
         super.onFinishInflate();
         mScroller = ScrollerCompat.create(getContext());
-        mSwipeControl = new SwipeControlImp(getContext());
+        mSwipeControl = new SwipeControlStyleNormal(getContext());
         addView(mSwipeControl.getSwipeHead(), 0);
         View lastView = getChildAt(getChildCount() - 1);
         if (lastView instanceof AbsListView) {
@@ -221,7 +221,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
             lastIndexView.layout(childLeft, childTop, childRight, childTop + bottom);
             childTop += bottom + lp.bottomMargin;
         }
-        scrollY_Down = childTop;
+
+        scrollY_Down = childTop- (bottom-top);
     }
 
     @Override
@@ -244,21 +245,29 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
     private int offSetChildrenPreLocation(int deltaY) {
         if (deltaY == 0) return 0;
 
-        int maxScrollY = scrollY_Down - getHeight();
-        int minScrollY = scrollY_Up - mSwipeControl.getOverScrollHei();
+      //  int maxScrollY = scrollY_Down - getHeight();
+      //  int minScrollY = scrollY_Up - mSwipeControl.getOverScrollHei();
+
+        int middleHei = scrollY_Up == 0 ? 0 : scrollY_Up + mSwipeControl.getOverScrollHei();
+
         int currentScrollY = getScrollY();
 
-        if (deltaY < 0 && currentScrollY < scrollY_Up && currentScrollY > minScrollY) {                                              //平滑过度下拉刷新的进度变化
-            deltaY = (int) (deltaY * Math.pow((currentScrollY - minScrollY) * 1f / mSwipeControl.getOverScrollHei(), 2.5));
+        if (currentScrollY < middleHei) {                                                                                              //平滑过度下拉刷新的进度变化
+            deltaY = (int) (deltaY * Math.pow((currentScrollY - scrollY_Up) *
+                    1f / mSwipeControl.getOverScrollHei(), 1));
         }
-
-        if ((currentScrollY >= minScrollY && currentScrollY < maxScrollY) ||                                                          //提供对多个View的支持
-                (getChildCount() == 2 && currentScrollY == 0 && !getChildAt(1).canScrollVertically(deltaY))) {                        //提供对单个View的支持
+        if ((currentScrollY >= scrollY_Up && currentScrollY < scrollY_Down) ||                                                          //提供对多个View的支持
+                (getChildCount() == 2 && currentScrollY == 0 && !getChildAt(1).canScrollVertically(deltaY))) {                         //提供对单个View的支持
 
 
             int willTo = currentScrollY + deltaY;
-            willTo = Math.min(willTo, maxScrollY);
-            willTo = Math.max(willTo, minScrollY);
+            willTo = Math.min(willTo, scrollY_Down);
+            willTo = Math.max(willTo, scrollY_Up);
+
+            if(willTo == currentScrollY){
+                return 0;
+            }
+
             scrollTo(0, willTo);
 
             if (willTo < 0 && isFreshComplete && !isFreshContinue) {                                                                 //刷新内部状态
@@ -288,12 +297,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
 
         if (deltaY == 0) return 0;
 
-        int maxScrollY = scrollY_Down - getHeight();
         int currentScrollY = getScrollY();
 
         if (currentScrollY >= 0) {
             int willTo = currentScrollY + deltaY;
-            willTo = Math.min(willTo, maxScrollY);
+            willTo = Math.min(willTo, scrollY_Down);
             willTo = Math.max(willTo, 0);
             scrollTo(0, willTo);
             return (willTo - currentScrollY);

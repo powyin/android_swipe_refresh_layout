@@ -28,7 +28,7 @@ public interface SwipeControl {
     View getSwipeHead();
     // 底部加载View
     View getSwipeFoot();
-    // 头部刷新View过度拉伸尺度
+    // 头部刷新View过度拉伸尺度      getSwipeHead得到的View得到高度后  减去此高度后  为松开刷新的实际高度
     int getOverScrollHei();
     // 状态改变回掉
     void onSwipeStatue(SwipeStatus status, int visibleHei, int wholeHei);

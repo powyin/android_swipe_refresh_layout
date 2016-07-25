@@ -5,7 +5,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="40dp">
 
         <com.powyin.scroll.widget.LoadProgressBar
             android:id="@+id/powyin_scroll_load_bar"

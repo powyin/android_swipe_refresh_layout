@@ -25,16 +25,14 @@ class LoadProgressBar extends View {              //刷新视图
     }
     public LoadProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mFixedHei = ViewUtils.dip2px(context,50);
         circlePaint = new Paint();
         circlePaint.setColor(0x99000000);
         circlePaint.setStrokeWidth(4);
     }
-    private int mFixedHei;
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec,heightMeasureSpec);
-        setMeasuredDimension(getMeasuredWidth(), mFixedHei);
+        setMeasuredDimension(getMeasuredWidth(), ViewUtils.dip2px(getContext(),40));
     }
 
     ValueAnimator animator;
@@ -44,8 +42,6 @@ class LoadProgressBar extends View {              //刷新视图
 
     int ballCount = 8;
     float divide;
-
-
 
     @Override
     protected void onDraw(Canvas canvas) {

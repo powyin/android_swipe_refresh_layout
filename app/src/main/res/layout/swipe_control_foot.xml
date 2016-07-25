@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/text_load_more_progress"
+            android:text="加载中"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/text_load_more_over"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="已经全部加载完毕"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textColor="#ff777777" />
+
+    </FrameLayout>
+
+</FrameLayout>
