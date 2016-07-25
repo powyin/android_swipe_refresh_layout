@@ -13,7 +13,7 @@
 
 
 
-### How to use
+### how to use
 
       <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
