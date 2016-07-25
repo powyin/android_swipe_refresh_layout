@@ -53,7 +53,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.1.3'
+  compile 'com.github.powyin:scroll:1.1.4'
 }
 ```
 
