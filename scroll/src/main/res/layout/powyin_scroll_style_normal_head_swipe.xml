@@ -9,7 +9,7 @@
     
     <View
         android:layout_width="match_parent"
-        android:layout_height="7dp"
+        android:layout_height="6dp"
         />
     
     <FrameLayout
@@ -24,8 +24,8 @@
 
         <ImageView
             android:id="@+id/powyin_swipe_refresh"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/powyin_scroll_progress_circle"
             android:layout_gravity="center" />
 
@@ -42,9 +42,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#7c7c7c"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:text="松开刷新"
         android:gravity="center"
-        android:textSize="14sp" />
+        android:textSize="13sp" />
 </LinearLayout>

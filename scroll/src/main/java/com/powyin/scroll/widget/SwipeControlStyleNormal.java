@@ -75,7 +75,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
                 statusComplete.setVisibility(View.INVISIBLE);
-                float radio = 1f * (visibleHei - textInfo.getHeight()) / statusPre.getHeight();
+                float radio = 2f * (visibleHei - textInfo.getHeight() - statusPre.getHeight() / 1.35f) / statusPre.getHeight();
                 statusPre.setProgress(radio);
                 if (!textInfo.getText().toString().equals("上拉刷新")) {
                     textInfo.setText("上拉刷新");

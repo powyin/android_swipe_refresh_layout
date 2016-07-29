@@ -40,8 +40,6 @@ public class MultiAdapter<T> implements ListAdapter {
 
     private Activity mActivity;
 
-    // private SwipeControl mSwipeControl;
-
     private List<T> mDataList = new ArrayList<>();
 
     private Map<T, ViewHolder> mDataToViewHolder = new HashMap<>();
