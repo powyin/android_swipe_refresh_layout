@@ -32,7 +32,9 @@ dependencies {
         android:id = "@+id/re"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fresh_model="BOTH" >
+         <!--app:fresh_model="ONLY_REFRESH"                                    枚举类型 设置支持刷新模式-->
+        app:fresh_model="BOTH"
+        >
         <ListView
             android:id="@+id/my_list"
             android:background="#ffffffff"
@@ -225,6 +227,15 @@ SwipeNest
 **SwipeRefresh 支持4种刷新模式**   
 
 ```
+    <declare-styleable name="SwipeRefresh">
+        <attr name="fresh_model">
+            <enum name="BOTH" value="0" />
+            <enum name="ONLY_REFRESH" value="1" />
+            <enum name="ONLY_LOADINN" value="2" />
+            <enum name="SWIPE_NONE" value="3" />
+        </attr>
+    </declare-styleable>
+
 (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH)) 只支持下拉刷新 
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
