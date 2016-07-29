@@ -84,7 +84,7 @@ dependencies {
       </com.powyin.scroll.widget.SwipeNest>
     
     
-**自定义刷新UI**   
+### 自定义刷新UI
 
 ```
 调用swipeRefresh.setSwipeControl(SwipeControl control) 或者 SwipeNest.setSwipeControl(SwipeControl control);
@@ -192,7 +192,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
 
 ```
 
-**设置刷新监听与刷新结果处理**   
+### 设置刷新监听与刷新结果处理
 
 swipeRefresh
 
@@ -224,9 +224,15 @@ SwipeNest
         
         swipeNest.finishRefresh();              //下拉刷新完成
 
-**SwipeRefresh 支持4种刷新模式**   
+
+### SwipeRefresh设置刷新模式
 
 ```
+
+SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)          
+
+app:fresh_model=“ONLY_REFRESH”                                     
+
     <declare-styleable name="SwipeRefresh">
         <attr name="fresh_model">
             <enum name="BOTH" value="0" />
@@ -236,20 +242,21 @@ SwipeNest
         </attr>
     </declare-styleable>
 
-(BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
-(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH)) 只支持下拉刷新 
-(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
-(SWIPE_NONE == SwipeModel.SWIPE_NONE）都不支持
+(BOTH = SwipeModel.SWIPE_BOTH)                    同时支持下拉刷新与上拉加载  
+(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH))  只支持下拉刷新 
+(ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN)   只支持上拉加载 
+(SWIPE_NONE == SwipeModel.SWIPE_NONE）            都不支持
 ```
 **注意**  
 ```
-  一：只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
-  二：通过Xml app:fresh_model或者SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 定义SwipeRefresh刷新模式
+  一：SwipeRefresh 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
+  二：SwipeRefresh 调用finishRefresh()后；将自动触发setIsLoadComplete(false)；如果不需要， 可设反；
   三：SwipeNest 不支持上拉加载; 请用其他方式实现  比如：
           (1) Adater的getView(getView(int postion) postion 为数据列表的最后一项时可以进行上拉加载操作）
           (2) 设置ViewTreeObserver.addOnGlobalLayoutListener 监听当ViewcanScrollVertically（-1） 与 Adater.getCount() 判断当前是否可以开始上拉加载；
           (3) 直接使用RecyleView();
   四：SwipeNest 目前只支持NestedScrollingChild继承类作为子View；
+  五：需要熟悉ListAdapter的Api；
   
 ```
 
