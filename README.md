@@ -8,7 +8,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.2.1'
+  compile 'com.github.powyin:scroll:1.2.5'
 }
 ```
 
