@@ -5,6 +5,13 @@
 ## SwipeNest 垂直布局一个或多个NestScrollChilder 实现下拉刷新(不支持下拉加载） 
 ## MuilpAdapter 快速实现 ListView 多种类型展示 
 
+Add Gradle dependency:
+```gradle
+dependencies {
+  compile 'com.github.powyin:scroll:1.2.1'
+}
+```
+
 ### SwipeRefresh UI
 
 |刷新（可自定义）|下拉加载获取新数据|上拉加载数据全部获得|
@@ -193,7 +200,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN) 只支持上拉加载 
 (SWIPE_NONE == SwipeModel.SWIPE_NONE）都不支持
 ```
-**note**  
+**注意**  
 ```
   一：只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
   二：通过Xml app:fresh_model或者SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 定义SwipeRefresh刷新模式
@@ -205,12 +212,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
   
 ```
 
-Add Gradle dependency:
-```gradle
-dependencies {
-  compile 'com.github.powyin:scroll:1.2.1'
-}
-```
+
 
 
 
