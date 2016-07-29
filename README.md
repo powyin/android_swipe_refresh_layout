@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-## SwipeNest 垂直布局多个NestScrollChilder 实现下拉刷新(不支持下拉加载） 
+## SwipeNest 垂直布局一个或多个NestScrollChilder 实现下拉刷新(不支持下拉加载） 
 ## MuilpAdapter 快速实现 ListView 多种类型展示 
 
 ### SwipeRefresh UI
@@ -16,7 +16,7 @@
 
 |刷新（可自定义）|平滑多个NestScrollChilder之间的滚动|自定义刷新|
 |---|---|----
-|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
+|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_1.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_2.gif)|
 
 
 ### how to use  SwipeRefresh
@@ -43,26 +43,36 @@
     
 ### how to use  SwipeNest 
 
-      <com.powyin.scroll.widget.SwipeRefresh
-        android:id = "@+id/re"
+      <com.powyin.scroll.widget.SwipeNest
+        android:id="@+id/nest_combine"
+        android:background="#e5e5e5"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:fresh_model="BOTH" >
-        <ListView
-            android:id="@+id/my_list"
-            android:background="#ffffffff"
+        android:layout_height="match_parent" >
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#b7b7b7"
+                android:clickable="true">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:src="@drawable/pic_4"
+                    android:scaleType="centerCrop"  />
+            </FrameLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+        <android.support.v7.widget.RecyclerView
+            android:background="#ffffff"
+            android:id="@+id/my_recycle"
+            android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-        <!--或者是RecyclerView-->
-        <!--或者 Any View-->
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:background="#ffffff"-->
-            <!--android:id="@+id/my_recycle"-->
-            <!--android:overScrollMode="never"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
-    </com.powyin.scroll.widget.SwipeRefresh>
-    
+      </com.powyin.scroll.widget.SwipeNest>
     
     
 **自定义刷新UI**   
