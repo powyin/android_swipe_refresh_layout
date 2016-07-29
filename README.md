@@ -1,19 +1,47 @@
 
 
 
-# SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-# SwipeNest 垂直布局多个NestScrollChilder 实现下拉刷新 
-# MuilpAdapter 快速实现 ListView 多种类型展示 
+## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
+## SwipeNest 垂直布局多个NestScrollChilder 实现下拉刷新(不支持下拉加载） 
+## MuilpAdapter 快速实现 ListView 多种类型展示 
 
 ### SwipeRefresh UI
 
-|刷新|下拉加载获取新数据|上拉加载数据全部获得|
+|刷新（可自定义）|下拉加载获取新数据|上拉加载数据全部获得|
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
 
 
+### SwipeNest UI
 
-### how to use
+|刷新（可自定义）|平滑多个NestScrollChilder之间的滚动|自定义刷新|
+|---|---|----
+|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
+
+
+### how to use  SwipeRefresh
+
+      <com.powyin.scroll.widget.SwipeRefresh
+        android:id = "@+id/re"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:fresh_model="BOTH" >
+        <ListView
+            android:id="@+id/my_list"
+            android:background="#ffffffff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <!--或者是RecyclerView-->
+        <!--或者 Any View-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:background="#ffffff"-->
+            <!--android:id="@+id/my_recycle"-->
+            <!--android:overScrollMode="never"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+    </com.powyin.scroll.widget.SwipeRefresh>
+    
+### how to use  SwipeNest 
 
       <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
@@ -40,7 +68,7 @@
 **自定义刷新UI**   
 
 ```
-调用swipeRefresh.setSwipeControl(SwipeControl control);
+调用swipeRefresh.setSwipeControl(SwipeControl control) 或者 SwipeNest.setSwipeControl(SwipeControl control);
 
 继承范例
 public class SwipeControlStyle_Horizontal implements SwipeControl {
@@ -78,6 +106,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
         return headView;
     }
 
+    // SwipeRefresh(必须 getSwipeFoot() != null )  SwipeNest(可以 getSwipeFoot() == null 其不实现上拉加载)
     // 刷新尾部
     @Override
     public View getSwipeFoot() {
@@ -129,11 +158,11 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
                 }
                 break;
 
-            case SWIPE_FOOT_LOADING:          // 上拉加载 进行中
+            case SWIPE_FOOT_LOADING:          // 上拉加载 进行中               (如果是给SwipeNest使用  忽略)
                 loadProgressBar.setVisibility(View.VISIBLE);
                 textLoad.setVisibility(View.GONE);
                 break;
-            case SWIPE_FOOT_COMPLETE:        // 上拉加载 已经拉取全部数据
+            case SWIPE_FOOT_COMPLETE:        // 上拉加载 已经拉取全部数据      (如果是给SwipeNest使用  忽略)
                 loadProgressBar.setVisibility(View.GONE);
                 textLoad.setVisibility(View.VISIBLE);
                 break;
@@ -145,11 +174,8 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
        
 
 ```
-
-
-
     
-**设置支持4种刷新模式**   
+**SwipeRefresh 支持4种刷新模式**   
 
 ```
 (BOTH = SwipeModel.SWIPE_BOTH) 同时支持下拉刷新与上拉加载  
@@ -159,15 +185,20 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
 ```
 **note**  
 ```
-  只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
-  通过Xml app:fresh_model或者SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 定义刷新模式
+  一：只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
+  二：通过Xml app:fresh_model或者SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model) 定义SwipeRefresh刷新模式
+  三：SwipeNest 不支持上拉加载; 请用其他方式实现  比如：
+          (1) Adater的getView(getView(int postion) postion 为数据列表的最后一项时可以进行上拉加载操作）
+          (2) 设置ViewTreeObserver.addOnGlobalLayoutListener 监听当ViewcanScrollVertically（-1） 与 Adater.getCount() 判断当前是否可以开始上拉加载；
+          (3) 直接使用RecyleView();
+  四：SwipeNest 目前只支持NestedScrollingChild继承类作为子View；
   
 ```
 
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.1.4'
+  compile 'com.github.powyin:scroll:1.2.1'
 }
 ```
 
