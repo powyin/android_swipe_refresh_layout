@@ -247,7 +247,7 @@ app:fresh_model=“ONLY_REFRESH”
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN)   只支持上拉加载 
 (SWIPE_NONE == SwipeModel.SWIPE_NONE）            都不支持
 ```
-**注意**  
+### 注意
 ```
   一：SwipeRefresh 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
   二：SwipeRefresh 调用finishRefresh()后；将自动触发setIsLoadComplete(false)；如果不需要， 可设反；
@@ -260,6 +260,10 @@ app:fresh_model=“ONLY_REFRESH”
   
 ```
 
+### contact me
+```
+  QQ 1217881964
+```
 
 
 
