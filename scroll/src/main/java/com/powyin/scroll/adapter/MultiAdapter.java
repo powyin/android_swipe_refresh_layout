@@ -40,7 +40,7 @@ public class MultiAdapter<T> implements ListAdapter {
 
     private Activity mActivity;
 
-   // private SwipeControl mSwipeControl;
+    // private SwipeControl mSwipeControl;
 
     private List<T> mDataList = new ArrayList<>();
 
@@ -78,9 +78,7 @@ public class MultiAdapter<T> implements ListAdapter {
         }
 
 
-
     }
-
 
 
     @Override
@@ -106,13 +104,13 @@ public class MultiAdapter<T> implements ListAdapter {
 
     @Override
     public Object getItem(int position) {
-     //   if (position == mDataList.size()) return mSwipeControl;
+        //   if (position == mDataList.size()) return mSwipeControl;
         return mDataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-     //   if (position == mDataList.size()) return mSwipeControl.hashCode();
+        //   if (position == mDataList.size()) return mSwipeControl.hashCode();
         return mDataList.get(position).hashCode();
     }
 
@@ -124,7 +122,7 @@ public class MultiAdapter<T> implements ListAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-    //    if (position == mDataList.size()) return mSwipeControl.getSwipeHead();
+        //    if (position == mDataList.size()) return mSwipeControl.getSwipeHead();
 
         ViewHolder holder;
         if (convertView == null) {
@@ -208,9 +206,9 @@ public class MultiAdapter<T> implements ListAdapter {
         notifyDataSetChanged();
     }
 
-    public void deleteLast(){
+    public void deleteLast() {
 
-        mDataList.remove(mDataList.size()-1);
+        mDataList.remove(mDataList.size() - 1);
         notifyDataSetChanged();
     }
 

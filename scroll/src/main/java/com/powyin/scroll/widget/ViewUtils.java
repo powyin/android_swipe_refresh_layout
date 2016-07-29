@@ -1,4 +1,5 @@
 package com.powyin.scroll.widget;
+
 import android.animation.Animator;
 import android.content.Context;
 
@@ -27,7 +28,6 @@ class ViewUtils {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
-
 
 
 }

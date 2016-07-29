@@ -24,14 +24,16 @@ class CircleViewBac extends View {
         super(context, attrs, defStyleAttr);
         bitmapDrawablePre = (BitmapDrawable) context.getResources().getDrawable(R.drawable.powyin_scroll_progress_pre);
     }
+
     BitmapDrawable bitmapDrawablePre;
     Paint arcPaint;
     RectF arcRectF;
     int wei;
     int hei;
     float progress;
+
     public void setProgress(float progress) {
-        if(this.progress!=progress){
+        if (this.progress != progress) {
             this.progress = progress;
             invalidate();
         }
@@ -44,7 +46,7 @@ class CircleViewBac extends View {
         wei = w;
         hei = h;
         bitmapDrawablePre.setBounds(0, 0, wei, hei);
-        arcRectF = new RectF(0, 0, w , h );
+        arcRectF = new RectF(0, 0, w, h);
         arcPaint = new Paint();
         arcPaint.setStrokeWidth(2);
         arcPaint.setStyle(Paint.Style.STROKE);

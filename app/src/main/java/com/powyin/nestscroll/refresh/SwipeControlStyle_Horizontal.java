@@ -35,11 +35,11 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
         this.mContent = context;
         LayoutInflater inflater = LayoutInflater.from(mContent);
         this.headView = inflater.inflate(R.layout.swipe_control_head, null);
-        overHead = headView.findViewById(R.id.swipe_over_head);
-        statusPre = (ProgressBar) headView.findViewById(R.id.swipe_image_info);
+        overHead = headView.findViewById(R.id.over_head);
+        statusPre = (ProgressBar) headView.findViewById(R.id.image_info);
 
-        statusComplete = (ImageView) headView.findViewById(R.id.swipe_ok);
-        textInfo = (TextView) headView.findViewById(R.id.swipe_text_info);
+        statusComplete = (ImageView) headView.findViewById(R.id.ok);
+        textInfo = (TextView) headView.findViewById(R.id.text_info);
 
         this.footView = inflater.inflate(R.layout.swipe_control_foot,null);
         loadProgressBar = (TextView) footView.findViewById(R.id.text_load_more_progress);

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
-    >
+    android:layout_height="wrap_content">
     <View
-        android:id="@+id/swipe_over_head"
+        android:id="@+id/powyin_swipe_over_head"
         android:layout_width="match_parent"
-        android:layout_height="150dp" />
+        android:layout_height="100dp" />
     
     <View
         android:layout_width="match_parent"
@@ -19,20 +17,20 @@
         android:layout_height="30dp"
         >
         <com.powyin.scroll.widget.CircleViewBac
-            android:id="@+id/swipe_image_info"
+            android:id="@+id/powyin_swipe_image_info"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_gravity="center" />
 
         <ImageView
-            android:id="@+id/swipe_refresh"
+            android:id="@+id/powyin_swipe_refresh"
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:src="@drawable/powyin_scroll_progress_circle"
             android:layout_gravity="center" />
 
         <ImageView
-            android:id="@+id/swipe_ok"
+            android:id="@+id/powyin_swipe_ok"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:src="@drawable/powyin_scroll_progress_ok"
@@ -40,7 +38,7 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/swipe_text_info"
+        android:id="@+id/powyin_swipe_text_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#7c7c7c"

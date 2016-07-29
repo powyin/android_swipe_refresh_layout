@@ -5,7 +5,7 @@
     android:background="#22878787"
     >
     <ImageView
-        android:id="@+id/swipe_over_head"
+        android:id="@+id/over_head"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:scaleType="centerCrop"
@@ -20,7 +20,7 @@
         android:paddingBottom="8dp"
         >
         <TextView
-            android:id="@+id/swipe_text_info"
+            android:id="@+id/text_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#525252"
@@ -36,11 +36,11 @@
         <FrameLayout
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_toLeftOf="@+id/swipe_text_info"
+            android:layout_toLeftOf="@+id/text_info"
             android:layout_centerVertical="true">
 
             <ProgressBar
-                android:id="@+id/swipe_image_info"
+                android:id="@+id/image_info"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
@@ -48,7 +48,7 @@
 
 
             <ImageView
-                android:id="@+id/swipe_ok"
+                android:id="@+id/ok"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/pic_2"

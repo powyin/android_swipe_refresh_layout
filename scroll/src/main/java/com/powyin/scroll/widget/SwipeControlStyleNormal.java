@@ -30,15 +30,15 @@ public class SwipeControlStyleNormal implements SwipeControl {
         this.mContent = context;
         LayoutInflater inflater = LayoutInflater.from(mContent);
         this.headView = inflater.inflate(R.layout.powyin_scroll_style_normal_head_swipe, null);
-        overHead = headView.findViewById(R.id.swipe_over_head);
-        statusPre = (CircleViewBac) headView.findViewById(R.id.swipe_image_info);
-        statusLoad = (ImageView) headView.findViewById(R.id.swipe_refresh);
-        statusComplete = (ImageView) headView.findViewById(R.id.swipe_ok);
-        textInfo = (TextView) headView.findViewById(R.id.swipe_text_info);
+        overHead = headView.findViewById(R.id.powyin_swipe_over_head);
+        statusPre = (CircleViewBac) headView.findViewById(R.id.powyin_swipe_image_info);
+        statusLoad = (ImageView) headView.findViewById(R.id.powyin_swipe_refresh);
+        statusComplete = (ImageView) headView.findViewById(R.id.powyin_swipe_ok);
+        textInfo = (TextView) headView.findViewById(R.id.powyin_swipe_text_info);
 
-        this.footView = inflater.inflate(R.layout.powyin_scroll_style_normal_loading_more,null);
+        this.footView = inflater.inflate(R.layout.powyin_scroll_style_normal_loading_more, null);
         loadProgressBar = (LoadProgressBar) footView.findViewById(R.id.powyin_scroll_load_bar);
-        textLoad = (TextView)footView.findViewById(R.id.powyin_scroll_load_more);
+        textLoad = (TextView) footView.findViewById(R.id.powyin_scroll_load_more);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
                 statusComplete.setVisibility(View.INVISIBLE);
-                if(!textInfo.getText().toString().equals("松开刷新")){
+                if (!textInfo.getText().toString().equals("松开刷新")) {
                     textInfo.setText("松开刷新");
                 }
 
@@ -77,7 +77,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                 statusComplete.setVisibility(View.INVISIBLE);
                 float radio = 1f * (visibleHei - textInfo.getHeight()) / statusPre.getHeight();
                 statusPre.setProgress(radio);
-                if(!textInfo.getText().toString().equals("上拉刷新")){
+                if (!textInfo.getText().toString().equals("上拉刷新")) {
                     textInfo.setText("上拉刷新");
                 }
                 break;
@@ -88,7 +88,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                     statusLoad.setAnimation(AnimationUtils.loadAnimation(mContent, R.anim.powyin_scroll_rotale));
                 }
                 statusComplete.setVisibility(View.INVISIBLE);
-                if(!textInfo.getText().toString().equals("正在拼命刷新中")){
+                if (!textInfo.getText().toString().equals("正在拼命刷新中")) {
                     textInfo.setText("正在拼命刷新中");
                 }
                 break;
@@ -97,7 +97,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
                 statusComplete.setVisibility(View.VISIBLE);
-                if(!textInfo.getText().toString().equals("刷新成功")){
+                if (!textInfo.getText().toString().equals("刷新成功")) {
                     textInfo.setText("刷新成功");
                 }
                 break;
