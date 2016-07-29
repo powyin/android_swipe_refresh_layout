@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-## SwipeNest 垂直布局一个或多个NestScrollChilder 实现下拉刷新(不支持下拉加载） 
+## SwipeNest 垂直布局一个或多个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
 ## MuilpAdapter 快速实现 ListView 多种类型展示 
 
 Add Gradle dependency:
@@ -14,14 +14,14 @@ dependencies {
 
 ### SwipeRefresh UI
 
-|刷新（可自定义）|下拉加载获取新数据|上拉加载数据全部获得|
+|刷新（可自定义）|下拉加载获取新数据(可自定义)|上拉加载数据全部获得(可自定义)|
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
 
 
 ### SwipeNest UI
 
-|刷新（可自定义）|平滑多个NestScrollChilder之间的滚动|自定义刷新|
+|刷新（可自定义）|平滑多个NestScrollChilder之间的滚动|自定义刷新范例|
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_1.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_2.gif)|
 
@@ -188,10 +188,44 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
 
 }
 
-       
-
 ```
-    
+
+**设置 监听**   
+
+swipeRefresh设置刷新监听
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // 开始下拉刷新
+            }
+
+            @Override
+            public void onLoading() {
+                // 开始加载更多
+            }
+        });
+        
+swipeRefresh刷新结果处理
+
+        swipeRefresh.finishRefresh();            //下拉刷新完成
+        swipeRefresh.hiddenLoadMore();           //已经获取更多数据   隐藏上拉加载进度条
+        swipeRefresh.setIsLoadComplete(true);    //已经没有更多数据   全部数据已经获得
+        
+SwipeNest设置刷新监听
+
+        swipeNest.setOnRefreshListener(new SwipeNest.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //开始上拉刷新
+            }
+
+        });
+
+SwipeNest刷新结果处理
+
+        swipeNest.finishRefresh();              //下拉刷新完成
+
 **SwipeRefresh 支持4种刷新模式**   
 
 ```
