@@ -31,7 +31,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
                 swipeNest.setSwipeControl(new SwipeControlStyle_Horizontal(this));
                 break;
             case R.id.click_me_to_stop_head:
-                swipeNest.finishRefresh();
+                swipeNest.finishRefresh();            //下拉刷新完成
                 break;
         }
     }
@@ -49,6 +49,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
             @Override
             public void onRefresh() {
                 System.out.println("------------------------------------------------onRefresh----------------------->>>>>>>>");
+                //  开始下拉刷新
             }
 
         });

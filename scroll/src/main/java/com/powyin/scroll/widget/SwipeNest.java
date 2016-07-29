@@ -257,11 +257,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
         if (isFly && mScroller.isOverScrolled() && mScroller.getFinalY() == scrollY_Down) {
             if (mTarget instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) mTarget;
-                recyclerView.fling(0, (int) (mScroller.getCurrVelocity() * 0.5f));
+                recyclerView.fling(0, (int) (mScroller.getCurrVelocity() * 0.7f));
             }
             if (mTarget instanceof NestedScrollView) {
                 NestedScrollView nestedScrollView = (NestedScrollView) mTarget;
-                nestedScrollView.fling((int) (mScroller.getCurrVelocity() * 0.5f));
+                nestedScrollView.fling((int) (mScroller.getCurrVelocity() * 0.7f));
             }
         }
 
@@ -325,9 +325,10 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
         if (mIsTouchEventMode || mIsFreshComplete) return false;
         int scrollY = getScrollY();
         int middleHei = scrollY_Up != 0 ? scrollY_Up + mSwipeControl.getOverScrollHei() : 0;
-        stopAllScroll();
+
         boolean isOverProgress = scrollY < middleHei;
         if (isOverProgress) {
+            stopAllScroll();
             animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, middleHei);
             animationReBackToRefreshing.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -381,8 +382,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
 
         if (!mIsFreshComplete && getScrollY() == middleHei) return false;
 
-        stopAllScroll();
+
         if (scrollY < 0) {
+            stopAllScroll();
             animationReBackToTop = ValueAnimator.ofInt(scrollY, 0);
             animationReBackToTop.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -394,7 +396,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
 
             if (scrollY == middleHei) {
                 animationReBackToTop.setDuration(Math.abs(450 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
-                animationReBackToTop.setStartDelay(400);
+                animationReBackToTop.setStartDelay(450);
             } else {
                 animationReBackToTop.setDuration(260);
             }

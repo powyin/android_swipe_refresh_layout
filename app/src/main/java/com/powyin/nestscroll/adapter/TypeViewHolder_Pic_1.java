@@ -4,8 +4,9 @@ import android.app.Activity;
 
 import com.powyin.nestscroll.R;
 import com.powyin.nestscroll.net.DataModel;
-import com.powyin.scroll.adapter.MultiAdapter;
+import com.powyin.scroll.adapter.MultipleAdapter;
 import com.powyin.scroll.adapter.ViewHolder;
+
 
 /**
  * Created by powyin on 2016/7/21.
@@ -26,7 +27,7 @@ public class TypeViewHolder_Pic_1 extends ViewHolder<DataModel> {
     }
 
     @Override
-    public void loadData(MultiAdapter<? super DataModel> adapter, DataModel data) {
+    public void loadData(MultipleAdapter<? super DataModel> adapter, DataModel data) {
 
     }
 }

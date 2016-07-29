@@ -13,6 +13,8 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 
+import com.powyin.scroll.R;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -23,30 +25,29 @@ import java.util.Map;
 /**
  * Created by powyin on 2016/6/14.
  */
-public class MultiAdapter<T> implements ListAdapter {
+public class MultipleAdapter<T> implements ListAdapter {
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T, N extends T> MultiAdapter<N> getByClass(Activity activity, Class<? extends ViewHolder<? extends T>>... cla) {
+    public static <T, N extends T> MultipleAdapter<N> getByClass(Activity activity, Class<? extends ViewHolder<? extends T>>... cla) {
         Class<? extends ViewHolder>[] arrClass = new Class[cla.length + 1];
         System.arraycopy(cla, 0, arrClass, 0, cla.length);
         arrClass[arrClass.length - 1] = ErrorViewHolder.class;
-        return new MultiAdapter<>(activity, arrClass);
+        return new MultipleAdapter<>(activity, arrClass);
     }
 
     private ViewHolder[] holderInstances;                                                                          // viewHolder 类实现实例
     private Class<? extends ViewHolder>[] holderClasses;                                                           // viewHolder class类
     private Class[] holderGenericDataClass;                                                                        // viewHolder 携带泛型
-
     private Activity mActivity;
-
     private List<T> mDataList = new ArrayList<>();
+    private boolean mShowError = true;
 
     private Map<T, ViewHolder> mDataToViewHolder = new HashMap<>();
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
 
-    public MultiAdapter(Activity activity, Class<? extends ViewHolder>[] cla) {
+    public MultipleAdapter(Activity activity, Class<? extends ViewHolder>[] cla) {
         this.mActivity = activity;
 
         holderClasses = cla;
@@ -71,7 +72,7 @@ public class MultiAdapter<T> implements ListAdapter {
                 holderInstances[i] = holderClasses[i].getConstructor(Activity.class).newInstance(mActivity);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法");
+                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
             }
         }
 
@@ -81,7 +82,7 @@ public class MultiAdapter<T> implements ListAdapter {
 
     @Override
     public boolean areAllItemsEnabled() {
-        return false;
+        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -102,13 +103,11 @@ public class MultiAdapter<T> implements ListAdapter {
 
     @Override
     public Object getItem(int position) {
-        //   if (position == mDataList.size()) return mSwipeControl;
         return mDataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        //   if (position == mDataList.size()) return mSwipeControl.hashCode();
         return mDataList.get(position).hashCode();
     }
 
@@ -120,8 +119,6 @@ public class MultiAdapter<T> implements ListAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //    if (position == mDataList.size()) return mSwipeControl.getSwipeHead();
-
         ViewHolder holder;
         if (convertView == null) {
             int index = getItemViewType(position);
@@ -130,7 +127,8 @@ public class MultiAdapter<T> implements ListAdapter {
                 convertView = holder.mainView;
                 convertView.setTag(holder);
             } catch (Exception e) {
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法");
+                e.printStackTrace();
+                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
             }
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -249,6 +247,14 @@ public class MultiAdapter<T> implements ListAdapter {
         }
     }
 
+    // 设置是否展示不合法数据；
+    public void setShowErrorHolder(boolean show) {
+        if (mShowError != show) {
+            mShowError = show;
+            notifyDataSetChanged();
+        }
+    }
+
 
     // 不合法信息展示类
     private static class ErrorViewHolder extends ViewHolder<Object> {
@@ -257,41 +263,33 @@ public class MultiAdapter<T> implements ListAdapter {
 
         public ErrorViewHolder(Activity activity) {
             super(activity);
+            errorInfo = (TextView) mainView.findViewById(R.id.powyin_scroll_err_text);
+
+        }
+
+
+        @Override
+        public void loadData(MultipleAdapter<? super Object> adapter, Object data) {
+            if (adapter.mShowError) {
+                errorInfo.setVisibility(View.VISIBLE);
+                errorInfo.setText(data == null ? "null" : data.toString());
+            } else {
+                errorInfo.setVisibility(View.GONE);
+            }
         }
 
         @Override
         protected int getItemViewRes() {
-            return 0;
+            return R.layout.powyin_scroll_multiple_adapter_err;
         }
 
         @Override
-        protected View getItemView() {
-            FrameLayout frameLayout = new FrameLayout(mActivity);
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
-            layoutParams.gravity = Gravity.CENTER;
-            layoutParams.topMargin = 10;
-            layoutParams.bottomMargin = 10;
-
-            errorInfo = new TextView(mActivity);
-            errorInfo.setMaxLines(2);
-            RectShape shape = new RectShape();
-            GradientDrawable gradientDrawabled = new GradientDrawable();
-
-            gradientDrawabled.setShape(GradientDrawable.RECTANGLE);
-            gradientDrawabled.setCornerRadius(13);
-            gradientDrawabled.setStroke(1, 0x33000000);
-            gradientDrawabled.setColor(0x11000000);
-            gradientDrawabled.setBounds(20, 20, 20, 20);
-
-            errorInfo.setBackgroundDrawable(gradientDrawabled);
-            frameLayout.addView(errorInfo, layoutParams);
-            return frameLayout;
+        protected boolean acceptData(Object data) {
+            return true;
         }
 
-        @Override
-        public void loadData(MultiAdapter<? super Object> adapter, Object data) {
-            //   errorInfo.setText(data.getClass()+"\n"+data.toString());
-        }
 
     }
+
+
 }

@@ -484,9 +484,9 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         if (mIsTouchEventMode || mIsFreshComplete) return false;
         int scrollY = getScrollY();
         int middleHei = scrollY_Up != 0 ? scrollY_Up + mSwipeControl.getOverScrollHei() : 0;
-        stopAllScroll();
         boolean isOverProgress = scrollY < middleHei;
         if (isOverProgress) {
+            stopAllScroll();
             animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, middleHei);
             animationReBackToRefreshing.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -540,8 +540,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
 
         if (!mIsFreshComplete && getScrollY() == middleHei) return false;
 
-        stopAllScroll();
         if (scrollY < 0) {
+            stopAllScroll();
             animationReBackToTop = ValueAnimator.ofInt(scrollY, 0);
             animationReBackToTop.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
@@ -553,7 +553,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
 
             if (scrollY == middleHei) {
                 animationReBackToTop.setDuration(Math.abs(450 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
-                animationReBackToTop.setStartDelay(400);
+                animationReBackToTop.setStartDelay(450);
             } else {
                 animationReBackToTop.setDuration(260);
             }
