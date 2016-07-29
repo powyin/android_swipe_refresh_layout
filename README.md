@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-## SwipeNest 垂直布局一个或多个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
+## SwipeNest 垂直布局（1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
 ## MuilpAdapter 快速实现 ListView 多种类型展示 
 
 Add Gradle dependency:
@@ -190,9 +190,9 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
 
 ```
 
-**设置 监听**   
+**设置刷新监听与刷新结果处理**   
 
-swipeRefresh设置刷新监听
+swipeRefresh
 
         swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
@@ -206,13 +206,11 @@ swipeRefresh设置刷新监听
             }
         });
         
-swipeRefresh刷新结果处理
-
         swipeRefresh.finishRefresh();            //下拉刷新完成
         swipeRefresh.hiddenLoadMore();           //已经获取更多数据   隐藏上拉加载进度条
         swipeRefresh.setIsLoadComplete(true);    //已经没有更多数据   全部数据已经获得
         
-SwipeNest设置刷新监听
+SwipeNest
 
         swipeNest.setOnRefreshListener(new SwipeNest.OnRefreshListener() {
             @Override
@@ -221,9 +219,7 @@ SwipeNest设置刷新监听
             }
 
         });
-
-SwipeNest刷新结果处理
-
+        
         swipeNest.finishRefresh();              //下拉刷新完成
 
 **SwipeRefresh 支持4种刷新模式**   
