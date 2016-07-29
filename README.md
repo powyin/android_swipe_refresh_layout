@@ -3,12 +3,12 @@
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
 ## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
-## MuilpAdapter 快速实现 ListView 多种类型展示 
+## MultipleAdapter 快速实现 ListView 多种类型展示 
 
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.3.0'
+  compile 'com.github.powyin:scroll:1.3.1'
 }
 ```
 
@@ -256,7 +256,8 @@ app:fresh_model=“ONLY_REFRESH”
           (2) 设置ViewTreeObserver.addOnGlobalLayoutListener 监听当ViewcanScrollVertically（-1） 与 Adater.getCount() 判断当前是否可以开始上拉加载；
           (3) 直接使用RecyleView();
   四：SwipeNest 目前只支持NestedScrollingChild继承类作为子View；
-  五：需要熟悉ListAdapter的Api；
+  五：MultipleAdapter 只是 把各种Adapter的处理逻辑 代理到 ViewHolder 上了；MultipleAdapter会根据 不同的数据类型 分别找到能装载此Data的ViewHolder，再在ViewHolder.loadData() 做刷新操作； 设计思路类似RecycleView.ViewHolder；
+  六：题外话 最好熟悉ListAdapter的Api；注意刷新Adapter时 保证 hasStableIds（）{ return true }；getItemId(int position)  获得直接与数据相关的唯一ID；
   
 ```
 
