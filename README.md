@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-## SwipeNest 垂直布局（1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
+## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
 ## MuilpAdapter 快速实现 ListView 多种类型展示 
 
 Add Gradle dependency:
