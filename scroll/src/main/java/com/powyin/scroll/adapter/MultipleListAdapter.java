@@ -3,12 +3,8 @@ package com.powyin.scroll.adapter;
 import android.app.Activity;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.shapes.RectShape;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -25,74 +21,69 @@ import java.util.Map;
 /**
  * Created by powyin on 2016/6/14.
  */
-public class MultipleAdapter<T> implements ListAdapter {
+public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> {
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T, N extends T> MultipleAdapter<N> getByClass(Activity activity, Class<? extends ViewHolder<? extends T>>... cla) {
-        Class<? extends ViewHolder>[] arrClass = new Class[cla.length + 1];
-        System.arraycopy(cla, 0, arrClass, 0, cla.length);
-        arrClass[arrClass.length - 1] = ErrorViewHolder.class;
-        return new MultipleAdapter<>(activity, arrClass);
+    public static <T, N extends T> MultipleListAdapter<N> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
+      return new MultipleListAdapter(activity, arrClass);
     }
 
-    private ViewHolder[] holderInstances;                                                                          // viewHolder 类实现实例
-    private Class<? extends ViewHolder>[] holderClasses;                                                           // viewHolder class类
-    private Class[] holderGenericDataClass;                                                                        // viewHolder 携带泛型
+    private PowViewHolder[] mHolderInstances;                                                                          // viewHolder 类实现实例
+    private Class<? extends PowViewHolder>[] mHolderClasses;                                                           // viewHolder class类
+    private Class[] mHolderGenericDataClass;                                                                        // viewHolder 携带泛型
     private Activity mActivity;
     private List<T> mDataList = new ArrayList<>();
-    private boolean mShowError = true;
-
-    private Map<T, ViewHolder> mDataToViewHolder = new HashMap<>();
+    private boolean mShowError = true;                                                                              // 是否展示错误信息
+    private Map<T, PowViewHolder> mDataToViewHolder = new HashMap<>();
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
+    public  MultipleListAdapter(Activity activity, Class<? extends PowViewHolder<? extends T >>... viewHolderClass) {
 
-    public MultipleAdapter(Activity activity, Class<? extends ViewHolder>[] cla) {
+        Class<? extends PowViewHolder>[] arrClass = new Class[viewHolderClass.length + 1];
+        System.arraycopy(viewHolderClass, 0, arrClass, 0, viewHolderClass.length);
+        arrClass[arrClass.length - 1] = ErrorPowViewHolder.class;
+
         this.mActivity = activity;
+        this.mHolderClasses = arrClass;
+        this.mHolderInstances = new PowViewHolder[arrClass.length];
+        this.mHolderGenericDataClass = new Class[arrClass.length];
 
-        holderClasses = cla;
-        holderInstances = new ViewHolder[cla.length];
-        holderGenericDataClass = new Class[cla.length];
-
-        for (int i = 0; i < cla.length; i++) {
-            Type genericType = null;                                                                                      // class类(泛型修饰信息)
-            Class typeClass = holderClasses[i];                                                                                     // class类
+        for (int i = 0; i < arrClass.length; i++) {
+            Type genericType;                                                                                      // class类(泛型修饰信息)
+            Class typeClass = mHolderClasses[i];                                                                                     // class类
             do {
                 genericType = typeClass.getGenericSuperclass();
                 typeClass = typeClass.getSuperclass();
-            } while (typeClass != ViewHolder.class && typeClass != Object.class);
+            } while (typeClass != PowViewHolder.class && typeClass != Object.class);
 
-            if (typeClass != ViewHolder.class || genericType == ViewHolder.class) {
+            if (typeClass != PowViewHolder.class || genericType == PowViewHolder.class) {
                 throw new RuntimeException("参数类必须继承泛型ViewHolder");
             }
             ParameterizedType paramType = (ParameterizedType) genericType;
             Type genericClass = paramType.getActualTypeArguments()[0];
-            holderGenericDataClass[i] = (Class) genericClass;                                                         //赋值 泛型类型(泛型类持有)
+            mHolderGenericDataClass[i] = (Class) genericClass;                                                         //赋值 泛型类型(泛型类持有)
             try {
-                holderInstances[i] = holderClasses[i].getConstructor(Activity.class).newInstance(mActivity);         //赋值 holder实例
+                mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class,ViewGroup.class).newInstance(mActivity,null);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
             }
         }
-
-
     }
 
+    //----------------------------------------------------adapterImp----------------------------------------------------//
 
     @Override
     public boolean areAllItemsEnabled() {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean isEnabled(int position) {
-        if (position == mDataList.size()) return true;
-        if (position == mDataList.size() + 1) return true;
-
-        int index = getItemViewType(position);
-        return holderInstances[index].isEnabled(mDataList.get(position));
+        return true;
     }
 
 
@@ -119,49 +110,49 @@ public class MultipleAdapter<T> implements ListAdapter {
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        PowViewHolder holder;
         if (convertView == null) {
             int index = getItemViewType(position);
             try {
-                holder = holderClasses[index].getConstructor(Activity.class).newInstance(mActivity);
-                convertView = holder.mainView;
+                holder = mHolderClasses[index].getConstructor(Activity.class,ViewGroup.class).newInstance(mActivity,parent);
+                convertView = holder.mViewHolder.itemView;
                 convertView.setTag(holder);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
             }
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (PowViewHolder) convertView.getTag();
         }
 
         T itemData = mDataList.get(position);
 
         holder.mData = itemData;
-        holder.loadData(this, itemData);
+        holder.loadData(this, null, itemData);
 
         if (itemData != null) {
             mDataToViewHolder.remove(itemData);
             mDataToViewHolder.put(itemData, holder);
         }
-        return holder.mainView;
+        return holder.mViewHolder.itemView;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public int getItemViewType(int position) {
-        if (position == mDataList.size()) return holderInstances.length;          // 刷新页面
-        for (int i = 0; i < holderInstances.length - 1; i++) {                    //返回能载入次数据的ViewHolderClass下标
+        if (position == mDataList.size()) return mHolderInstances.length;          // 刷新页面
+        for (int i = 0; i < mHolderInstances.length - 1; i++) {                    //返回能载入次数据的ViewHolderClass下标
             T itemData = mDataList.get(position);
-            if (itemData != null && holderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && holderInstances[i].acceptData(itemData)) {
+            if (itemData != null && mHolderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && mHolderInstances[i].acceptData(itemData)) {
                 return i;
             }
         }
-        return holderInstances.length - 1;                                        //错误页面数据
+        return mHolderInstances.length - 1;                                        //错误页面数据
     }
 
     @Override
     public int getViewTypeCount() {
-        return holderClasses.length + 1;
+        return mHolderClasses.length + 1;
     }
 
     @Override
@@ -170,7 +161,6 @@ public class MultipleAdapter<T> implements ListAdapter {
     }
 
 
-    //--------------------------------------------------------BaseAdapterImp------------------------------------------------------------//
     public void registerDataSetObserver(DataSetObserver observer) {
         mDataSetObservable.registerObserver(observer);
     }
@@ -187,21 +177,24 @@ public class MultipleAdapter<T> implements ListAdapter {
         mDataSetObservable.notifyInvalidated();
     }
 
-    //---------------------------------------------------------------数据设置------------------------------------------------------------//
+    //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
     // 载入数据
+    @Override
     public void loadData(List<T> dataList) {
         mDataList.clear();
         mDataList.addAll(dataList);
         notifyDataSetChanged();
     }
 
+    @Override
     public void deleteFirst() {
 
         mDataList.remove(0);
         notifyDataSetChanged();
     }
 
+    @Override
     public void deleteLast() {
 
         mDataList.remove(mDataList.size() - 1);
@@ -209,22 +202,26 @@ public class MultipleAdapter<T> implements ListAdapter {
     }
 
     // 加入头部数据
+    @Override
     public void addFirst(T data) {
         mDataList.add(0, data);
         notifyDataSetChanged();
     }
 
+    @Override
     public void addFirst(List<T> datas) {
         mDataList.addAll(0, datas);
         notifyDataSetChanged();
     }
 
     // 加入尾部数据
+    @Override
     public void addLast(T data) {
         mDataList.add(mDataList.size(), data);
         notifyDataSetChanged();
     }
 
+    @Override
     public void addLast(List<T> dataList) {
         mDataList.addAll(mDataList.size(), dataList);
         notifyDataSetChanged();
@@ -232,14 +229,16 @@ public class MultipleAdapter<T> implements ListAdapter {
 
     // 更新data对应View的数据显示
     @SuppressWarnings("unchecked")
+    @Override
     public void notifyDataChange(T data) {
-        ViewHolder holder = mDataToViewHolder.get(data);
+        PowViewHolder holder = mDataToViewHolder.get(data);
         if (holder != null && holder.mData == data) {
-            holder.loadData(this, data);
+            holder.loadData(this, null, data);
         }
     }
 
     // 删除数据
+    @Override
     public void deleteData(T data) {
         if (mDataList.contains(data)) {
             mDataList.remove(data);
@@ -248,6 +247,7 @@ public class MultipleAdapter<T> implements ListAdapter {
     }
 
     // 设置是否展示不合法数据；
+    @Override
     public void setShowErrorHolder(boolean show) {
         if (mShowError != show) {
             mShowError = show;
@@ -257,20 +257,18 @@ public class MultipleAdapter<T> implements ListAdapter {
 
 
     // 不合法信息展示类
-    private static class ErrorViewHolder extends ViewHolder<Object> {
-
+    private static class ErrorPowViewHolder extends PowViewHolder<Object> {
         TextView errorInfo;
 
-        public ErrorViewHolder(Activity activity) {
-            super(activity);
-            errorInfo = (TextView) mainView.findViewById(R.id.powyin_scroll_err_text);
+        public ErrorPowViewHolder(Activity activity, ViewGroup viewGroup) {
+            super(activity,viewGroup);
+            errorInfo = (TextView) mViewHolder.itemView.findViewById(R.id.powyin_scroll_err_text);
 
         }
 
-
         @Override
-        public void loadData(MultipleAdapter<? super Object> adapter, Object data) {
-            if (adapter.mShowError) {
+        public void loadData(MultipleListAdapter<? super Object> multipleListAdapter, MultipleRecycleAdapter<? super Object> multipleRecycleAdapter, Object data) {
+            if (multipleListAdapter.mShowError) {
                 errorInfo.setVisibility(View.VISIBLE);
                 errorInfo.setText(data == null ? "null" : data.toString());
             } else {

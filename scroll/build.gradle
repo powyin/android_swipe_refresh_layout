@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "1.3.5"
+version = "1.3.7"
 
 android {
 
@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 15
-        versionName "15.0"
+        versionCode 17
+        versionName "17.0"
     }
     buildTypes {
         release {
@@ -31,8 +31,8 @@ dependencies {
     compile 'com.android.support:design:24.1.1'
 }
 
-def siteUrl = 'https://github.com/powyin/refresh-nest-scroll'    // 项目的主页
-def gitUrl = 'git@github.com:powyin/refresh-nest-scroll.git'     // Git仓库的url
+def siteUrl = 'https://github.com/powyin/refresh'                // 项目的主页
+def gitUrl = 'git@github.com:powyin/refresh.git'                 // Git仓库的url
 group = 'com.github.powyin'                                      // Maven Group ID for the artifact，一般填你唯一的包名
 
 install {

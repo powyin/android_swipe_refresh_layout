@@ -6,7 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.powyin.nestscroll.adapter.TypePowViewHolder_Obj;
 import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
+import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.widget.SwipeNest;
 
 /**
@@ -57,7 +59,11 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
 
     private void initRecycle(){
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new RecyclerAdapter(this));
+        MultipleRecycleAdapter<Object> multipleRecycleAdapter = new MultipleRecycleAdapter<>(this,TypePowViewHolder_Obj.class);
+        for (int i=0;i<35;i++){
+            multipleRecycleAdapter.addFirst(new Object());
+        }
+        mRecyclerView.setAdapter(multipleRecycleAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
