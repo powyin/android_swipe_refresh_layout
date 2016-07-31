@@ -84,20 +84,6 @@ dependencies {
       </com.powyin.scroll.widget.SwipeNest>
     
     
-    
-    
-### how to use  MultipleRecycleAdapter&MultipleListAdapter
-
-        MultipleRecycleAdapter multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
-        mRecyclerView.setAdapter(multipleRecycleAdapter);
-        
-        MultipleListAdapter multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
-        listView.setAdapter(multipleListAdapter);
-        
-        PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
-        AdapterDelegate<T>  此接口定义了ListAdapter 与 RecycleView.Adatper 公共数据操作；
-    
-    
 ### 自定义刷新UI
 
 ```
@@ -262,6 +248,18 @@ app:fresh_model=“ONLY_REFRESH”
 (SWIPE_NONE == SwipeModel.SWIPE_NONE）            都不支持
 ```
 
+
+### how to use  MultipleRecycleAdapter&MultipleListAdapter
+
+        MultipleRecycleAdapter multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
+        mRecyclerView.setAdapter(multipleRecycleAdapter);
+        
+        MultipleListAdapter multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
+        listView.setAdapter(multipleListAdapter);
+        
+        PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
+        AdapterDelegate<T>  此接口定义了ListAdapter 与 RecycleView.Adatper 公共数据操作；
+    
 
 
 ### 注意
