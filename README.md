@@ -3,7 +3,7 @@
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
 ## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
-## MultipleAdapter 快速实现 ListView 多种类型展示 
+## MultipleListAdapter<T>  MultipleRecycleAdapter<T>  快速实现 ListView 与 RecycleView多种类型展示 
 
 Add Gradle dependency:
 ```gradle
@@ -82,6 +82,20 @@ dependencies {
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
       </com.powyin.scroll.widget.SwipeNest>
+    
+    
+    
+    
+### how to use  MultipleRecycleAdapter   MultipleListAdapter
+
+        MultipleRecycleAdapter multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
+        mRecyclerView.setAdapter(multipleRecycleAdapter);
+        
+        MultipleListAdapter multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
+        listView.setAdapter(multipleListAdapter);
+        
+        PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
+        AdapterDelegate<T>  此接口定义了ListAdapter 与 RecycleView.Adatper 公共数据操作；
     
     
 ### 自定义刷新UI
@@ -247,6 +261,13 @@ app:fresh_model=“ONLY_REFRESH”
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN)   只支持上拉加载 
 (SWIPE_NONE == SwipeModel.SWIPE_NONE）            都不支持
 ```
+
+
+
+
+
+
+
 ### 注意
 ```
   一：SwipeRefresh 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
