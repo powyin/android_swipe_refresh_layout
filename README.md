@@ -3,7 +3,7 @@
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
 ## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
-## MultipleListAdapter<T>  MultipleRecycleAdapter<T>  快速实现 ListView 与 RecycleView多种类型展示 
+### MultipleListAdapter<T>&MultipleRecycleAdapter<T>  快速实现 ListView 与 RecycleView多种类型展示 
 
 Add Gradle dependency:
 ```gradle
@@ -86,7 +86,7 @@ dependencies {
     
     
     
-### how to use  MultipleRecycleAdapter   MultipleListAdapter
+### how to use  MultipleRecycleAdapter&MultipleListAdapter
 
         MultipleRecycleAdapter multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
         mRecyclerView.setAdapter(multipleRecycleAdapter);
@@ -264,10 +264,6 @@ app:fresh_model=“ONLY_REFRESH”
 
 
 
-
-
-
-
 ### 注意
 ```
   一：SwipeRefresh 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
@@ -277,8 +273,8 @@ app:fresh_model=“ONLY_REFRESH”
           (2) 设置ViewTreeObserver.addOnGlobalLayoutListener 监听当ViewcanScrollVertically（-1） 与 Adater.getCount() 判断当前是否可以开始上拉加载；
           (3) 直接使用RecyleView();
   四：SwipeNest 目前只支持NestedScrollingChild继承类作为子View；
-  五：MultipleAdapter 只是 把各种Adapter的处理逻辑 代理到 ViewHolder 上了；MultipleAdapter会根据 不同的数据类型 分别找到能装载此Data的ViewHolder，再通过ViewHolder.loadData() 做刷新操作； 设计思路类似RecycleView.ViewHolder；
-  六：MultipleAdapter 遇到无法识别的数据 无法绑定到固定ViewHolder；会使用内部实现的ErroerViewHolder装载次数据； 打印结果为此数据Data.toString(); 若不显示此信息 可以通过MultipleAdapter.setShowErrorHolder(false) 隐藏次数据的展示；
+  五：MultipleListAdapter<T>&MultipleRecycleAdapter<T> 只是 把各种Adapter的处理逻辑 代理到 ViewHolder 上了；MultipleAdapter会根据 不同的数据类型 分别找到能装载此Data的ViewHolder，再通过ViewHolder.loadData() 做刷新操作； 设计思路类似RecycleView.ViewHolder；
+  六：MultipleListAdapter<T>&MultipleRecycleAdapter<T> 遇到无法识别的数据 无法绑定到固定ViewHolder；会使用内部实现的ErroerViewHolder装载次数据； 打印结果为此数据Data.toString(); 若不显示此信息 可以通过MultipleAdapter.setShowErrorHolder(false) 隐藏次数据的展示；
   六：题外话 最好熟悉ListAdapter的Api；注意刷新Adapter时 保证 hasStableIds（）{ return true }；getItemId(int position)  获得直接与数据相关的唯一ID；
   
 ```
