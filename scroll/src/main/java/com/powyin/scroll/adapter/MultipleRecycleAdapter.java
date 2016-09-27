@@ -35,7 +35,6 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     private List<T> mDataList = new ArrayList<>();
     private boolean mShowError = true;                                                                                 // 是否展示错误信息
     private Map<T, PowViewHolder> mDataToViewHolder = new HashMap<>();
-    private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
