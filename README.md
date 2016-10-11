@@ -3,7 +3,8 @@
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
 ## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新(不支持上拉加载） 
-### MultipleListAdapter<T>&MultipleRecycleAdapter<T>  快速实现 ListView 与 RecycleView多类型展示 （上拉加载）
+### MultipleListAdapter<T> 快速实现 ListView 多种类型展示 
+### MultipleRecycleAdapter<T>  快速实现  RecycleView多种类型展示 自带上拉加载 可设置开启
 
 Add Gradle dependency:
 ```gradle
