@@ -109,8 +109,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
-            int speWid = getChildMeasureSpec(widthMeasureSpec, 0, ViewGroup.LayoutParams.MATCH_PARENT);
-            int speHei = getChildMeasureSpec(heightMeasureSpec, 0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            int speWid = getChildMeasureSpec(widthMeasureSpec, 0, LayoutParams.MATCH_PARENT);
+            int speHei = getChildMeasureSpec(heightMeasureSpec, 0, LayoutParams.WRAP_CONTENT);
             child.measure(speWid, speHei);
         }
     }
@@ -526,7 +526,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
                 public void onAnimationRepeat(Animator animation) {
                 }
             });
-            animationReBackToRefreshing.setDuration(Math.abs(450 * (middleHei - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
+            animationReBackToRefreshing.setDuration(Math.abs(550 * (middleHei - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
             animationReBackToRefreshing.start();
         }
         return isOverProgress;
@@ -538,7 +538,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         int scrollY = getScrollY();
         int middleHei = scrollY_Up != 0 ? scrollY_Up + mSwipeControl.getOverScrollHei() : 0;
 
-        if (!mIsFreshComplete && getScrollY() == middleHei) return false;
+        if (!mIsFreshComplete && scrollY == middleHei) return false;
 
         if (scrollY < 0) {
             stopAllScroll();
@@ -552,10 +552,10 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
             });
 
             if (scrollY == middleHei) {
-                animationReBackToTop.setDuration(Math.abs(450 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
-                animationReBackToTop.setStartDelay(450);
+                animationReBackToTop.setDuration(Math.abs(550 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
+                animationReBackToTop.setStartDelay(550);
             } else {
-                animationReBackToTop.setDuration(260);
+                animationReBackToTop.setDuration(320);
             }
             animationReBackToTop.start();
             return true;
@@ -581,13 +581,19 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
 
     // 结束上拉刷新
     public void finishRefresh() {
-        this.mIsFreshContinue = false;
-        this.mIsFreshComplete = true;
-        this.mIsLoadComplete = false;
-        this.mIsLoadContinue = false;
-        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE,
-                -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
-        tryBackToFreshFinish();
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mIsFreshContinue = false;
+                mIsFreshComplete = true;
+                mIsLoadComplete = false;
+                mIsLoadContinue = false;
+                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE,
+                        -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
+                tryBackToFreshFinish();
+            }
+        },600);
+
     }
 
     // 设置下拉加载是否全部加载完成

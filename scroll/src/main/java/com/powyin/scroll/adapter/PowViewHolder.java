@@ -17,6 +17,8 @@ public abstract class PowViewHolder<T>{
     protected final Activity mActivity;
     protected T mData;
 
+
+
     public PowViewHolder(Activity activity , ViewGroup viewGroup) {
         this.mActivity = activity;
         View item = getItemView();
@@ -30,7 +32,7 @@ public abstract class PowViewHolder<T>{
 
     protected abstract int getItemViewRes();
 
-    public abstract void loadData(MultipleListAdapter<? super T> multipleListAdapter, MultipleRecycleAdapter<? super T> multipleRecycleAdapter, T data);
+    public abstract void loadData(AdapterDelegate<? super T> multipleAdapter, T data , int postion);
 
     protected View getItemView() {
         return null;
@@ -43,7 +45,7 @@ public abstract class PowViewHolder<T>{
 
     static class RecycleViewHolder<T> extends RecyclerView.ViewHolder {
         PowViewHolder<T> mPowViewHolder;
-        public RecycleViewHolder(View itemView, PowViewHolder<T> powViewHolder) {
+        RecycleViewHolder(View itemView, PowViewHolder<T> powViewHolder) {
             super(itemView);
             this.mPowViewHolder = powViewHolder;
         }

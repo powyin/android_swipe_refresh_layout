@@ -1,13 +1,23 @@
 package com.powyin.scroll.adapter;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
+import android.widget.Space;
 import android.widget.TextView;
-
 
 import com.powyin.scroll.R;
 
@@ -25,35 +35,62 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T, N extends T> MultipleListAdapter<N> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
-      return new MultipleListAdapter(activity, arrClass);
+    public static <T, N extends T> MultipleListAdapter<N> getByViewHolder(Activity activity,
+                                                                          Class<? extends PowViewHolder<? extends T>>... arrClass) {
+        return new MultipleListAdapter(activity, arrClass);
     }
+
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
+    public static <T, N extends T> MultipleListAdapter<N> getByViewHolder(Activity activity, int loadMoreViewCount,
+                                                                          Class<? extends PowViewHolder<? extends T>>... arrClass) {
+        return new MultipleListAdapter(activity, loadMoreViewCount, arrClass);
+    }
+
 
     private PowViewHolder[] mHolderInstances;                                                                          // viewHolder 类实现实例
     private Class<? extends PowViewHolder>[] mHolderClasses;                                                           // viewHolder class类
-    private Class[] mHolderGenericDataClass;                                                                        // viewHolder 携带泛型
+    private Class[] mHolderGenericDataClass;                                                                           // viewHolder 携带泛型
     private Activity mActivity;
     private List<T> mDataList = new ArrayList<>();
-    private boolean mShowError = true;                                                                              // 是否展示错误信息
-    private Map<T, PowViewHolder> mDataToViewHolder = new HashMap<>();
+    private boolean mShowError = true;                                                                                 // 是否展示错误信息
+
+    private final int mFixedLoadMoreCount;
+    private int mSpaceCount;
+    private int mLoadMoreCount;
+
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
+
+
+    // 上拉加载实现
+    private boolean mLoadEnableShow = false;                                                                              // 是否展示加载更多
+    private LoadStatus mLoadStatus = LoadStatus.CONTINUE;
+    private LoadMorePowViewHolder loadMorePowViewHolder;
+    private String mLoadCompleteInfo = "我是有底线的";
+    private OnLoadMoreListener mOnLoadMoreListener;                                                                       // 显示更多监听
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
     public  MultipleListAdapter(Activity activity, Class<? extends PowViewHolder<? extends T >>... viewHolderClass) {
+        this(activity,1,viewHolderClass);
+    }
 
-        Class<? extends PowViewHolder>[] arrClass = new Class[viewHolderClass.length + 1];
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
+    public  MultipleListAdapter(Activity activity, int loadMoreViewCount, Class<? extends PowViewHolder<? extends T >>... viewHolderClass) {
+
+        Class<? extends PowViewHolder>[] arrClass = new Class[viewHolderClass.length];
         System.arraycopy(viewHolderClass, 0, arrClass, 0, viewHolderClass.length);
-        arrClass[arrClass.length - 1] = ErrorPowViewHolder.class;
 
         this.mActivity = activity;
+        this.mFixedLoadMoreCount = loadMoreViewCount;
         this.mHolderClasses = arrClass;
         this.mHolderInstances = new PowViewHolder[arrClass.length];
         this.mHolderGenericDataClass = new Class[arrClass.length];
 
         for (int i = 0; i < arrClass.length; i++) {
-            Type genericType;                                                                                      // class类(泛型修饰信息)
-            Class typeClass = mHolderClasses[i];                                                                                     // class类
+            Type genericType;                                                                                          // class类(泛型修饰信息)
+            Class typeClass = mHolderClasses[i];                                                                       // class类
             do {
                 genericType = typeClass.getGenericSuperclass();
                 typeClass = typeClass.getSuperclass();
@@ -69,9 +106,10 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
                 mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class,ViewGroup.class).newInstance(mActivity,null);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
+                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者  " + e.getMessage());
             }
         }
+
     }
 
     //----------------------------------------------------adapterImp----------------------------------------------------//
@@ -119,7 +157,7 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
                 convertView.setTag(holder);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 ImageView 载入图片尺寸过大 或者 " + e.getMessage());
+                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者    " + e.getMessage());
             }
         } else {
             holder = (PowViewHolder) convertView.getTag();
@@ -128,31 +166,49 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
         T itemData = mDataList.get(position);
 
         holder.mData = itemData;
-        holder.loadData(this, null, itemData);
+        holder.loadData(this, itemData, position);
 
-        if (itemData != null) {
-            mDataToViewHolder.remove(itemData);
-            mDataToViewHolder.put(itemData, holder);
-        }
         return holder.mViewHolder.itemView;
+    }
+
+    private void ensureConfig(){
+        if(!mLoadEnableShow) {
+            mSpaceCount = 0;
+            mLoadMoreCount = 0;
+        }else {
+            int dataSize = mDataList.size();
+            mSpaceCount = dataSize%mFixedLoadMoreCount==0 ? 0 : mFixedLoadMoreCount - dataSize%mFixedLoadMoreCount;
+            mLoadMoreCount = mFixedLoadMoreCount;
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public int getItemViewType(int position) {
-        if (position == mDataList.size()) return mHolderInstances.length;          // 刷新页面
-        for (int i = 0; i < mHolderInstances.length - 1; i++) {                    //返回能载入次数据的ViewHolderClass下标
+        if (position >= mDataList.size()){
+
+            ensureConfig();
+
+            if(position>=mDataList.size()+mSpaceCount){
+                return mHolderInstances.length + 2;
+            }else {
+                return mHolderInstances.length + 1;
+            }
+        }
+
+        for (int i = 0; i < mHolderInstances.length ; i++) {                        //返回能载入次数据的ViewHolderClass下标
             T itemData = mDataList.get(position);
             if (itemData != null && mHolderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && mHolderInstances[i].acceptData(itemData)) {
                 return i;
             }
         }
-        return mHolderInstances.length - 1;                                        //错误页面数据
+
+        return mHolderInstances.length ;                                              //错误页面数据
     }
 
     @Override
     public int getViewTypeCount() {
-        return mHolderClasses.length + 1;
+        return mHolderClasses.length + 3;
     }
 
     @Override
@@ -214,34 +270,66 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
         notifyDataSetChanged();
     }
 
-    // 加入尾部数据
     @Override
     public void addLast(T data) {
+        if(data!=null){
+            mDataList.add(data);
+            notifyDataSetChanged();
+        }
+    }
+
+    // 加入尾部数据
+    @Override
+    public void addLast(T data, LoadStatus status, int delay) {
         mDataList.add(mDataList.size(), data);
         notifyDataSetChanged();
     }
 
     @Override
     public void addLast(List<T> dataList) {
-        mDataList.addAll(mDataList.size(), dataList);
-        notifyDataSetChanged();
-    }
-
-    // 更新data对应View的数据显示
-    @SuppressWarnings("unchecked")
-    @Override
-    public void notifyDataChange(T data) {
-        PowViewHolder holder = mDataToViewHolder.get(data);
-        if (holder != null && holder.mData == data) {
-            holder.loadData(this, null, data);
+        if(dataList!=null && dataList.size()!=0){
+            mDataList.addAll(dataList.size(),dataList);
+            notifyDataSetChanged();
         }
     }
+
+    @Override
+    public void addLast(final List<T> dataList , LoadStatus status, int delay) {
+        if(delay<=10){
+            addLast(dataList);
+        }else {
+            mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    addLast(dataList);
+                }
+            },delay);
+        }
+
+    }
+
+    @Override
+    public List<T> getDataList() {
+        return mDataList;
+    }
+
+
 
     // 删除数据
     @Override
     public void deleteData(T data) {
         if (mDataList.contains(data)) {
             mDataList.remove(data);
+            notifyDataSetChanged();
+        }
+    }
+
+
+    // 清空数据
+    @Override
+    public void deleteAllData() {
+        if(mDataList.size()!=0){
+            mDataList.clear();
             notifyDataSetChanged();
         }
     }
@@ -255,39 +343,222 @@ public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> 
         }
     }
 
+    // 设置是否显示加载更多
+    @Override
+    public void setShowLoadMore(boolean show) {
+        if(this.mLoadEnableShow != show){
+            this.mLoadEnableShow = show;
+            notifyDataSetChanged();
+        }
+    }
 
-    // 不合法信息展示类
-    private static class ErrorPowViewHolder extends PowViewHolder<Object> {
-        TextView errorInfo;
+    @Override
+    public void setLoadMoreStatus(LoadStatus status) {
+        if(status==null) return;
 
-        public ErrorPowViewHolder(Activity activity, ViewGroup viewGroup) {
-            super(activity,viewGroup);
-            errorInfo = (TextView) mViewHolder.itemView.findViewById(R.id.powyin_scroll_err_text);
-
+        switch (status){
+            case CONTINUE:
+                mLoadStatus = LoadStatus.CONTINUE;
+                break;
+            case COMPLITE:
+                mLoadStatus = LoadStatus.COMPLITE;
         }
 
-        @Override
-        public void loadData(MultipleListAdapter<? super Object> multipleListAdapter, MultipleRecycleAdapter<? super Object> multipleRecycleAdapter, Object data) {
-            if (multipleListAdapter.mShowError) {
-                errorInfo.setVisibility(View.VISIBLE);
-                errorInfo.setText(data == null ? "null" : data.toString());
+        if(loadMorePowViewHolder!=null){
+            loadMorePowViewHolder.ensureAnimation(false);
+            for(View holder : loadMorePowViewHolder.viewHolders){
+                holder.invalidate();
+            }
+        }
+    }
+
+    // 设置显示更多监听
+    @Override
+    public void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {
+        this.mOnLoadMoreListener = loadMoreListener;
+    }
+
+    // 0 空白页面
+    private  class IncludeTypeEmpty extends PowViewHolder.RecycleViewHolder<Object> {
+        IncludeTypeEmpty(ViewGroup viewGroup) {
+            super(new Space(mActivity) , null);
+        }
+    }
+
+    // 1 不合法信息展示类
+    private  class IncludeTypeError extends  PowViewHolder.RecycleViewHolder<Object>{
+        TextView errorInfo;
+        IncludeTypeError(ViewGroup viewGroup) {
+            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_err, viewGroup,false) ,null);
+            errorInfo = (TextView)super.itemView.findViewById(R.id.powyin_scroll_err_text);
+        }
+    }
+
+    // 2 加载更多iew
+    private class LoadMorePowViewHolder {
+
+        boolean mAttached = false;
+
+        List<LoadProgressBar> viewHolders = new ArrayList<>();
+
+        ValueAnimator animator;
+        Paint circlePaint;
+        TextPaint textPaint;
+        int canvasWei;
+        int canvasHei;
+
+        float canvasTextX;
+        float canvasTextY;
+
+        int ballCount = 10;
+        float divide;
+        LoadMorePowViewHolder(){
+            circlePaint = new Paint();
+            circlePaint.setColor(0x99000000);
+            circlePaint.setStrokeWidth(4);
+            textPaint = new TextPaint();
+            textPaint.setColor(0x99000000);
+            textPaint.setTextSize(ViewUtils.sp2px(mActivity,13));
+            textPaint.setAntiAlias(true);
+            textPaint.setStrokeWidth(1);
+        }
+
+
+        View getNewInstance(){
+            LoadProgressBar view = new LoadProgressBar(mActivity);
+            viewHolders.add(view);
+            return view;
+        }
+
+
+        private void ensureAnimation(boolean forceReStart) {
+
+            if(!mAttached || mLoadStatus== LoadStatus.COMPLITE){
+                if(animator!=null){
+                    animator.cancel();
+                    animator = null;
+                }
+                return;
+            }
+
+            if (forceReStart) {
+                if (animator != null) {
+                    animator.cancel();
+                    animator = null;
+                }
             } else {
-                errorInfo.setVisibility(View.GONE);
+                if (animator != null && animator.isRunning()) {
+                    return;
+                }
+            }
+
+            animator = ValueAnimator.ofFloat(0, 1);
+            animator.setDuration(2000);
+            animator.setRepeatCount(5);
+
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
+                    for(View holder : viewHolders){
+                        holder.invalidate();
+                    }
+                }
+            });
+
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if ( animation == animator) {
+                        ensureAnimation(true);
+                    }
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+
+            animator.start();
+        }
+
+        private float getSplit(float value) {
+            int positive = value >= 0 ? 1 : -1;                                 //保存符号 判断正负
+            value = Math.abs(value);
+            if (value <= 1) return value * positive;
+            return (float) Math.pow(value, 2) * positive;
+        }
+
+        class LoadProgressBar extends View {              //刷新视图
+            int mIndex;
+            public LoadProgressBar(Context context) {
+                super(context);
+            }
+
+            @Override
+            protected void onAttachedToWindow() {
+                super.onAttachedToWindow();
+                mAttached = true;
+                ensureAnimation(false);
+            }
+
+            @Override
+            protected void onDetachedFromWindow() {
+                super.onDetachedFromWindow();
+                mAttached = false;
+                ensureAnimation(false);
+            }
+
+            @Override
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                setMeasuredDimension(getMeasuredWidth(), ViewUtils.dip2px(getContext(), 40));
+            }
+
+
+
+            @Override
+            protected void onDraw(Canvas canvas) {
+                super.onDraw(canvas);
+                if(mLoadStatus == LoadStatus.COMPLITE){
+                    int diff =  mIndex*getWidth();
+                    canvas.drawText(mLoadCompleteInfo,canvasTextX - diff,canvasTextY,textPaint);
+                    canvas.drawLine(20 - diff ,  canvasHei/2,  canvasTextX-20 -diff , canvasHei/2,  textPaint);
+                    canvas.drawLine(canvasWei-canvasTextX+20 -diff , canvasHei/2,  canvasWei-20 -diff,  canvasHei/2,textPaint);
+
+                }else {
+                    for (int i = 0; i < ballCount; i++) {
+                        float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
+                        wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
+                        wei -= mIndex*getWidth();                               // good
+                        canvas.drawCircle(wei, canvasHei / 2, 8, circlePaint);
+                    }
+                }
+            }
+
+            @Override
+            protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+                super.onLayout(changed, left, top, right, bottom);
+                canvasHei = getHeight();
+                canvasWei = getWidth()*mLoadMoreCount;
+
+                canvasTextX = canvasWei /2 - textPaint.measureText(mLoadCompleteInfo) /2;
+                canvasTextY = canvasHei /2 + textPaint.getTextSize()/2.55f;
+
+                ensureAnimation(false);
             }
         }
 
-        @Override
-        protected int getItemViewRes() {
-            return R.layout.powyin_scroll_multiple_adapter_err;
-        }
-
-        @Override
-        protected boolean acceptData(Object data) {
-            return true;
-        }
-
-
     }
+
 
 
 }

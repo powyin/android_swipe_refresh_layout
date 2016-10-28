@@ -8,6 +8,11 @@ import java.util.List;
  */
 public interface AdapterDelegate<T> {
 
+    enum LoadStatus {
+        CONTINUE,
+        COMPLITE,
+    }
+
     // 载入数据
     void loadData(List<T> dataList);
 
@@ -22,15 +27,36 @@ public interface AdapterDelegate<T> {
 
     // 加入尾部数据
     void addLast(T data);
+    void addLast(T data, LoadStatus status,  int delayTime);
+
 
     void addLast(List<T> dataList);
+    void addLast(List<T> dataList,  LoadStatus status, int delayTime);
 
-    // 更新data对应View的数据显示
-    void notifyDataChange(T data);
+
+
+    List<T> getDataList();
+
+
 
     // 删除数据
     void deleteData(T data);
 
+    // 清空数据
+    void deleteAllData();
+
     // 设置是否展示不合法数据；
     void setShowErrorHolder(boolean show);
+
+    //------------------------------------------------------ 上拉加载--------------------------------------------------------//
+
+    // 设置是否展示加载更多
+    void setShowLoadMore(boolean show);
+
+    // 设置加载状态
+    void setLoadMoreStatus(LoadStatus status);
+
+    // 设置加载更多监听
+    void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener);
+
 }

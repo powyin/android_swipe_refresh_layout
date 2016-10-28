@@ -1,6 +1,5 @@
 package com.powyin.scroll.widget;
 
-import android.animation.Animator;
 import android.content.Context;
 
 /**

@@ -8,8 +8,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewParent;
-import android.view.ViewTreeObserver;
-import android.widget.ListView;
 
 
 /**
