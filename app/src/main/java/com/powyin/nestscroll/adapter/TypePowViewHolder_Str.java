@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.ViewGroup;
 
 import com.powyin.nestscroll.R;
+import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.adapter.PowViewHolder;
@@ -19,7 +20,7 @@ public class TypePowViewHolder_Str extends PowViewHolder<String> {
 
 
     @Override
-    public void loadData(MultipleListAdapter<? super String> multipleListAdapter, MultipleRecycleAdapter<? super String> multipleRecycleAdapter, String data) {
+    public void loadData(AdapterDelegate<? super String> multipleAdapter, String data, int postion) {
 
     }
 

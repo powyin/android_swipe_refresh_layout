@@ -49,5 +49,6 @@ public abstract class PowViewHolder<T>{
             super(itemView);
             this.mPowViewHolder = powViewHolder;
         }
+
     }
 }

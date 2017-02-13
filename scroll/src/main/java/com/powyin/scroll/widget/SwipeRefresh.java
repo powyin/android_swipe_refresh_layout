@@ -612,18 +612,28 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
             return;
         }
 
-        if (mTarget instanceof RecyclerView) {                                                                  //平滑recyclerView 下拉加载过程
-            RecyclerView recyclerView = (RecyclerView) mTarget;
-            if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                layoutManager.scrollVerticallyBy(currentScrollY, null, null);
-            }
+//        if (mTarget instanceof RecyclerView) {                                                                  //平滑recyclerView 下拉加载过程
+//            RecyclerView recyclerView = (RecyclerView) mTarget;
+//            if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//            //    System.out.println("-----------------"+( layoutManager==null));
+//            //    layoutManager.scrollVerticallyBy(currentScrollY, null, null);
+//
+//                mTarget.scrollBy(0,currentScrollY);
+//
+//            //    layoutManager.scrollVerticallyBy(currentScrollY,null, new RecyclerView.State());
+//            }
+//        }
+//
+//        if (mTarget instanceof ListView) {                                                                      //ListView 下拉加载过程
+//            ListView listView = (ListView) mTarget;
+//            listView.smoothScrollBy(currentScrollY, 0);
+//        }
+
+        if(mTarget instanceof RecyclerView || mTarget instanceof  ListView){
+            mTarget.scrollBy(0,currentScrollY);
         }
 
-        if (mTarget instanceof ListView) {                                                                      //ListView 下拉加载过程
-            ListView listView = (ListView) mTarget;
-            listView.smoothScrollBy(currentScrollY, 0);
-        }
         scrollTo(0, 0);
     }
 

@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import com.powyin.nestscroll.R;
 import com.powyin.nestscroll.net.DataModel;
+import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.adapter.PowViewHolder;
@@ -28,8 +29,9 @@ public class TypePowViewHolder_Pic_1 extends PowViewHolder<DataModel> {
         return data.type==2;
     }
 
+
     @Override
-    public void loadData(MultipleListAdapter<? super DataModel> multipleListAdapter, MultipleRecycleAdapter<? super DataModel> multipleRecycleAdapter, DataModel data) {
+    public void loadData(AdapterDelegate<? super DataModel> multipleAdapter, DataModel data, int postion) {
 
     }
 }

@@ -3,6 +3,7 @@ package com.powyin.nestscroll.adapter;
 import android.app.Activity;
 import android.view.ViewGroup;
 
+import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.adapter.PowViewHolder;
@@ -23,8 +24,10 @@ public class TypePowViewHolder_Date extends PowViewHolder<Date> {
         return 0;
     }
 
+
+
     @Override
-    public void loadData(MultipleListAdapter<? super Date> multipleListAdapter, MultipleRecycleAdapter<? super Date> multipleRecycleAdapter, Date data) {
+    public void loadData(AdapterDelegate<? super Date> multipleAdapter, Date data, int postion) {
 
     }
 }

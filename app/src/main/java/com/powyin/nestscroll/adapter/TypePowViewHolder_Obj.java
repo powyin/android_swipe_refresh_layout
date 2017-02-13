@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.powyin.nestscroll.R;
+import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.adapter.PowViewHolder;
@@ -30,8 +31,9 @@ public class TypePowViewHolder_Obj extends PowViewHolder<Object> {
         return R.layout.recycler_view_holder_item;
     }
 
+
     @Override
-    public void loadData(MultipleListAdapter<? super Object> multipleListAdapter, MultipleRecycleAdapter<? super Object> multipleRecycleAdapter, Object data) {
+    public void loadData(AdapterDelegate<? super Object> multipleAdapter, Object data, int postion) {
 
     }
 }

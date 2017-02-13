@@ -126,6 +126,8 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
         T itemData = position < mDataList.size() ?  mDataList.get(position) : null;
         PowViewHolder<T> powViewHolder = holder.mPowViewHolder;
 
+    //    System.out.println("---------------------------------------------------->>>>>>>>>>>>>>>>>"+(holder.mPowViewHolder==null));
+
         if(position>=mDataList.size()){
             if(position >= mDataList.size() + mSpaceCount){
                 ((LoadMorePowViewHolder.LoadProgressBar)holder.itemView).mIndex = position - (mDataList.size()+mSpaceCount);
@@ -137,8 +139,10 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
             }
 
         }else {
-            powViewHolder.mData = itemData;
-            powViewHolder.loadData( this, itemData , position);
+            if(powViewHolder!=null){
+                powViewHolder.mData = itemData;
+                powViewHolder.loadData( this, itemData , position);
+            }
         }
     }
 
