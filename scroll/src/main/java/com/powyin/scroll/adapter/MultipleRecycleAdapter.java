@@ -28,6 +28,10 @@ import java.util.List;
  */
 public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHolder.RecycleViewHolder> implements AdapterDelegate<T> {
 
+    // 0 空白页面；
+    // 1 错误页面；
+    // 2 加载更多；
+
     @SuppressWarnings("unchecked")
     @SafeVarargs
     public static <T, N extends T> MultipleRecycleAdapter<N> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
@@ -393,7 +397,6 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
     // 2 加载更多iew
     private class LoadMorePowViewHolder {
-
 
         boolean mAttached = false;
 

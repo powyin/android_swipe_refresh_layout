@@ -421,7 +421,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
                     / mSwipeControl.getOverScrollHei(), 2));
         }
 
-        if (pre && currentScrollY != 0 || !pre) {
+        if (currentScrollY != 0 || !pre) {
             int willTo = currentScrollY + deltaY;
             willTo = Math.min(willTo, scrollY_Down);
             willTo = Math.max(willTo, scrollY_Up);
@@ -593,7 +593,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
                 tryBackToFreshFinish();
             }
         },600);
-
     }
 
     // 设置下拉加载是否全部加载完成

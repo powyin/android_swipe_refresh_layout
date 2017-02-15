@@ -18,7 +18,7 @@ public interface SwipeControl {
         SWIPE_HEAD_OVER,                        //提示: 松开刷新
         SWIPE_HEAD_TOAST,                       //提示: 下拉刷新
         SWIPE_HEAD_LOADING,                     //提示: 刷新中
-        SWIPE_HEAD_COMPLETE,                     //提示: 刷新完成
+        SWIPE_HEAD_COMPLETE,                    //提示: 刷新完成
         // 下拉加载
         SWIPE_FOOT_LOADING,
         SWIPE_FOOT_COMPLETE;

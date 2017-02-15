@@ -33,6 +33,10 @@ import java.util.Map;
  */
 public class MultipleListAdapter<T> implements ListAdapter , AdapterDelegate<T> {
 
+    // 0 空白页面；
+    // 1 错误页面；
+    // 2 加载更多；
+
     @SuppressWarnings("unchecked")
     @SafeVarargs
     public static <T, N extends T> MultipleListAdapter<N> getByViewHolder(Activity activity,
