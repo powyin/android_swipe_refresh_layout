@@ -42,12 +42,35 @@ public abstract class PowViewHolder<T>{
         return true;
     }
 
+    // holder 依附
+    protected void onViewAttachedToWindow() {
+
+    }
+
+    // holder 脱离
+    protected void onViewDetachedFromWindow() {
+
+    }
 
     static class RecycleViewHolder<T> extends RecyclerView.ViewHolder {
         PowViewHolder<T> mPowViewHolder;
         RecycleViewHolder(View itemView, PowViewHolder<T> powViewHolder) {
             super(itemView);
             this.mPowViewHolder = powViewHolder;
+        }
+
+        // holder 依附
+        void onViewAttachedToWindow() {
+            if(this.mPowViewHolder!=null){
+                this.mPowViewHolder.onViewAttachedToWindow();
+            }
+        }
+
+        // holder 脱离
+        void onViewDetachedFromWindow() {
+            if(this.mPowViewHolder!=null){
+                this.mPowViewHolder.onViewDetachedFromWindow();
+            }
         }
 
     }

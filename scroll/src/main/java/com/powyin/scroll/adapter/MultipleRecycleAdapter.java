@@ -164,6 +164,19 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
         return mDataList.size()+mSpaceCount+mLoadMoreCount;
     }
 
+    // holder 依附
+    @Override
+    public void onViewAttachedToWindow(PowViewHolder.RecycleViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        holder.onViewAttachedToWindow();
+    }
+
+    // holder 脱离
+    @Override
+    public void onViewDetachedFromWindow(PowViewHolder.RecycleViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.onViewDetachedFromWindow();
+    }
 
     @Override
     public long getItemId(int position) {
@@ -225,8 +238,21 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
         return mHolderInstances.length ;                                              //错误页面数据
     }
 
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        mRecyclerView = null;
+    }
+
+
+
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
+
+    public RecyclerView getRecyclerView(){
+        return mRecyclerView;
+    }
+
 
     // 载入数据
     @Override
