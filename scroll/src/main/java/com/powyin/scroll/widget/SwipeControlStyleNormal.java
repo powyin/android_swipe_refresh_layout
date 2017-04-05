@@ -92,7 +92,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                     textInfo.setText("正在拼命刷新中");
                 }
                 break;
-            case SWIPE_HEAD_COMPLETE:
+            case SWIPE_HEAD_COMPLETE_OK:
                 statusPre.setVisibility(View.INVISIBLE);
                 statusLoad.clearAnimation();
                 statusLoad.setVisibility(View.INVISIBLE);
@@ -101,13 +101,27 @@ public class SwipeControlStyleNormal implements SwipeControl {
                     textInfo.setText("刷新成功");
                 }
                 break;
+            case SWIPE_HEAD_COMPLETE_ERROR:
 
+                statusPre.setVisibility(View.INVISIBLE);
+                statusLoad.clearAnimation();
+                statusLoad.setVisibility(View.INVISIBLE);
+                statusComplete.setVisibility(View.VISIBLE);
+                if (!textInfo.getText().toString().equals("刷新失败")) {
+                    textInfo.setText("刷新失败");
+                }
+
+                break;
             case SWIPE_FOOT_LOADING:
                 loadProgressBar.setVisibility(View.VISIBLE);
                 loadProgressBar.ensureAnimation();
                 textLoad.setVisibility(View.GONE);
                 break;
-            case SWIPE_FOOT_COMPLETE:
+            case SWIPE_FOOT_COMPLETE_OK:
+                loadProgressBar.setVisibility(View.GONE);
+                textLoad.setVisibility(View.VISIBLE);
+                break;
+            case SWIPE_FOOT_COMPLETE_ERROR:
                 loadProgressBar.setVisibility(View.GONE);
                 textLoad.setVisibility(View.VISIBLE);
                 break;

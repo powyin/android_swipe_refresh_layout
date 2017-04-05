@@ -9,7 +9,6 @@ import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -48,7 +47,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
     private ValueAnimator animationReBackToTop;                                     //滚动 回到正常显示
 
     private boolean mIsFreshContinue = false;                                       //下拉刷新 正在刷新
-    private boolean mIsFreshComplete = false;                                       //下拉刷新 刷新完成
+    private boolean mIsFreshCompleteOk = false;                                     //下拉刷新 刷新完成
+    private boolean mIsFreshCompleteError = false;                                  //下拉刷新 刷新完成
     private boolean mIsLoadContinue = false;                                        //上拉加载 正在加载
     private boolean mIsLoadComplete = false;                                        //上拉加载 全部加载完成
 
@@ -125,7 +125,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         scrollY_Up = -mSwipeControl.getSwipeHead().getMeasuredHeight();
         scrollY_Down = mSwipeControl.getSwipeFoot().getMeasuredHeight();
 
-        mSwipeControl.getSwipeHead().layout(0, -mSwipeControl.getSwipeHead().getMeasuredHeight(), right - left, 0);
+        mSwipeControl.getSwipeHead().layout(left, -mSwipeControl.getSwipeHead().getMeasuredHeight(), right , 0);
 
         mTarget.layout(0, 0, right - left, bottom - top);
 
@@ -210,7 +210,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         ensureTarget();
-        if (!isEnabled() || (canChildScrollDown() && canChildScrollUp()) || mNestedScrollInProgress) {
+        if (mNestedScrollInProgress || !isEnabled() || (canChildScrollDown() && canChildScrollUp()) ) {
             return false;
         }
 
@@ -262,10 +262,10 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         int pointerIndex;
         switch (MotionEventCompat.getActionMasked(ev)) {
             case MotionEvent.ACTION_DOWN:
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId( 0);
                 break;
             case MotionEvent.ACTION_MOVE: {
-                pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                pointerIndex = ev.findPointerIndex( mActivePointerId);
                 if (pointerIndex < 0 || !mInterceptDragged) {
                     break;
                 }
@@ -416,7 +416,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
 
         int currentScrollY = getScrollY();
 
-        if (deltaOriginY < 0 && currentScrollY < middleHei) {                                                                        //平滑过度下拉刷新的进度变化
+        if (deltaOriginY < 0 && currentScrollY < middleHei) {                                                                        //过度拉伸 阻尼效果
             deltaY = (int) (deltaY * Math.pow((mSwipeControl.getOverScrollHei() - (middleHei - currentScrollY)) * 1f
                     / mSwipeControl.getOverScrollHei(), 2));
         }
@@ -445,15 +445,18 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
 
             scrollTo(0, willTo);
 
-            if (willTo < 0 && willTo > middleHei && mIsFreshComplete && !mIsFreshContinue) {                                                                 //刷新内部状态
-                mIsFreshComplete = false;
+            if (willTo < 0 && willTo > middleHei && (mIsFreshCompleteOk || mIsFreshCompleteError) && !mIsFreshContinue) {                                                                 //刷新内部状态
+                mIsFreshCompleteOk = false;
+                mIsFreshCompleteError = false;
             }
             int swipeViewVisibilityHei = 0 - willTo;
             if (swipeViewVisibilityHei > 0) {                                                                                          //更新刷新状态
                 if (mIsFreshContinue) {
                     mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
-                } else if (mIsFreshComplete) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
+                } else if (mIsFreshCompleteOk) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_OK, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
+                } else if (mIsFreshCompleteError) {
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
                 } else if (willTo < middleHei) {
                     mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
                 } else {
@@ -469,7 +472,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
             }
             if (willTo > 0) {
                 if (mIsLoadComplete) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_FOOT_COMPLETE, willTo, mSwipeControl.getSwipeFoot().getHeight());
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_FOOT_COMPLETE_OK, willTo, mSwipeControl.getSwipeFoot().getHeight());
                 } else {
                     mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_FOOT_LOADING, willTo, mSwipeControl.getSwipeFoot().getHeight());
                 }
@@ -481,7 +484,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
     }
 
     private boolean tryBackToRefreshing() {
-        if (mIsTouchEventMode || mIsFreshComplete) return false;
+        if (mIsTouchEventMode || mIsFreshCompleteOk || mIsFreshCompleteError) return false;
         int scrollY = getScrollY();
         int middleHei = scrollY_Up != 0 ? scrollY_Up + mSwipeControl.getOverScrollHei() : 0;
         boolean isOverProgress = scrollY < middleHei;
@@ -538,7 +541,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         int scrollY = getScrollY();
         int middleHei = scrollY_Up != 0 ? scrollY_Up + mSwipeControl.getOverScrollHei() : 0;
 
-        if (!mIsFreshComplete && scrollY == middleHei) return false;
+        if (!(mIsFreshCompleteOk || mIsFreshCompleteError) && scrollY == middleHei) return false;
 
         if (scrollY < 0) {
             stopAllScroll();
@@ -579,31 +582,50 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
         this.mOnRefreshListener = onRefreshListener;
     }
 
-    // 结束上拉刷新
-    public void finishRefresh() {
+    // 结束上拉刷新 成功
+    public void completeFreshSuccess() {
         postDelayed(new Runnable() {
             @Override
             public void run() {
                 mIsFreshContinue = false;
-                mIsFreshComplete = true;
+                mIsFreshCompleteOk = true;
+                mIsFreshCompleteError = false;
                 mIsLoadComplete = false;
                 mIsLoadContinue = false;
-                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE,
+                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_OK,
                         -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                 tryBackToFreshFinish();
             }
-        },600);
+        }, 500);
     }
+
+    // 结束上拉刷新 成功
+    public void completeFreshError() {
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mIsFreshContinue = false;
+                mIsFreshCompleteOk = false;
+                mIsFreshCompleteError = true;
+                mIsLoadComplete = false;
+                mIsLoadContinue = false;
+                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR,
+                        -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
+                tryBackToFreshFinish();
+            }
+        }, 500);
+    }
+
 
     // 设置下拉加载是否全部加载完成
     public void setIsLoadComplete(boolean isLoadComplete) {
         this.mIsLoadComplete = isLoadComplete;
-        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_FOOT_COMPLETE,
+        mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_FOOT_COMPLETE_OK,
                 getHeight() - mSwipeControl.getSwipeFoot().getTop(), mSwipeControl.getSwipeFoot().getHeight());
     }
 
     // 隐藏下拉加载显示
-    public void hiddenLoadMore() {
+    public void completeLoadedHidden() {
         this.mIsLoadContinue = false;
         ensureTarget();
         int currentScrollY = getScrollY();
@@ -611,30 +633,46 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent {
             return;
         }
 
-//        if (mTarget instanceof RecyclerView) {                                                                  //平滑recyclerView 下拉加载过程
-//            RecyclerView recyclerView = (RecyclerView) mTarget;
-//            if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-//            //    System.out.println("-----------------"+( layoutManager==null));
-//            //    layoutManager.scrollVerticallyBy(currentScrollY, null, null);
-//
-//                mTarget.scrollBy(0,currentScrollY);
-//
-//            //    layoutManager.scrollVerticallyBy(currentScrollY,null, new RecyclerView.State());
-//            }
-//        }
-//
-//        if (mTarget instanceof ListView) {                                                                      //ListView 下拉加载过程
-//            ListView listView = (ListView) mTarget;
-//            listView.smoothScrollBy(currentScrollY, 0);
-//        }
-
-        if(mTarget instanceof RecyclerView || mTarget instanceof  ListView){
-            mTarget.scrollBy(0,currentScrollY);
+        if (mTarget instanceof RecyclerView || mTarget instanceof ListView) {
+            mTarget.scrollBy(0, currentScrollY);
         }
 
         scrollTo(0, 0);
     }
+
+    // 隐藏下拉加载显示 全部加载 完成
+    public void completeLoadedNoMore() {
+        this.mIsLoadContinue = false;
+        ensureTarget();
+        int currentScrollY = getScrollY();
+        if (currentScrollY <= 0) {
+            return;
+        }
+
+        if (mTarget instanceof RecyclerView || mTarget instanceof ListView) {
+            mTarget.scrollBy(0, currentScrollY);
+        }
+
+        scrollTo(0, 0);
+    }
+
+    // 隐藏下拉加载显示 全部加载 失败
+    public void completeLoadedFail() {
+        this.mIsLoadContinue = false;
+        ensureTarget();
+        int currentScrollY = getScrollY();
+        if (currentScrollY <= 0) {
+            return;
+        }
+
+        if (mTarget instanceof RecyclerView || mTarget instanceof ListView) {
+            mTarget.scrollBy(0, currentScrollY);
+        }
+
+        scrollTo(0, 0);
+    }
+
+
 
     // 设置刷新模式
     public void setSwipeModel(SwipeControl.SwipeModel model) {

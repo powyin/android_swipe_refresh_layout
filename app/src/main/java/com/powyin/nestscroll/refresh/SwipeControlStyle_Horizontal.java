@@ -87,7 +87,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
                     textInfo.setText("正在拼命刷新中");
                 }
                 break;
-            case SWIPE_HEAD_COMPLETE:
+            case SWIPE_HEAD_COMPLETE_OK:
                 statusPre.setVisibility(View.INVISIBLE);
 
                 statusComplete.setVisibility(View.VISIBLE);
@@ -100,7 +100,7 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
                 loadProgressBar.setVisibility(View.VISIBLE);
                 textLoad.setVisibility(View.GONE);
                 break;
-            case SWIPE_FOOT_COMPLETE:
+            case SWIPE_FOOT_COMPLETE_OK:
                 loadProgressBar.setVisibility(View.GONE);
                 textLoad.setVisibility(View.VISIBLE);
                 break;

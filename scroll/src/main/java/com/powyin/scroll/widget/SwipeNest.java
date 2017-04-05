@@ -281,7 +281,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
                     / mSwipeControl.getOverScrollHei(), 2));
         }
 
-        if (pre && currentScrollY != scrollY_Down || !pre) {
+        if ( currentScrollY != scrollY_Down || !pre) {
 
             int willTo = currentScrollY + deltaY;
             willTo = Math.min(willTo, scrollY_Down);
@@ -301,7 +301,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
                 if (mIsFreshContinue) {
                     mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
                 } else if (mIsFreshComplete) {
-                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
+                    mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_OK, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
                 } else if (willTo < middleHei) {
                     mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, mSwipeControl.getSwipeHead().getHeight());
                 } else {
@@ -437,7 +437,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, Neste
             public void run() {
                 mIsFreshContinue = false;
                 mIsFreshComplete = true;
-                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE,
+                mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_COMPLETE_OK,
                         -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                 tryBackToFreshFinish();
             }

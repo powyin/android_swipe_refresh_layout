@@ -15,13 +15,15 @@ public interface SwipeControl {
 
     enum SwipeStatus {
         // 上拉刷新
-        SWIPE_HEAD_OVER,                        //提示: 松开刷新
-        SWIPE_HEAD_TOAST,                       //提示: 下拉刷新
-        SWIPE_HEAD_LOADING,                     //提示: 刷新中
-        SWIPE_HEAD_COMPLETE,                    //提示: 刷新完成
+        SWIPE_HEAD_OVER,                           //提示: 松开刷新
+        SWIPE_HEAD_TOAST,                          //提示: 下拉刷新
+        SWIPE_HEAD_LOADING,                        //提示: 刷新中
+        SWIPE_HEAD_COMPLETE_OK,                    //提示: 刷新完成
+        SWIPE_HEAD_COMPLETE_ERROR,                 //提示: 刷新失败
         // 下拉加载
         SWIPE_FOOT_LOADING,
-        SWIPE_FOOT_COMPLETE;
+        SWIPE_FOOT_COMPLETE_OK,
+        SWIPE_FOOT_COMPLETE_ERROR
     }
 
     // 头部刷新View

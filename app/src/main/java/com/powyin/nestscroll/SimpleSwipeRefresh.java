@@ -42,7 +42,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                 swipeRefresh.setSwipeControl(new SwipeControlStyle_Horizontal(this));   //设置定义刷新样式
                 break;
             case R.id.click_me_to_stop_head:
-                swipeRefresh.finishRefresh();                                           //下拉刷新完成
+                swipeRefresh.completeFreshSuccess();                                           //下拉刷新完成
                 break;
             case R.id.click_me_to_stop_foot_fresh:
                 if(multipleListAdapter!=null){
@@ -57,7 +57,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                     multipleRecycleAdapter.addLast(new DataModel(-1));                             //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
                     multipleRecycleAdapter.addLast(new DataModel(3));
                 }
-                swipeRefresh.hiddenLoadMore();                                          //已经获取更多数据   隐藏上拉加载进度条
+                swipeRefresh.completeLoadedHidden();                                          //已经获取更多数据   隐藏上拉加载进度条
                 break;
             case R.id.click_me_to_stop_foot_over:
                 swipeRefresh.setIsLoadComplete(true);                                   //已经没有更多数据   全部数据已经获得
