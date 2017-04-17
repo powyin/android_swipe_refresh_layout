@@ -96,11 +96,11 @@ public class SwipeControlStyle_Horizontal implements SwipeControl {
                 }
                 break;
 
-            case SWIPE_FOOT_LOADING:
+            case SWIPE_LOAD_LOADING:
                 loadProgressBar.setVisibility(View.VISIBLE);
                 textLoad.setVisibility(View.GONE);
                 break;
-            case SWIPE_FOOT_COMPLETE_OK:
+            case SWIPE_LOAD_NO_MORE:
                 loadProgressBar.setVisibility(View.GONE);
                 textLoad.setVisibility(View.VISIBLE);
                 break;

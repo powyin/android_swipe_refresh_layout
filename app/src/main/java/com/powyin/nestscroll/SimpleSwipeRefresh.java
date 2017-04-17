@@ -15,6 +15,7 @@ import com.powyin.nestscroll.net.DataModel;
 import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
+import com.powyin.scroll.widget.ISwipe;
 import com.powyin.scroll.widget.SwipeRefresh;
 
 /**
@@ -39,28 +40,28 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.click_me_to_set_swipe_control:
-                swipeRefresh.setSwipeControl(new SwipeControlStyle_Horizontal(this));   //设置定义刷新样式
+                swipeRefresh.setSwipeControl(new SwipeControlStyle_Horizontal(this));               //设置定义刷新样式
                 break;
             case R.id.click_me_to_stop_head:
-                swipeRefresh.completeFreshSuccess();                                           //下拉刷新完成
+                swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.ERROR_AUTO_CANCEL);                    //下拉刷新完成
                 break;
             case R.id.click_me_to_stop_foot_fresh:
                 if(multipleListAdapter!=null){
                     multipleListAdapter.addLast(new DataModel(2));
                     multipleListAdapter.addLast(new DataModel(1));
-                    multipleListAdapter.addLast(new DataModel(-1));                             //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
+                    multipleListAdapter.addLast(new DataModel(-1));                                 //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
                     multipleListAdapter.addLast(new DataModel(3));
                 }
                 if(multipleRecycleAdapter!=null){
                     multipleRecycleAdapter.addLast(new DataModel(2));
                     multipleRecycleAdapter.addLast(new DataModel(1));
-                    multipleRecycleAdapter.addLast(new DataModel(-1));                             //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
+                    multipleRecycleAdapter.addLast(new DataModel(-1));                              //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
                     multipleRecycleAdapter.addLast(new DataModel(3));
                 }
-                swipeRefresh.completeLoadedHidden();                                          //已经获取更多数据   隐藏上拉加载进度条
+                swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.CONTINUE);                 //已经获取更多数据   隐藏上拉加载进度条
                 break;
             case R.id.click_me_to_stop_foot_over:
-                swipeRefresh.setIsLoadComplete(true);                                   //已经没有更多数据   全部数据已经获得
+                swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.NO_MORE);                  //已经没有更多数据   全部数据已经获得
                 break;
         }
     }
@@ -71,14 +72,14 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         findViewById(R.id.click_me_to_stop_head).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_fresh).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_over).setOnClickListener(this);
-      //  listView = (ListView)findViewById(R.id.my_list);
-        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
+        listView = (ListView)findViewById(R.id.my_list);
+      //  mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
         swipeRefresh = (SwipeRefresh)findViewById(R.id.re);
     }
 
     private void init(){
-        initRecycleView();
-    //    initListView();
+     //   initRecycleView();
+        initListView();
         swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
             public void onRefresh() {

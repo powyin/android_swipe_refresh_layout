@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by powyin on 2016/7/30.
  */
-public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHolder.RecycleViewHolder> implements AdapterDelegate<T> {
+public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolder.RecycleViewHolder> implements AdapterDelegate<T> {
 
     // 0 空白页面；
     // 1 错误页面；
@@ -37,7 +37,6 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     public static <T, N extends T> MultipleRecycleAdapter<N> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
         return new MultipleRecycleAdapter(activity, arrClass);
     }
-
 
 
     private PowViewHolder[] mHolderInstances;                                                                          // viewHolder 类实现实例
@@ -51,8 +50,6 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     private int mLoadMoreCount;
 
 
-
-
     // 上拉加载实现
     private boolean mLoadEnableShow = false;                                                                              // 是否展示加载更多
     private LoadStatus mLoadStatus = LoadStatus.CONTINUE;
@@ -63,8 +60,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public  MultipleRecycleAdapter(Activity activity, Class<? extends PowViewHolder<? extends T >>... viewHolderClass) {
-
+    public MultipleRecycleAdapter(Activity activity, Class<? extends PowViewHolder<? extends T>>... viewHolderClass) {
         Class<? extends PowViewHolder>[] arrClass = new Class[viewHolderClass.length];
         System.arraycopy(viewHolderClass, 0, arrClass, 0, viewHolderClass.length);
 
@@ -74,8 +70,8 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
         this.mHolderGenericDataClass = new Class[arrClass.length];
 
         for (int i = 0; i < arrClass.length; i++) {
-            Type genericType;                                                                                          // class类(泛型修饰信息)
-            Class typeClass = mHolderClasses[i];                                                                       // class类
+            Type genericType;                                                                                                                // class类(泛型修饰信息)
+            Class typeClass = mHolderClasses[i];                                                                                             // class类
             do {
                 genericType = typeClass.getGenericSuperclass();
                 typeClass = typeClass.getSuperclass();
@@ -86,12 +82,12 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
             }
             ParameterizedType paramType = (ParameterizedType) genericType;
             Type genericClass = paramType.getActualTypeArguments()[0];
-            mHolderGenericDataClass[i] = (Class) genericClass;                                                         //赋值 泛型类型(泛型类持有)
+            mHolderGenericDataClass[i] = (Class) genericClass;                                                                               //赋值 泛型类型(泛型类持有)
             try {
-                mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class,ViewGroup.class).newInstance(mActivity,null);         //赋值 holder实例
+                mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, null);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者 " + e.getMessage());
+                throw new RuntimeException( e.getMessage());
             }
         }
     }
@@ -102,23 +98,23 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     @Override
     public PowViewHolder.RecycleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        if(viewType == mHolderClasses.length+2){
-            if(loadMorePowViewHolder==null){
+        if (viewType == mHolderClasses.length + 2) {
+            if (loadMorePowViewHolder == null) {
                 loadMorePowViewHolder = new LoadMorePowViewHolder();
             }
             return loadMorePowViewHolder.getNewInstance();
-        } else if(viewType == mHolderClasses.length +1){
+        } else if (viewType == mHolderClasses.length + 1) {
             return new IncludeTypeEmpty(parent);
-        } else if(viewType == mHolderClasses.length) {
+        } else if (viewType == mHolderClasses.length) {
             return new IncludeTypeError(parent);
-        }else {
+        } else {
             PowViewHolder holder;
-                try {
-                    holder = mHolderClasses[viewType].getConstructor(Activity.class,ViewGroup.class).newInstance(mActivity,parent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者   " + e.getMessage());
-                }
+            try {
+                holder = mHolderClasses[viewType].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者   " + e.getMessage());
+            }
 
             return holder.mViewHolder;
         }
@@ -127,25 +123,25 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(PowViewHolder.RecycleViewHolder holder, int position) {
-        T itemData = position < mDataList.size() ?  mDataList.get(position) : null;
+        T itemData = position < mDataList.size() ? mDataList.get(position) : null;
         PowViewHolder<T> powViewHolder = holder.mPowViewHolder;
 
-    //    System.out.println("---------------------------------------------------->>>>>>>>>>>>>>>>>"+(holder.mPowViewHolder==null));
+        //    System.out.println("---------------------------------------------------->>>>>>>>>>>>>>>>>"+(holder.mPowViewHolder==null));
 
-        if(position>=mDataList.size()){
-            if(position >= mDataList.size() + mSpaceCount){
-                ((LoadMorePowViewHolder.LoadProgressBar)holder.itemView).mIndex = position - (mDataList.size()+mSpaceCount);
+        if (position >= mDataList.size()) {
+            if (position >= mDataList.size() + mSpaceCount) {
+                ((LoadMorePowViewHolder.LoadProgressBar) holder.itemView).mIndex = position - (mDataList.size() + mSpaceCount);
             }
 
-            if(mLoadStatus == LoadStatus.CONTINUE && mOnLoadMoreListener != null){
+            if (mLoadStatus == LoadStatus.CONTINUE && mOnLoadMoreListener != null) {
                 mLoadStatus = null;
                 mOnLoadMoreListener.onLoadMore();
             }
 
-        }else {
-            if(powViewHolder!=null){
+        } else {
+            if (powViewHolder != null) {
                 powViewHolder.mData = itemData;
-                powViewHolder.loadData( this, itemData , position);
+                powViewHolder.loadData(this, itemData, position);
             }
         }
     }
@@ -161,7 +157,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     public int getItemCount() {
         ensureConfig();
 
-        return mDataList.size()+mSpaceCount+mLoadMoreCount;
+        return mDataList.size() + mSpaceCount + mLoadMoreCount;
     }
 
     // holder 依附
@@ -181,30 +177,30 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     @Override
     public long getItemId(int position) {
         T date = position < mDataList.size() ? mDataList.get(position) : null;
-        return date==null? 0 : date.hashCode();
+        return date == null ? 0 : date.hashCode();
     }
 
-    private void ensureConfig(){
-        if(!mLoadEnableShow || mRecyclerView==null) {
+    private void ensureConfig() {
+        if (!mLoadEnableShow || mRecyclerView == null) {
             mSpaceCount = 0;
             mLoadMoreCount = 0;
-        }else {
+        } else {
             RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
-            if(layoutManager instanceof GridLayoutManager){
-                GridLayoutManager gridLayoutManager =  (GridLayoutManager)layoutManager;
-                int spanCount =  gridLayoutManager.getSpanCount();
+            if (layoutManager instanceof GridLayoutManager) {
+                GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+                int spanCount = gridLayoutManager.getSpanCount();
                 int dataSize = mDataList.size();
 
-                mSpaceCount = dataSize%spanCount==0 ? 0 : spanCount - dataSize%spanCount;
+                mSpaceCount = dataSize % spanCount == 0 ? 0 : spanCount - dataSize % spanCount;
                 mLoadMoreCount = spanCount;
-            } else if(layoutManager instanceof LinearLayoutManager){
+            } else if (layoutManager instanceof LinearLayoutManager) {
                 mSpaceCount = 0;
                 mLoadMoreCount = 1;
-            } else if(layoutManager instanceof StaggeredGridLayoutManager){
+            } else if (layoutManager instanceof StaggeredGridLayoutManager) {
                 // 待 完善 ；
                 mSpaceCount = 0;
                 mLoadMoreCount = 1;
-            }else {
+            } else {
                 mSpaceCount = 0;
                 mLoadMoreCount = 1;
             }
@@ -214,28 +210,25 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     @SuppressWarnings("unchecked")
     @Override
     public int getItemViewType(int position) {
-        if (position >= mDataList.size()){
-//            if(mRecyclerView == null || mRecyclerView.getLayoutManager()==null){
-//                return mHolderInstances.length;
-//            }
+        if (position >= mDataList.size()) {
 
             ensureConfig();
 
-            if(position>=mDataList.size()+mSpaceCount){
+            if (position >= mDataList.size() + mSpaceCount) {
                 return mHolderInstances.length + 2;
-            }else {
+            } else {
                 return mHolderInstances.length + 1;
             }
         }
 
-        for (int i = 0; i < mHolderInstances.length ; i++) {                        //返回能载入次数据的ViewHolderClass下标
+        for (int i = 0; i < mHolderInstances.length; i++) {                        //返回能载入次数据的ViewHolderClass下标
             T itemData = mDataList.get(position);
             if (itemData != null && mHolderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && mHolderInstances[i].acceptData(itemData)) {
                 return i;
             }
         }
 
-        return mHolderInstances.length ;                                              //错误页面数据
+        return mHolderInstances.length;                                              //错误页面数据
     }
 
     @Override
@@ -245,14 +238,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     }
 
 
-
-
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
-
-    public RecyclerView getRecyclerView(){
-        return mRecyclerView;
-    }
-
 
     // 载入数据
     @Override
@@ -289,50 +275,50 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
     @Override
     public void addLast(T data) {
-        if(data==null) return;
+        if (data == null) return;
         mDataList.add(data);
         notifyDataSetChanged();
     }
 
     // 加入尾部数据    delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addLast(final T data, final LoadStatus status , int delayTime ) {
-        if(delayTime <=10){
+    public void addLast(final T data, final LoadStatus status, int delayTime) {
+        if (delayTime <= 10) {
             addLast(data);
             setLoadMoreStatus(status);
-        }else {
+        } else {
             mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     addLast(data);
                     setLoadMoreStatus(status);
                 }
-            },delayTime);
+            }, delayTime);
         }
     }
 
 
     @Override
     public void addLast(List<T> dataList) {
-        if(dataList==null || dataList.size()==0) return;
-        mDataList.addAll(mDataList.size(),dataList);
+        if (dataList == null || dataList.size() == 0) return;
+        mDataList.addAll(mDataList.size(), dataList);
         notifyDataSetChanged();
     }
 
     // 加入尾部数据     delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addLast(final List<T> dataList, final LoadStatus status , int delayTime ) {
-        if(delayTime <=10){
+    public void addLast(final List<T> dataList, final LoadStatus status, int delayTime) {
+        if (delayTime <= 10) {
             mDataList.addAll(mDataList.size(), dataList);
             setLoadMoreStatus(status);
-        }else {
+        } else {
             mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     addLast(dataList);
                     setLoadMoreStatus(status);
                 }
-            },delayTime);
+            }, delayTime);
         }
     }
 
@@ -340,7 +326,6 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     public List<T> getDataList() {
         return mDataList;
     }
-
 
 
     // 删除数据
@@ -355,7 +340,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     // 清空数据
     @Override
     public void deleteAllData() {
-        if(mDataList.size()!=0){
+        if (mDataList.size() != 0) {
             mDataList.clear();
             notifyDataSetChanged();
         }
@@ -373,7 +358,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     // 设置是否显示加载更多
     @Override
     public void setShowLoadMore(boolean show) {
-        if(this.mLoadEnableShow != show){
+        if (this.mLoadEnableShow != show) {
             this.mLoadEnableShow = show;
             notifyDataSetChanged();
         }
@@ -381,9 +366,9 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
     @Override
     public void setLoadMoreStatus(LoadStatus status) {
-        if(status==null) return;
+        if (status == null) return;
 
-        switch (status){
+        switch (status) {
             case CONTINUE:
                 mLoadStatus = LoadStatus.CONTINUE;
                 break;
@@ -391,9 +376,9 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
                 mLoadStatus = LoadStatus.COMPLITE;
         }
 
-        if(loadMorePowViewHolder!=null){
+        if (loadMorePowViewHolder != null) {
             loadMorePowViewHolder.ensureAnimation(false);
-            for(RecyclerView.ViewHolder holder : loadMorePowViewHolder.viewHolders){
+            for (RecyclerView.ViewHolder holder : loadMorePowViewHolder.viewHolders) {
                 holder.itemView.invalidate();
             }
         }
@@ -406,18 +391,19 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
     }
 
     // 0 空白页面
-    private  class IncludeTypeEmpty extends PowViewHolder.RecycleViewHolder<Object> {
+    private class IncludeTypeEmpty extends PowViewHolder.RecycleViewHolder<Object> {
         IncludeTypeEmpty(ViewGroup viewGroup) {
-            super(new Space(mActivity) , null);
+            super(new Space(mActivity), null);
         }
     }
 
     // 1 不合法信息展示类
-    private  class IncludeTypeError extends  PowViewHolder.RecycleViewHolder<Object>{
+    private class IncludeTypeError extends PowViewHolder.RecycleViewHolder<Object> {
         TextView errorInfo;
+
         IncludeTypeError(ViewGroup viewGroup) {
-            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_err, viewGroup,false) ,null);
-            errorInfo = (TextView)super.itemView.findViewById(R.id.powyin_scroll_err_text);
+            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_err, viewGroup, false), null);
+            errorInfo = (TextView) super.itemView.findViewById(R.id.powyin_scroll_err_text);
         }
     }
 
@@ -439,20 +425,21 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
         int ballCount = 10;
         float divide;
-        LoadMorePowViewHolder(){
+
+        LoadMorePowViewHolder() {
             circlePaint = new Paint();
             circlePaint.setColor(0x99000000);
             circlePaint.setStrokeWidth(4);
             textPaint = new TextPaint();
             textPaint.setColor(0x99000000);
-            textPaint.setTextSize(ViewUtils.sp2px(mActivity,13));
+            textPaint.setTextSize(ViewUtils.sp2px(mActivity, 13));
             textPaint.setAntiAlias(true);
             textPaint.setStrokeWidth(1);
         }
 
 
-        PowViewHolder.RecycleViewHolder getNewInstance(){
-            PowViewHolder.RecycleViewHolder holder =  new PowViewHolder.RecycleViewHolder<Object> (new LoadProgressBar(mActivity),null);
+        PowViewHolder.RecycleViewHolder getNewInstance() {
+            PowViewHolder.RecycleViewHolder holder = new PowViewHolder.RecycleViewHolder<Object>(new LoadProgressBar(mActivity), null);
             viewHolders.add(holder);
             return holder;
         }
@@ -460,8 +447,8 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
         private void ensureAnimation(boolean forceReStart) {
 
-            if(!mAttached || mLoadStatus== LoadStatus.COMPLITE){
-                if(animator!=null){
+            if (!mAttached || mLoadStatus == LoadStatus.COMPLITE) {
+                if (animator != null) {
                     animator.cancel();
                     animator = null;
                 }
@@ -487,7 +474,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
-                    for(RecyclerView.ViewHolder holder : viewHolders){
+                    for (RecyclerView.ViewHolder holder : viewHolders) {
                         holder.itemView.invalidate();
                     }
                 }
@@ -500,7 +487,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if ( animation == animator) {
+                    if (animation == animator) {
                         ensureAnimation(true);
                     }
                 }
@@ -526,6 +513,7 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
 
         class LoadProgressBar extends View {              //刷新视图
             int mIndex;
+
             public LoadProgressBar(Context context) {
                 super(context);
             }
@@ -551,21 +539,20 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
             }
 
 
-
             @Override
             protected void onDraw(Canvas canvas) {
                 super.onDraw(canvas);
-                if(mLoadStatus == LoadStatus.COMPLITE){
-                    int diff =  mIndex*getWidth();
-                    canvas.drawText(mLoadCompleteInfo,canvasTextX - diff,canvasTextY,textPaint);
-                    canvas.drawLine(20 - diff ,  canvasHei/2,  canvasTextX-20 -diff , canvasHei/2,  textPaint);
-                    canvas.drawLine(canvasWei-canvasTextX+20 -diff , canvasHei/2,  canvasWei-20 -diff,  canvasHei/2,textPaint);
+                if (mLoadStatus == LoadStatus.COMPLITE) {
+                    int diff = mIndex * getWidth();
+                    canvas.drawText(mLoadCompleteInfo, canvasTextX - diff, canvasTextY, textPaint);
+                    canvas.drawLine(20 - diff, canvasHei / 2, canvasTextX - 20 - diff, canvasHei / 2, textPaint);
+                    canvas.drawLine(canvasWei - canvasTextX + 20 - diff, canvasHei / 2, canvasWei - 20 - diff, canvasHei / 2, textPaint);
 
-                }else {
+                } else {
                     for (int i = 0; i < ballCount; i++) {
                         float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
                         wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
-                        wei -= mIndex*getWidth();                               // good
+                        wei -= mIndex * getWidth();                               // good
                         canvas.drawCircle(wei, canvasHei / 2, 8, circlePaint);
                     }
                 }
@@ -575,18 +562,16 @@ public class MultipleRecycleAdapter<T>  extends RecyclerView.Adapter<PowViewHold
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
                 canvasHei = getHeight();
-                canvasWei = getWidth()*mLoadMoreCount;
+                canvasWei = getWidth() * mLoadMoreCount;
 
-                canvasTextX = canvasWei /2 - textPaint.measureText(mLoadCompleteInfo) /2;
-                canvasTextY = canvasHei /2 + textPaint.getTextSize()/2.55f;
+                canvasTextX = canvasWei / 2 - textPaint.measureText(mLoadCompleteInfo) / 2;
+                canvasTextY = canvasHei / 2 + textPaint.getTextSize() / 2.55f;
 
                 ensureAnimation(false);
             }
         }
 
     }
-
-
 
 
 }
