@@ -9,7 +9,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.5.6'
+  compile 'com.github.powyin:scroll:1.5.9'
 }
 ```
 
@@ -103,23 +103,10 @@ swipeRefresh
             }
         });
         
-        swipeRefresh.finishRefresh();            //下拉刷新完成
-        swipeRefresh.hiddenLoadMore();           //已经获取更多数据   隐藏上拉加载进度条
-        swipeRefresh.setIsLoadComplete(true);    //已经没有更多数据   全部数据已经获得
+        swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.SUCCESS);           //下拉刷新 完成
+        swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.ERROR_AUTO_CANCEL); //下拉刷新 失败
+        swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.CONTINUE);        //已经获取更多数据   隐藏上拉加载进度条
         
-SwipeNest
-
-        swipeNest.setOnRefreshListener(new SwipeNest.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //开始上拉刷新
-            }
-
-        });
-        
-        swipeNest.finishRefresh();              //下拉刷新完成
-
-
 ### SwipeRefresh设置刷新模式
 
 ```
@@ -172,10 +159,6 @@ app:fresh_model=“ONLY_REFRESH”
   
 ```
 
-### contact me
-```
-  QQ 1217881964
-```
 
 
 
