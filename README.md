@@ -103,8 +103,8 @@ swipeRefresh
             }
         });
         
-        swipeRefresh.setFreshStatue(ISwip.RreshStatus.SUCCESS);           //下拉刷新 完成
-        swipeRefresh.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL); //下拉刷新 失败
+        swipeRefresh.setFreshStatue(ISwip.RreshStatus.SUCCESS);             //下拉刷新 完成
+        swipeRefresh.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL);  //下拉刷新 失败
         swipeRefresh.setLoadMoreStatus(ISwipe.LoadedStatus.CONTINUE);        //已经获取更多数据   隐藏上拉加载进度条
         
 ### SwipeRefresh设置刷新模式
