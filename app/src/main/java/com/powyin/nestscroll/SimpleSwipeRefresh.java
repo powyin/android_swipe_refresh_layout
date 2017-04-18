@@ -43,7 +43,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                 swipeRefresh.setSwipeControl(new SwipeControlStyle_Horizontal(this));               //设置定义刷新样式
                 break;
             case R.id.click_me_to_stop_head:
-                swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.ERROR_AUTO_CANCEL);                    //下拉刷新完成
+                swipeRefresh.setFreshStatue(ISwipe.FreshStatus.SUCCESS);                    //下拉刷新完成
                 break;
             case R.id.click_me_to_stop_foot_fresh:
                 if(multipleListAdapter!=null){
@@ -72,14 +72,14 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         findViewById(R.id.click_me_to_stop_head).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_fresh).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_over).setOnClickListener(this);
-        listView = (ListView)findViewById(R.id.my_list);
-      //  mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
+    //    listView = (ListView)findViewById(R.id.my_list);
+        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
         swipeRefresh = (SwipeRefresh)findViewById(R.id.re);
     }
 
     private void init(){
-     //   initRecycleView();
-        initListView();
+        initRecycleView();
+     //   initListView();
         swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -88,7 +88,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
             }
 
             @Override
-            public void onLoading() {
+            public void onLoading(boolean isLoadViewShow) {
                 System.out.println("------------------------------------------------onLoading----------------------->>>>>>>>");
                 // 开始加载更多
             }
