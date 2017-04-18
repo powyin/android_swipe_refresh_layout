@@ -9,7 +9,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-  compile 'com.github.powyin:scroll:1.5.9'
+  compile 'com.github.powyin:scroll:1.7.0'
 }
 ```
 
@@ -98,14 +98,17 @@ swipeRefresh
             }
 
             @Override
-            public void onLoading() {
+            public void onLoading(boolen isLoadViewShow) {
                 // 开始加载更多
             }
         });
         
-        swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.SUCCESS);           //下拉刷新 完成
-        swipeRefresh.setFreshStatue(SwipeRefresh.RefreshStatus.ERROR_AUTO_CANCEL); //下拉刷新 失败
-        swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.CONTINUE);        //已经获取更多数据   隐藏上拉加载进度条
+        swipeRefresh.setFreshStatue(ISwip.RreshStatus.SUCCESS);             //下拉刷新 完成
+        swipeRefresh.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL);  //下拉刷新 失败
+        swipeRefresh.setLoadMoreStatus(ISwipe.LoadedStatus.CONTINUE);       //已经获取更多数据   隐藏上拉加载进度条
+        
+        
+        
         
 ### SwipeRefresh设置刷新模式
 
