@@ -621,7 +621,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
             if (scrollY == middleHei) {
                 animationReBackToTop.setDuration(Math.abs(550 * (0 - scrollY) / mSwipeControl.getSwipeHead().getHeight()));
-                animationReBackToTop.setStartDelay(550);
+                animationReBackToTop.setStartDelay(650);
             } else {
                 animationReBackToTop.setDuration(320);
             }
@@ -679,7 +679,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                                 -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                         tryBackToFreshFinish();
                     }
-                }, 350);
+                }, 500);
                 break;
             case ERROR_FIXED:                                                                              //设置刷新失败 自动隐藏
                 mFreshStatus = FreshStatus.ERROR_FIXED;
@@ -703,7 +703,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                                 -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                         tryBackToFreshFinish();
                     }
-                }, 350);
+                }, 500);
                 break;
 
 
