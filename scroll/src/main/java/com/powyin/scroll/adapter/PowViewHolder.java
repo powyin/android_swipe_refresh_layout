@@ -41,13 +41,12 @@ public abstract class PowViewHolder<T> {
         } else {
             mRegisterMainItemClickStatus = -1;
         }
-
     }
-
 
     private View.OnClickListener getItemViewOnClickListener() {
         if (mItemView.hasOnClickListeners()) {
             try {
+
                 Field mListenerInfo = View.class.getDeclaredField("mListenerInfo");
                 mListenerInfo.setAccessible(true);
                 Object infoObject = mListenerInfo.get(mItemView);
@@ -58,8 +57,6 @@ public abstract class PowViewHolder<T> {
                 Object onClickObject = clickListener.get(infoObject);
 
                 if (onClickObject == null) return null;
-
-                System.out.println(" ..............            " + (onClickObject instanceof View.OnClickListener));
 
                 if (onClickObject instanceof View.OnClickListener) {
                     return (View.OnClickListener) onClickObject;
@@ -78,14 +75,13 @@ public abstract class PowViewHolder<T> {
         public void onClick(View v) {
             if (mMultipleAdapter != null && mMultipleAdapter instanceof MultipleRecycleAdapter) {
                 MultipleRecycleAdapter adapter = (MultipleRecycleAdapter) mMultipleAdapter;
-                adapter.invokeItemClick(PowViewHolder.this,mPosition, v.getId());
+                adapter.invokeItemClick(PowViewHolder.this, mPosition, v.getId());
             }
         }
     };
 
 
     protected final void registerItemClick(int... viewIds) {
-
         if (mRegisterMainItemClickStatus > 0 && mItemView.hasOnClickListeners() && getItemViewOnClickListener() == mOnClickListener) {
             mItemView.setOnClickListener(null);
         }
