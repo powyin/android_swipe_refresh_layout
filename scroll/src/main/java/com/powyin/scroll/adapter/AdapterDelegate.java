@@ -59,4 +59,52 @@ public interface AdapterDelegate<T> {
     // 设置加载更多监听
     void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener);
 
+    // 设置点击监听;
+
+    void setOnItemClickListener(OnItemClickListener<T> clickListener);
+
+    //------------------------------------------------------ 上拉加载--------------------------------------------------------//
+
+    // 加载更多监听
+    interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
+    // 点击
+    interface OnItemClickListener<T>{
+        void onClick(PowViewHolder<T> holder , T data, int index , int resId  );
+
+    }
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

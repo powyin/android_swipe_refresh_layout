@@ -5,6 +5,7 @@
 
 
     <ImageView
+        android:id="@+id/avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/header" />

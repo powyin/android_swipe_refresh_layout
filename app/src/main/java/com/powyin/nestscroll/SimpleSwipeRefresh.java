@@ -13,8 +13,10 @@ import com.powyin.nestscroll.adapter.TypePowViewHolder_Text;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Pic_4;
 import com.powyin.nestscroll.net.DataModel;
 import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
+import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
+import com.powyin.scroll.adapter.PowViewHolder;
 import com.powyin.scroll.widget.ISwipe;
 import com.powyin.scroll.widget.SwipeRefresh;
 
@@ -104,6 +106,13 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
             int rad = (int)(Math.random()*10)%3+1;
             multipleListAdapter.addLast(new DataModel(rad));
         }
+
+        multipleListAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener() {
+            @Override
+            public void onClick(PowViewHolder holder, Object data, int index, int resId) {
+                System.out.println(".....................clkci" + holder + "   " + data + "   " + index + " " + resId);
+            }
+        });
     }
 
     private void initRecycleView(){
@@ -116,6 +125,13 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
             multipleRecycleAdapter.addLast(new DataModel(rad));
         }
         mRecyclerView.setAdapter(multipleRecycleAdapter);
+
+        multipleRecycleAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener<DataModel>() {
+            @Override
+            public void onClick(PowViewHolder<DataModel> holder, DataModel data, int index, int resId) {
+                System.out.println(".....................clkci" + holder + "   " + data + "   " + index + " " + resId);
+            }
+        });
     }
 
 

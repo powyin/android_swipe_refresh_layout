@@ -16,6 +16,7 @@ import com.powyin.scroll.adapter.PowViewHolder;
 public class TypePowViewHolder_Text extends PowViewHolder<DataModel> {
     public TypePowViewHolder_Text(Activity activity, ViewGroup viewGroup) {
         super(activity,viewGroup);
+        registerItemClick(R.id.avatar);
     }
     @Override
     protected int getItemViewRes() {

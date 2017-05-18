@@ -28,6 +28,6 @@ public class TypePowViewHolder_Pic_4 extends PowViewHolder<DataModel> {
 
     @Override
     public void loadData(AdapterDelegate<? super DataModel> multipleAdapter, DataModel data, int postion) {
-
+        registerItemClick(R.id.content);
     }
 }

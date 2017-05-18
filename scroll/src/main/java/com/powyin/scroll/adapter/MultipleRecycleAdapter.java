@@ -56,6 +56,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
     private LoadMorePowViewHolder loadMorePowViewHolder;
     private String mLoadCompleteInfo = "我是有底线的";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                       // 显示更多监听
+    private OnItemClickListener<T> mOnItemClickListener;
 
 
     @SuppressWarnings("unchecked")
@@ -87,7 +88,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
                 mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, null);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException( e.getMessage());
+                throw new RuntimeException(e.getMessage());
             }
         }
     }
@@ -113,7 +114,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
                 holder = mHolderClasses[viewType].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者   " + e.getMessage());
+                throw new RuntimeException(e.getMessage());
             }
 
             return holder.mViewHolder;
@@ -123,6 +124,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(PowViewHolder.RecycleViewHolder holder, int position) {
+
         T itemData = position < mDataList.size() ? mDataList.get(position) : null;
         PowViewHolder<T> powViewHolder = holder.mPowViewHolder;
 
@@ -141,6 +143,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
         } else {
             if (powViewHolder != null) {
                 powViewHolder.mData = itemData;
+                powViewHolder.mMultipleAdapter = this;
+                powViewHolder.mPosition = position;
+                System.out.println("-----------"+position);
+                if (mOnItemClickListener != null && powViewHolder.mRegisterMainItemClickStatus == 0) {
+                    powViewHolder.registerAutoItemClick();
+                    System.out.println("-----------------gister---"+position);
+                }
                 powViewHolder.loadData(this, itemData, position);
             }
         }
@@ -235,6 +244,12 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         mRecyclerView = null;
+    }
+
+    final void invokeItemClick(PowViewHolder<T> powViewHolder, int index, int resId) {
+        if(mOnItemClickListener !=null && index>=0 && index < mDataList.size()){
+            mOnItemClickListener.onClick(powViewHolder ,mDataList.get(index),index,resId);
+        }
     }
 
 
@@ -388,6 +403,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
     @Override
     public void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {
         this.mOnLoadMoreListener = loadMoreListener;
+    }
+
+    // 设置ViewHolder 点击监听
+
+
+    @Override
+    public void setOnItemClickListener(OnItemClickListener<T> clickListener) {
+        this.mOnItemClickListener = clickListener;
     }
 
     // 0 空白页面

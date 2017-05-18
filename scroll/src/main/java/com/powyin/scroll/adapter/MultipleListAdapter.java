@@ -8,15 +8,10 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
-import android.widget.Space;
 import android.widget.TextView;
 
 import com.powyin.scroll.R;
@@ -24,9 +19,7 @@ import com.powyin.scroll.R;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by powyin on 2016/6/14.
@@ -199,6 +192,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             PowViewHolder holder = (PowViewHolder) convertView.getTag();
             T itemData = mDataList.get(position);
             holder.mData = itemData;
+
+            if(holder.mRegisterMainItemClickStatus ==0 ){
+                holder.registerAutoItemClick();
+            }
+
             holder.loadData(this, itemData, position);
             return holder.mViewHolder.itemView;
         }
@@ -265,6 +263,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     public void notifyDataSetInvalidated() {
         mDataSetObservable.notifyInvalidated();
+    }
+
+    @Override
+    public void setOnItemClickListener(OnItemClickListener clickListener) {
+
     }
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
