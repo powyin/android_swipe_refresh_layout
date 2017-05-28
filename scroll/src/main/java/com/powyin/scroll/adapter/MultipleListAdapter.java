@@ -468,7 +468,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             circlePaint.setStrokeWidth(4);
             textPaint = new TextPaint();
             textPaint.setColor(0x99000000);
-            textPaint.setTextSize(ViewUtils.sp2px(mActivity, 13));
+
+            final float fontScale = mActivity.getResources().getDisplayMetrics().scaledDensity;
+            int target =  (int) (13 * fontScale + 0.5f);
+
+            textPaint.setTextSize(target);
             textPaint.setAntiAlias(true);
             textPaint.setStrokeWidth(1);
         }
@@ -571,7 +575,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-                setMeasuredDimension(getMeasuredWidth(), ViewUtils.dip2px(getContext(), 40));
+
+                float scale = getContext().getResources().getDisplayMetrics().density;
+                int target =  (int) (40 * scale + 0.5f);
+
+                setMeasuredDimension(getMeasuredWidth(), target);
             }
 
 

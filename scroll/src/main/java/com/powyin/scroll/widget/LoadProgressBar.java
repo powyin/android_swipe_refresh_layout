@@ -32,8 +32,14 @@ class LoadProgressBar extends View {              //刷新视图
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(getMeasuredWidth(), ViewUtils.dip2px(getContext(), 40));
+
+        float scale = getContext().getResources().getDisplayMetrics().density;
+        int target = (int) (40 * scale + 0.5f);
+
+        setMeasuredDimension(getMeasuredWidth(), target);
+
     }
+
 
     ValueAnimator animator;
     Paint circlePaint;
