@@ -478,7 +478,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             }
 
 
-            if ( willTo > 0 && !canChildScrollDown()) {                                //确保当mTarget没有足够内容进行独立滑动时 上拉加载不启动
+            if ( willTo > 0 && !canChildScrollDown()) {                                                                               //确保当mTarget没有足够内容进行独立滑动时 上拉加载不启动
                 willTo = 0;
             }
 
@@ -652,7 +652,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     public void setFreshStatue(FreshStatus statue) {
         switch (statue) {
             case CONTINUE:
-
                 mFreshStatus = FreshStatus.CONTINUE;
                 mRefreshStatusContinueRunning = true;
                 mLoadedStatus = LoadedStatus.CONTINUE;
@@ -665,7 +664,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                 mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_HEAD_LOADING,
                         -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                 tryBackToRefreshing();
-
                 break;
             case SUCCESS:                                                                                   //设置刷新成功 自动隐藏
                 postDelayed(new Runnable() {
@@ -679,7 +677,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                                 -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                         tryBackToFreshFinish();
                     }
-                }, 500);
+                }, 1000);
                 break;
             case ERROR_FIXED:                                                                              //设置刷新失败 自动隐藏
                 mFreshStatus = FreshStatus.ERROR_FIXED;
@@ -703,10 +701,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                                 -getScrollY(), mSwipeControl.getSwipeHead().getHeight());
                         tryBackToFreshFinish();
                     }
-                }, 500);
+                }, 1000);
                 break;
-
-
         }
     }
 
@@ -714,24 +710,27 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     public void setLoadMoreStatus(ISwipe.LoadedStatus status) {
         switch (status) {
             case CONTINUE:
+                lab:{
+                    ensureTarget();
+                    int currentScrollY = getScrollY();
+                    if (currentScrollY <= 0) {
+                        break lab;
+                    }
+                    if ((mTarget instanceof RecyclerView ||
+                            mTarget instanceof ListView ||
+                            mTarget instanceof ScrollView ||
+                            mTarget instanceof NestedScrollView) && canChildScrollUp()) {
+                        mTarget.scrollBy(0, currentScrollY);
+                    }
+
+                    stopAllScroll();
+                    scrollTo(0, 0);
+                }
 
                 this.mLoadedStatusContinueRunning = false;
                 this.mLoadedStatus = LoadedStatus.CONTINUE;
                 mSwipeControl.onSwipeStatue(SwipeControl.SwipeStatus.SWIPE_LOAD_LOADING,
                         getHeight() - mSwipeControl.getSwipeFoot().getTop(), mSwipeControl.getSwipeFoot().getHeight());
-
-                ensureTarget();
-                int currentScrollY = getScrollY();
-                if (currentScrollY <= 0) {
-                    return;
-                }
-
-                if (mTarget instanceof RecyclerView || mTarget instanceof ListView || mTarget instanceof ScrollView || mTarget instanceof NestedScrollView) {
-                    mTarget.scrollBy(0, currentScrollY);
-                }
-
-                stopAllScroll();
-                scrollTo(0, 0);
                 break;
             case ERROR:
                 this.mLoadedStatusContinueRunning = true;
