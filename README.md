@@ -10,7 +10,7 @@ Add Gradle dependency:
 ```gradle
 dependencies {
       compile 'com.github.powyin:scroll:1.8.6'
-      compile 'com.android.support:design:24.0.0'
+      compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
 
@@ -30,26 +30,31 @@ dependencies {
 
 ### how to use  SwipeRefresh
 
-      <com.powyin.scroll.widget.SwipeRefresh
+ <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-         <!--app:fresh_model="ONLY_REFRESH"                                    枚举类型 设置支持刷新模式-->
         app:fresh_model="BOTH"
         >
-        <ListView
-            android:id="@+id/my_list"
-            android:background="#ffffffff"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <!--或者是RecyclerView-->
-        <!--或者 Any View-->
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:background="#ffffff"-->
-            <!--android:id="@+id/my_recycle"-->
+
+
+        <!--<ListView-->
+            <!--android:id="@+id/my_list"-->
+            <!--android:background="#ffffffff"-->
             <!--android:overScrollMode="never"-->
+            <!--android:dividerHeight="0dp"-->
+            <!--android:divider="#00000000"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="match_parent"/>-->
+
+        <!--或者是RecyclerView-->
+        <android.support.v7.widget.RecyclerView
+            android:background="#ffffff"
+            android:id="@+id/my_recycle"
+            android:overScrollMode="never"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
     </com.powyin.scroll.widget.SwipeRefresh>
     
 ### how to use  SwipeNest 
@@ -58,12 +63,14 @@ dependencies {
         android:id="@+id/nest_combine"
         android:background="#e5e5e5"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        >
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:overScrollMode="never">
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +80,8 @@ dependencies {
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:src="@drawable/pic_4"
-                    android:scaleType="centerCrop"  />
+                    android:scaleType="centerCrop"
+                    />
             </FrameLayout>
         </android.support.v4.widget.NestedScrollView>
 
@@ -83,11 +91,8 @@ dependencies {
             android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-      </com.powyin.scroll.widget.SwipeNest>
+    </com.powyin.scroll.widget.SwipeNest>
     
-    
-
-
 ### 设置刷新监听与刷新结果处理
 
 swipeRefresh
