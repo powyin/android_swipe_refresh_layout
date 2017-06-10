@@ -30,12 +30,12 @@ dependencies {
 
 ### how to use  SwipeRefresh
 
- <com.powyin.scroll.widget.SwipeRefresh
+   
+      <com.powyin.scroll.widget.SwipeRefresh
         android:id = "@+id/re"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fresh_model="BOTH"
-        >
+        app:fresh_model="BOTH" >
 
 
         <!--<ListView-->
