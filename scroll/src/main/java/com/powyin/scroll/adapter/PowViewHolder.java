@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
  * 使用时：必须确定泛型类型
  */
 public abstract class PowViewHolder<T> {
-    final RecycleViewHolder mViewHolder;
+    final RecycleViewHolder<T> mViewHolder;
 
     protected final View mItemView;
     protected final Activity mActivity;
@@ -31,7 +31,7 @@ public abstract class PowViewHolder<T> {
             throw new RuntimeException("must provide View by getItemView() or gitItemViewRes()");
         }
         mItemView = item == null ? activity.getLayoutInflater().inflate(getItemViewRes(), viewGroup, false) : item;
-        mViewHolder = new RecycleViewHolder<>(mItemView, this);
+        mViewHolder = new RecycleViewHolder<T>(mItemView, this);
     }
 
     final void registerAutoItemClick() {
@@ -127,28 +127,5 @@ public abstract class PowViewHolder<T> {
 
     }
 
-    static class RecycleViewHolder<T> extends RecyclerView.ViewHolder {
-        PowViewHolder<T> mPowViewHolder;
 
-        RecycleViewHolder(View itemView, PowViewHolder<T> powViewHolder) {
-            super(itemView);
-            this.mPowViewHolder = powViewHolder;
-        }
-
-
-        // holder 依附
-        void onViewAttachedToWindow() {
-            if (this.mPowViewHolder != null) {
-                this.mPowViewHolder.onViewAttachedToWindow();
-            }
-        }
-
-        // holder 脱离
-        void onViewDetachedFromWindow() {
-            if (this.mPowViewHolder != null) {
-                this.mPowViewHolder.onViewDetachedFromWindow();
-            }
-        }
-
-    }
 }

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by powyin on 2016/7/30.
  */
-public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolder.RecycleViewHolder> implements AdapterDelegate<T> {
+public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecycleViewHolder> implements AdapterDelegate<T> {
 
     // 0 空白页面；
     // 1 错误页面；
@@ -97,7 +97,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
 
     @SuppressWarnings("unchecked")
     @Override
-    public PowViewHolder.RecycleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecycleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         if (viewType == mHolderClasses.length + 2) {
             if (loadMorePowViewHolder == null) {
@@ -123,7 +123,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(PowViewHolder.RecycleViewHolder holder, int position) {
+    public void onBindViewHolder(RecycleViewHolder holder, int position) {
 
         T itemData = position < mDataList.size() ? mDataList.get(position) : null;
         PowViewHolder<T> powViewHolder = holder.mPowViewHolder;
@@ -145,10 +145,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
                 powViewHolder.mData = itemData;
                 powViewHolder.mMultipleAdapter = this;
                 powViewHolder.mPosition = position;
-                System.out.println("-----------"+position);
+
                 if (mOnItemClickListener != null && powViewHolder.mRegisterMainItemClickStatus == 0) {
                     powViewHolder.registerAutoItemClick();
-                    System.out.println("-----------------gister---"+position);
                 }
                 powViewHolder.loadData(this, itemData, position);
             }
@@ -171,14 +170,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
 
     // holder 依附
     @Override
-    public void onViewAttachedToWindow(PowViewHolder.RecycleViewHolder holder) {
+    public void onViewAttachedToWindow(RecycleViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         holder.onViewAttachedToWindow();
     }
 
     // holder 脱离
     @Override
-    public void onViewDetachedFromWindow(PowViewHolder.RecycleViewHolder holder) {
+    public void onViewDetachedFromWindow(RecycleViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         holder.onViewDetachedFromWindow();
     }
@@ -414,14 +413,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
     }
 
     // 0 空白页面
-    private class IncludeTypeEmpty extends PowViewHolder.RecycleViewHolder<Object> {
+    private class IncludeTypeEmpty extends RecycleViewHolder<Object> {
         IncludeTypeEmpty(ViewGroup viewGroup) {
             super(new Space(mActivity), null);
         }
     }
 
     // 1 不合法信息展示类
-    private class IncludeTypeError extends PowViewHolder.RecycleViewHolder<Object> {
+    private class IncludeTypeError extends RecycleViewHolder<Object> {
         TextView errorInfo;
 
         IncludeTypeError(ViewGroup viewGroup) {
@@ -465,8 +464,8 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<PowViewHolde
         }
 
 
-        PowViewHolder.RecycleViewHolder getNewInstance() {
-            PowViewHolder.RecycleViewHolder holder = new PowViewHolder.RecycleViewHolder<Object>(new LoadProgressBar(mActivity), null);
+        RecycleViewHolder getNewInstance() {
+            RecycleViewHolder holder = new RecycleViewHolder<Object>(new LoadProgressBar(mActivity), null);
             viewHolders.add(holder);
             return holder;
         }
