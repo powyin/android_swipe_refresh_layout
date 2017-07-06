@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  * Created by powyin on 2016/7/30.
  */
-public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecycleViewHolder> implements AdapterDelegate<T> {
+public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AdapterDelegate<T> {
 
     // 0 空白页面；
     // 1 错误页面；
@@ -43,6 +44,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecycleViewH
     private Class<? extends PowViewHolder>[] mHolderClasses;                                                           // viewHolder class类
     private Class[] mHolderGenericDataClass;                                                                           // viewHolder 携带泛型
     private Activity mActivity;
+    private boolean isMovingEnable = false;                                                                            // 是否支持拖拽
     private List<T> mDataList = new ArrayList<>();
     private boolean mShowError = true;                                                                                 // 是否展示错误信息
     private RecyclerView mRecyclerView;
@@ -91,13 +93,19 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecycleViewH
                 throw new RuntimeException(e.getMessage());
             }
         }
+
+        for(PowViewHolder<T> holder :mHolderInstances){
+            isMovingEnable |= holder.ennableDragAndDrop();
+            if(isMovingEnable) break;
+        }
+
     }
 
     //----------------------------------------------------adapterImp----------------------------------------------------//
 
     @SuppressWarnings("unchecked")
     @Override
-    public RecycleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         if (viewType == mHolderClasses.length + 2) {
             if (loadMorePowViewHolder == null) {
@@ -155,10 +163,35 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecycleViewH
     }
 
 
+    ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+
+            RecycleViewHolder powViewHolder = (RecycleViewHolder)viewHolder;
+            if(powViewHolder.mPowViewHolder)
+
+
+            return
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    });
+
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         mRecyclerView = recyclerView;
+        if(isMovingEnable){
+            itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        }
     }
 
     @Override
