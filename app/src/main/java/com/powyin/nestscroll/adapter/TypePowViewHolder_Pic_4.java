@@ -32,7 +32,7 @@ public class TypePowViewHolder_Pic_4 extends PowViewHolder<DataModel> {
     }
 
     @Override
-    protected boolean ennableDragAndDrop() {
+    protected boolean isEnableDragAndDrop() {
         return true;
     }
 

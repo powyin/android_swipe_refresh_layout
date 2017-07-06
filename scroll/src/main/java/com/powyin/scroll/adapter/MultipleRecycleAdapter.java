@@ -2,7 +2,6 @@ package com.powyin.scroll.adapter;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -23,7 +22,6 @@ import com.powyin.scroll.R;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -97,7 +95,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
 
         for(PowViewHolder<T> holder :mHolderInstances){
-            isMovingEnable |= holder.ennableDragAndDrop();
+            isMovingEnable |= holder.isEnableDragAndDrop();
             if(isMovingEnable) break;
         }
 
@@ -169,7 +167,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             PowViewHolder powViewHolder = ((RecycleViewHolder)viewHolder).mPowViewHolder;
-            if(powViewHolder!= null && powViewHolder.ennableDragAndDrop()){
+            if(powViewHolder!= null && powViewHolder.isEnableDragAndDrop()){
                 return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN|ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT , 0);
             }
             return 0;
@@ -180,7 +178,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             PowViewHolder oriViewHolder = ((RecycleViewHolder)viewHolder).mPowViewHolder;
             PowViewHolder tarViewHolder = ((RecycleViewHolder)target).mPowViewHolder;
             if(oriViewHolder==null || tarViewHolder==null ||
-                    !oriViewHolder.ennableDragAndDrop() || !tarViewHolder.ennableDragAndDrop())
+                    !oriViewHolder.isEnableDragAndDrop() || !tarViewHolder.isEnableDragAndDrop())
                 return false;
             int ori = viewHolder.getAdapterPosition();
             int tar = target.getAdapterPosition();

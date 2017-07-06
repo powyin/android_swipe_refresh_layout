@@ -26,7 +26,7 @@ public class TypePowViewHolder_Str extends PowViewHolder<String> {
 
 
     @Override
-    protected boolean ennableDragAndDrop() {
+    protected boolean isEnableDragAndDrop() {
         return true;
     }
 

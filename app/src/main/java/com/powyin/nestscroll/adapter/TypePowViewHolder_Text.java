@@ -34,7 +34,7 @@ public class TypePowViewHolder_Text extends PowViewHolder<DataModel> {
     }
 
     @Override
-    protected boolean ennableDragAndDrop() {
+    protected boolean isEnableDragAndDrop() {
         return true;
     }
 }

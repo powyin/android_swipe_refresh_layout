@@ -128,7 +128,7 @@ public abstract class PowViewHolder<T> {
     }
 
     // 是否支持拖动
-    protected boolean ennableDragAndDrop(){
+    protected boolean isEnableDragAndDrop(){
         return false;
     }
 
