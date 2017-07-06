@@ -24,6 +24,12 @@ public class TypePowViewHolder_Str extends PowViewHolder<String> {
 
     }
 
+
+    @Override
+    protected boolean ennableDragAndDrop() {
+        return true;
+    }
+
     @Override
     protected int getItemViewRes() {
         return R.layout.view_holder_type_pic_1;

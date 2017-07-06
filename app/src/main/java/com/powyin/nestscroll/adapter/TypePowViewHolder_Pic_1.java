@@ -34,4 +34,9 @@ public class TypePowViewHolder_Pic_1 extends PowViewHolder<DataModel> {
     public void loadData(AdapterDelegate<? super DataModel> multipleAdapter, DataModel data, int postion) {
 
     }
+
+    @Override
+    protected boolean ennableDragAndDrop() {
+        return true;
+    }
 }

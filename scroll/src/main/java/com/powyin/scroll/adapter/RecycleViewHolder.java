@@ -7,7 +7,7 @@ import android.view.View;
  * Created by powyin on 2017/6/28.
  */
 
-public class RecycleViewHolder<T> extends RecyclerView.ViewHolder {
+class RecycleViewHolder<T> extends RecyclerView.ViewHolder {
     PowViewHolder<T> mPowViewHolder;
     RecycleViewHolder(View itemView, PowViewHolder<T> powViewHolder) {
         super(itemView);
