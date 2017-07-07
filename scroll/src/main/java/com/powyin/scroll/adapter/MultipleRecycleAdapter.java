@@ -94,9 +94,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             }
         }
 
-        for(PowViewHolder<T> holder :mHolderInstances){
+        for (PowViewHolder<T> holder : mHolderInstances) {
             isMovingEnable |= holder.isEnableDragAndDrop();
-            if(isMovingEnable) break;
+            if (isMovingEnable) break;
         }
 
         setHasStableIds(true);
@@ -136,7 +136,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         T itemData = position < mDataList.size() ? mDataList.get(position) : null;
-        PowViewHolder<T> powViewHolder = ((RecycleViewHolder)holder).mPowViewHolder;
+        PowViewHolder<T> powViewHolder = ((RecycleViewHolder) holder).mPowViewHolder;
 
         if (position >= mDataList.size()) {
             if (position >= mDataList.size() + mSpaceCount) {
@@ -166,24 +166,24 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            PowViewHolder powViewHolder = ((RecycleViewHolder)viewHolder).mPowViewHolder;
-            if(powViewHolder!= null && powViewHolder.isEnableDragAndDrop()){
-                return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN|ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT , 0);
+            PowViewHolder powViewHolder = ((RecycleViewHolder) viewHolder).mPowViewHolder;
+            if (powViewHolder != null && powViewHolder.isEnableDragAndDrop()) {
+                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, 0);
             }
             return 0;
         }
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-            PowViewHolder oriViewHolder = ((RecycleViewHolder)viewHolder).mPowViewHolder;
-            PowViewHolder tarViewHolder = ((RecycleViewHolder)target).mPowViewHolder;
-            if(oriViewHolder==null || tarViewHolder==null ||
+            PowViewHolder oriViewHolder = ((RecycleViewHolder) viewHolder).mPowViewHolder;
+            PowViewHolder tarViewHolder = ((RecycleViewHolder) target).mPowViewHolder;
+            if (oriViewHolder == null || tarViewHolder == null ||
                     !oriViewHolder.isEnableDragAndDrop() || !tarViewHolder.isEnableDragAndDrop())
                 return false;
             int ori = viewHolder.getAdapterPosition();
             int tar = target.getAdapterPosition();
             mDataList.set(ori, mDataList.set(tar, mDataList.get(ori)));
-            notifyItemMoved(ori,tar);
+            notifyItemMoved(ori, tar);
             return true;
         }
 
@@ -196,14 +196,11 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     });
 
 
-
-
-
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         mRecyclerView = recyclerView;
-        if(isMovingEnable){
+        if (isMovingEnable) {
             itemTouchHelper.attachToRecyclerView(mRecyclerView);
         }
     }
@@ -217,14 +214,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-        ((RecycleViewHolder)holder).onViewAttachedToWindow();
+        ((RecycleViewHolder) holder).onViewAttachedToWindow();
     }
 
     // holder 脱离
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        ((RecycleViewHolder)holder).onViewDetachedFromWindow();
+        ((RecycleViewHolder) holder).onViewDetachedFromWindow();
     }
 
     @Override
@@ -290,13 +287,24 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     }
 
     final void invokeItemClick(PowViewHolder<T> powViewHolder, int index, int resId) {
-        if(mOnItemClickListener !=null && index>=0 && index < mDataList.size()){
-            mOnItemClickListener.onClick(powViewHolder ,mDataList.get(index),index,resId);
+        if (mOnItemClickListener != null && index >= 0 && index < mDataList.size()) {
+            mOnItemClickListener.onClick(powViewHolder, mDataList.get(index), index, resId);
         }
     }
 
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
+
+    // 获取数据
+    @Override
+    public List<T> getDataList() {
+        return mDataList;
+    }
+
+    @Override
+    public int getDataCount() {
+        return mDataList.size();
+    }
 
     // 载入数据
     @Override
@@ -307,72 +315,28 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         notifyDataSetChanged();
     }
 
-    @Override
-    public void deleteFirst() {
-        mDataList.remove(0);
-        ensureConfig();
-        notifyDataSetChanged();
-    }
 
+    // 添加数据
     @Override
-    public void deleteLast() {
-        mDataList.remove(mDataList.size() - 1);
-        ensureConfig();
-        notifyDataSetChanged();
-    }
-
-    // 加入头部数据
-    @Override
-    public void addFirst(T data) {
-        mDataList.add(0, data);
-        ensureConfig();
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void addFirst(List<T> datas) {
-        mDataList.addAll(0, datas);
-        ensureConfig();
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void addLast(T data) {
+    public void addData(int position, T data) {
         if (data == null) return;
-        mDataList.add(data);
+        mDataList.add(position, data);
         ensureConfig();
         notifyDataSetChanged();
     }
 
-    // 加入尾部数据    delayTime 延迟加入 让上拉加载显示时间加长
+    // 添加数据
     @Override
-    public void addLast(final T data, final LoadStatus status, int delayTime) {
-        if (delayTime <= 10) {
-            addLast(data);
-            setLoadMoreStatus(status);
-        } else {
-            mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    addLast(data);
-                    setLoadMoreStatus(status);
-                }
-            }, delayTime);
-        }
-    }
-
-
-    @Override
-    public void addLast(List<T> dataList) {
-        if (dataList == null || dataList.size() == 0) return;
-        mDataList.addAll(mDataList.size(), dataList);
+    public void addData(int position, List<T> dataList) {
+        if(dataList==null) return;
+        mDataList.addAll(position,dataList);
         ensureConfig();
         notifyDataSetChanged();
     }
 
     // 加入尾部数据     delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addLast(final List<T> dataList, final LoadStatus status, int delayTime) {
+    public void addDataAtLast(final List<T> dataList, final LoadStatus status, int delayTime) {
         if (delayTime <= 10) {
             mDataList.addAll(mDataList.size(), dataList);
             ensureConfig();
@@ -391,25 +355,29 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
+    // 删除数据
     @Override
-    public List<T> getDataList() {
-        return mDataList;
+    public T removeData(int position) {
+        T ret = mDataList.remove(position);
+        ensureConfig();
+        notifyDataSetChanged();
+        return ret;
     }
 
 
     // 删除数据
     @Override
-    public void deleteData(T data) {
-        if (mDataList.contains(data)) {
-            mDataList.remove(data);
-            ensureConfig();
-            notifyDataSetChanged();
-        }
+    public void removeData(T data) {
+        mDataList.remove(data);
+        ensureConfig();
+        notifyDataSetChanged();
     }
+
+
 
     // 清空数据
     @Override
-    public void deleteAllData() {
+    public void clearData() {
         if (mDataList.size() != 0) {
             mDataList.clear();
             ensureConfig();
@@ -515,7 +483,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             textPaint.setColor(0x99000000);
 
             final float fontScale = mActivity.getResources().getDisplayMetrics().scaledDensity;
-            int target =  (int) (13 * fontScale + 0.5f);
+            int target = (int) (13 * fontScale + 0.5f);
 
             textPaint.setTextSize(target);
             textPaint.setAntiAlias(true);

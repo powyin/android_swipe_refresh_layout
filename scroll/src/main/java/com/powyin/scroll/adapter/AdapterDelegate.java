@@ -13,37 +13,30 @@ public interface AdapterDelegate<T> {
         COMPLITE,
     }
 
+
+    // 获取数据源
+    List<T> getDataList();
+    // 获取数据数量
+    int getDataCount();
+
     // 载入数据
     void loadData(List<T> dataList);
 
-    void deleteFirst();
 
-    void deleteLast();
-
-    // 加入头部数据
-    void addFirst(T data);
-
-    void addFirst(List<T> datas);
-
+    // 添加数据
+    void addData(int position, T data);
+    void addData(int position, List<T> dataList);
     // 加入尾部数据
-    void addLast(T data);
-    void addLast(T data, LoadStatus status,  int delayTime);
-
-
-    void addLast(List<T> dataList);
-    void addLast(List<T> dataList,  LoadStatus status, int delayTime);
-
-
-
-    List<T> getDataList();
-
-
+    void addDataAtLast(List<T> dataList,  LoadStatus status, int delayTime);
 
     // 删除数据
-    void deleteData(T data);
+    T removeData(int position);
+    void removeData(T data);
 
     // 清空数据
-    void deleteAllData();
+    void clearData();
+
+
 
     // 设置是否展示不合法数据；
     void setShowErrorHolder(boolean show);
@@ -75,7 +68,6 @@ public interface AdapterDelegate<T> {
         void onClick(PowViewHolder<T> holder , T data, int index , int resId  );
 
     }
-
 
 
 }

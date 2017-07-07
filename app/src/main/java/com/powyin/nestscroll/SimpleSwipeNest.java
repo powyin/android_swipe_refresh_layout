@@ -61,7 +61,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         MultipleRecycleAdapter<Object> multipleRecycleAdapter = new MultipleRecycleAdapter<>(this,TypePowViewHolder_Obj.class);
         for (int i=0;i<35;i++){
-            multipleRecycleAdapter.addFirst(new Object());
+            multipleRecycleAdapter.addData(0,new Object());
         }
         mRecyclerView.setAdapter(multipleRecycleAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

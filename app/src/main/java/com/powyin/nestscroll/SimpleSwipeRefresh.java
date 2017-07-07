@@ -49,16 +49,16 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                 break;
             case R.id.click_me_to_stop_foot_fresh:
                 if(multipleListAdapter!=null){
-                    multipleListAdapter.addLast(new DataModel(2));
-                    multipleListAdapter.addLast(new DataModel(1));
-                    multipleListAdapter.addLast(new DataModel(-1));                                 //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
-                    multipleListAdapter.addLast(new DataModel(3));
+                    multipleListAdapter.addData(multipleListAdapter.getDataCount(),new DataModel(2));
+                    multipleListAdapter.addData(multipleListAdapter.getDataCount(),new DataModel(1));
+                    multipleListAdapter.addData(multipleListAdapter.getDataCount(),new DataModel(-1));                                 //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
+                    multipleListAdapter.addData(multipleListAdapter.getDataCount(),new DataModel(3));
                 }
                 if(multipleRecycleAdapter!=null){
-                    multipleRecycleAdapter.addLast(new DataModel(2));
-                    multipleRecycleAdapter.addLast(new DataModel(1));
-                    multipleRecycleAdapter.addLast(new DataModel(-1));                              //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
-                    multipleRecycleAdapter.addLast(new DataModel(3));
+                    multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(2));
+                    multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(1));
+                    multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(-1));                              //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
+                    multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(3));
                 }
                 swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.CONTINUE);                 //已经获取更多数据   隐藏上拉加载进度条
                 break;
@@ -104,7 +104,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         listView.setAdapter(multipleListAdapter);
         for(int i=0;i<3;i++){
             int rad = (int)(Math.random()*10)%3+1;
-            multipleListAdapter.addLast(new DataModel(rad));
+            multipleListAdapter.addData(multipleListAdapter.getDataCount()-1,new DataModel(rad));
         }
 
         multipleListAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener() {
@@ -122,7 +122,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
         for(int i=0;i<3;i++){
             int rad = (int)(Math.random()*10)%3+1;
-            multipleRecycleAdapter.addLast(new DataModel(rad));
+            multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount()-1,new DataModel(rad));
         }
         mRecyclerView.setAdapter(multipleRecycleAdapter);
 

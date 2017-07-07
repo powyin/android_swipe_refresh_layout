@@ -8,6 +8,7 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
@@ -178,22 +179,22 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         }
 
         Object object = convertView.getTag();
-        if(typeIndex == mHolderClasses.length + 2){
-            LoadMorePowViewHolder holder = (LoadMorePowViewHolder)object;
+        if (typeIndex == mHolderClasses.length + 2) {
+            LoadMorePowViewHolder holder = (LoadMorePowViewHolder) object;
 
             // todo 刷新
-        }else if(typeIndex == mHolderClasses.length+1){
-            IncludeTypeEmpty holder = (IncludeTypeEmpty)object;
+        } else if (typeIndex == mHolderClasses.length + 1) {
+            IncludeTypeEmpty holder = (IncludeTypeEmpty) object;
 
-        }else if(typeIndex == mHolderClasses.length){
-            IncludeTypeError holder = (IncludeTypeError)object;
+        } else if (typeIndex == mHolderClasses.length) {
+            IncludeTypeError holder = (IncludeTypeError) object;
 
-        }else {
+        } else {
             PowViewHolder holder = (PowViewHolder) convertView.getTag();
             T itemData = mDataList.get(position);
             holder.mData = itemData;
 
-            if(holder.mRegisterMainItemClickStatus ==0 ){
+            if (holder.mRegisterMainItemClickStatus == 0) {
                 holder.registerAutoItemClick();
             }
 
@@ -272,6 +273,18 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
+    // 获取数据列表
+    @NonNull
+    @Override
+    public List<T> getDataList() {
+        return mDataList;
+    }
+
+    // 获取数据数量
+    @Override
+    public int getDataCount() {
+        return mDataList.size();
+    }
 
     // 载入数据
     @Override
@@ -281,89 +294,50 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         notifyDataSetChanged();
     }
 
+    // 添加数据
     @Override
-    public void deleteFirst() {
-        mDataList.remove(0);
+    public void addData(int position, T data) {
+        mDataList.add(position, data);
         notifyDataSetChanged();
     }
 
+    // 添加数据
     @Override
-    public void deleteLast() {
-        mDataList.remove(mDataList.size() - 1);
+    public void addData(int position, List<T> dataList) {
+        mDataList.addAll(position, dataList);
         notifyDataSetChanged();
     }
 
-    // 加入头部数据
+    // 移除数据
     @Override
-    public void addFirst(T data) {
-        mDataList.add(0, data);
+    public T removeData(int position) {
+        T ret = mDataList.remove(position);
         notifyDataSetChanged();
-    }
-
-    @Override
-    public void addFirst(List<T> datas) {
-        mDataList.addAll(0, datas);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void addLast(T data) {
-        if (data == null) return;
-        mDataList.add(data);
-        notifyDataSetChanged();
-    }
-
-    // 加入尾部数据    delayTime 延迟加入 让上拉加载显示时间加长
-    @Override
-    public void addLast(final T data, final LoadStatus status, int delayTime) {
-        if (delayTime <= 10) {
-            addLast(data);
-            setLoadMoreStatus(status);
-        } else {
-            mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    addLast(data);
-                    setLoadMoreStatus(status);
-                }
-            }, delayTime);
-        }
-    }
-
-
-    @Override
-    public void addLast(List<T> dataList) {
-        if (dataList == null || dataList.size() == 0) return;
-        mDataList.addAll(mDataList.size(), dataList);
-        notifyDataSetChanged();
+        return ret;
     }
 
     // 加入尾部数据     delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addLast(final List<T> dataList, final LoadStatus status, int delayTime) {
+    public void addDataAtLast(final List<T> dataList, final LoadStatus status, int delayTime) {
         if (delayTime <= 10) {
             mDataList.addAll(mDataList.size(), dataList);
+            notifyDataSetChanged();
             setLoadMoreStatus(status);
         } else {
             mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    addLast(dataList);
+                    mDataList.addAll(mDataList.size(), dataList);
+                    notifyDataSetChanged();
                     setLoadMoreStatus(status);
                 }
             }, delayTime);
         }
     }
 
-    @Override
-    public List<T> getDataList() {
-        return mDataList;
-    }
-
-
     // 删除数据
     @Override
-    public void deleteData(T data) {
+    public void removeData(T data) {
         if (mDataList.contains(data)) {
             mDataList.remove(data);
             notifyDataSetChanged();
@@ -372,7 +346,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     // 清空数据
     @Override
-    public void deleteAllData() {
+    public void clearData() {
         if (mDataList.size() != 0) {
             mDataList.clear();
             notifyDataSetChanged();
@@ -470,7 +444,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             textPaint.setColor(0x99000000);
 
             final float fontScale = mActivity.getResources().getDisplayMetrics().scaledDensity;
-            int target =  (int) (13 * fontScale + 0.5f);
+            int target = (int) (13 * fontScale + 0.5f);
 
             textPaint.setTextSize(target);
             textPaint.setAntiAlias(true);
@@ -577,7 +551,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
                 float scale = getContext().getResources().getDisplayMetrics().density;
-                int target =  (int) (40 * scale + 0.5f);
+                int target = (int) (40 * scale + 0.5f);
 
                 setMeasuredDimension(getMeasuredWidth(), target);
             }
