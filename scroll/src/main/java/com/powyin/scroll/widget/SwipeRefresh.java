@@ -42,7 +42,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     private boolean mIsTouchEventMode = false;                                      //DispatchTouchEvent  是否在进行TouchEvent传递
     private boolean mPreScroll;                                                     //DispatchTouchEvent  是否预滚动
-    private boolean mDraggedDisable;                                                //禁止拦截消息传递;
     private boolean mDraggedDispatch;                                               //DispatchTouchEvent  已经打断
     private boolean mDraggedIntercept;                                              //InterceptTouchEvent 打断
 

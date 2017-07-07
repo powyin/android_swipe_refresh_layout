@@ -1,7 +1,6 @@
 package com.powyin.scroll.adapter;
 
 import android.app.Activity;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,7 +14,7 @@ import java.lang.reflect.Field;
 public abstract class PowViewHolder<T> {
     final RecycleViewHolder<T> mViewHolder;
 
-    protected final View mItemView;
+    public final View mItemView;
     protected final Activity mActivity;
 
     protected T mData;
@@ -26,11 +25,10 @@ public abstract class PowViewHolder<T> {
 
     public PowViewHolder(Activity activity, ViewGroup viewGroup) {
         this.mActivity = activity;
-        View item = getItemView();
-        if (item == null && getItemViewRes() == 0) {
+        if (getItemViewRes() == 0) {
             throw new RuntimeException("must provide View by getItemView() or gitItemViewRes()");
         }
-        mItemView = item == null ? activity.getLayoutInflater().inflate(getItemViewRes(), viewGroup, false) : item;
+        mItemView = activity.getLayoutInflater().inflate(getItemViewRes(), viewGroup, false) ;
         mViewHolder = new RecycleViewHolder<T>(mItemView, this);
     }
 
@@ -105,16 +103,26 @@ public abstract class PowViewHolder<T> {
         }
     }
 
+
+
+
     protected abstract int getItemViewRes();
 
     public abstract void loadData(AdapterDelegate<? super T> multipleAdapter, T data, int position);
 
-    protected View getItemView() {
-        return null;
-    }
 
     protected boolean acceptData(T data) {
         return true;
+    }
+
+    // 是否支持拖动
+    protected boolean isEnableDragAndDrop(){
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K  extends View> K findViewById(int resId){
+        return (K)mItemView.findViewById(resId);
     }
 
     // holder 依附
@@ -127,10 +135,7 @@ public abstract class PowViewHolder<T> {
 
     }
 
-    // 是否支持拖动
-    protected boolean isEnableDragAndDrop(){
-        return false;
-    }
+
 
 
 }
