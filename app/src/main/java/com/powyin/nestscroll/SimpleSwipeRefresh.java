@@ -122,7 +122,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
         for(int i=0;i<3;i++){
             int rad = (int)(Math.random()*10)%3+1;
-            multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount()-1,new DataModel(rad));
+            multipleRecycleAdapter.addData(0,new DataModel(rad));
         }
         mRecyclerView.setAdapter(multipleRecycleAdapter);
 

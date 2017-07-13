@@ -62,10 +62,10 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     // 上拉加载实现
     private boolean mLoadEnableShow = false;                                                                              // 是否展示加载更多
-    private LoadStatus mLoadStatus = LoadStatus.CONTINUE;
+    private LoadedStatus mLoadStatus = LoadedStatus.CONTINUE;
     private LoadMorePowViewHolder loadMorePowViewHolder;
     private String mLoadCompleteInfo = "我是有底线的";
-    private OnLoadMoreListener mOnLoadMoreListener;                                                                       // 显示更多监听
+    OnLoadMoreListener mOnLoadMoreListener;                                                                       // 显示更多监听
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
@@ -273,6 +273,42 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
+
+    @Override
+    public void setHeadView(View view) {
+
+    }
+
+    @Override
+    public void setFootView(View view) {
+
+    }
+
+    @Override
+    public void removeHeadView() {
+
+    }
+
+    @Override
+    public void removeFootView() {
+
+    }
+
+    @Override
+    public void enableEmptyView(boolean show) {
+
+    }
+
+    @Override
+    public void setEmptyView(View view) {
+
+    }
+
+    @Override
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> clickListener) {
+
+    }
+
     // 获取数据列表
     @NonNull
     @Override
@@ -316,10 +352,15 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         return ret;
     }
 
+    @Override
+    public void addDataAtLast(List<T> dataList) {
+        addDataAtLast(dataList,null,0);
+    }
+
     // 加入尾部数据     delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addDataAtLast(final List<T> dataList, final LoadStatus status, int delayTime) {
-        if (delayTime <= 10) {
+    public void addDataAtLast(final List<T> dataList, final LoadedStatus status, int delayTime) {
+        if (delayTime <= 0) {
             mDataList.addAll(mDataList.size(), dataList);
             notifyDataSetChanged();
             setLoadMoreStatus(status);
@@ -353,18 +394,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         }
     }
 
-    // 设置是否展示不合法数据；
-    @Override
-    public void setShowErrorHolder(boolean show) {
-        if (mShowError != show) {
-            mShowError = show;
-            notifyDataSetChanged();
-        }
-    }
+
 
     // 设置是否显示加载更多
     @Override
-    public void setShowLoadMore(boolean show) {
+    public void enableLoadMore(boolean show) {
         if (this.mLoadEnableShow != show) {
             this.mLoadEnableShow = show;
             notifyDataSetChanged();
@@ -372,15 +406,15 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     }
 
     @Override
-    public void setLoadMoreStatus(LoadStatus status) {
+    public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
 
         switch (status) {
             case CONTINUE:
-                mLoadStatus = LoadStatus.CONTINUE;
+                mLoadStatus = LoadedStatus.CONTINUE;
                 break;
-            case COMPLITE:
-                mLoadStatus = LoadStatus.COMPLITE;
+            case NO_MORE:
+                mLoadStatus = LoadedStatus.NO_MORE;
         }
 
         if (loadMorePowViewHolder != null) {
@@ -461,7 +495,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
         private void ensureAnimation(boolean forceReStart) {
 
-            if (!mAttached || mLoadStatus == LoadStatus.COMPLITE) {
+            if (!mAttached || mLoadStatus == LoadedStatus.NO_MORE) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -560,7 +594,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             @Override
             protected void onDraw(Canvas canvas) {
                 super.onDraw(canvas);
-                if (mLoadStatus == LoadStatus.COMPLITE) {
+                if (mLoadStatus == LoadedStatus.NO_MORE) {
                     int diff = mIndex * getWidth();
                     canvas.drawText(mLoadCompleteInfo, canvasTextX - diff, canvasTextY, textPaint);
                     canvas.drawLine(20 - diff, canvasHei / 2, canvasTextX - 20 - diff, canvasHei / 2, textPaint);

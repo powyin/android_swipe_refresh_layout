@@ -32,12 +32,16 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 intent = new Intent(this,SimpleSwipeRefresh.class);
                 startActivity(intent);
                 break;
+            case R.id.click_me_to_adapter:
+                intent = new Intent(this,SimpleMuiltpleAdapter.class);
+                startActivity(intent);
         }
     }
 
     private void findView(){
         findViewById(R.id.click_me_to_nest).setOnClickListener(this);
         findViewById(R.id.click_me_to_refresh).setOnClickListener(this);
+        findViewById(R.id.click_me_to_adapter).setOnClickListener(this);
     }
 
 

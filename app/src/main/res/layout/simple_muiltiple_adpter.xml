@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f1f1f1"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_recycle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:overScrollMode="never" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:background="#514a4c4a"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/click_me_to_switch_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="切换头部" />
+
+        <TextView
+            android:id="@+id/click_me_to_switch_foot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="切换尾部" />
+
+        <TextView
+            android:id="@+id/click_me_to_switch_space"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="切换空白" />
+
+        <TextView
+            android:id="@+id/click_me_to_switch_load"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="切换下拉" />
+
+        <TextView
+            android:id="@+id/click_me_to_add_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="添加数据" />
+
+
+        <TextView
+            android:id="@+id/click_me_to_free_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#85e6f3"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="清空数据" />
+
+    </LinearLayout>
+
+
+</FrameLayout>

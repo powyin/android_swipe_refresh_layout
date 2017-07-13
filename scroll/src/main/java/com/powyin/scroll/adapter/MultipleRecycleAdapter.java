@@ -6,15 +6,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextPaint;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Space;
+import android.view.ViewParent;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.powyin.scroll.R;
@@ -29,9 +30,16 @@ import java.util.List;
  */
 public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AdapterDelegate<T> {
 
-    // 0 空白页面；
-    // 1 错误页面；
-    // 2 加载更多；
+    // 空白页面
+    private final int ITYPE_Empty = 0x110;
+    // 错误页面
+    private final int ITYPE_ERROR = 0x111;
+    // 加载更多
+    private final int ITYPE_LOAD = 0x112;
+    // 头部
+    private final int ITYPE_HEAD = 0x113;
+    // 尾部
+    private final int ITYPE_FOOT = 0x114;
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
@@ -46,19 +54,26 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private Activity mActivity;
     private boolean isMovingEnable = false;                                                                            // 是否支持拖拽
     private List<T> mDataList = new ArrayList<>();
-    private boolean mShowError = true;                                                                                 // 是否展示错误信息
     private RecyclerView mRecyclerView;
-    private int mSpaceCount;
-    private int mLoadMoreCount;
 
 
     // 上拉加载实现
-    private boolean mLoadEnableShow = false;                                                                              // 是否展示加载更多
-    private LoadStatus mLoadStatus = LoadStatus.CONTINUE;
-    private LoadMorePowViewHolder loadMorePowViewHolder;
+    private LoadedStatus mLoadStatus = LoadedStatus.CONTINUE;
     private String mLoadCompleteInfo = "我是有底线的";
-    private OnLoadMoreListener mOnLoadMoreListener;                                                                       // 显示更多监听
+    private String mLoadErrorInfo = "加载失败";
+    private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
     private OnItemClickListener<T> mOnItemClickListener;
+
+    private IncludeTypeLoad mLoad;
+
+    private View mSpaceView;
+    private View mHeadView;
+    private View mFootView;
+
+    private boolean mSpaceEnable = false;
+    boolean mHasHead = false;
+    private boolean mHasFoot = false;
+    private boolean mHasLoad = true;                     // 是否展示加载更多
 
 
     @SuppressWarnings("unchecked")
@@ -99,7 +114,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             if (isMovingEnable) break;
         }
 
-        setHasStableIds(true);
+        //  setHasStableIds(true);
 
     }
 
@@ -108,60 +123,83 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @SuppressWarnings("unchecked")
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case ITYPE_Empty:
+                return new IncludeTypeEmpty(parent);
+            case ITYPE_ERROR:
+                return new IncludeTypeError(parent);
+            case ITYPE_LOAD:
+                return new IncludeTypeLoad(parent);
+            case ITYPE_HEAD:
+                return new IncludeTypeHead(parent);
+            case ITYPE_FOOT:
+                return new IncludeTypeFoot(parent);
+            default:
+                PowViewHolder holder;
+                try {
+                    holder = mHolderClasses[viewType].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
+                }
 
-        if (viewType == mHolderClasses.length + 2) {
-            if (loadMorePowViewHolder == null) {
-                loadMorePowViewHolder = new LoadMorePowViewHolder();
-            }
-            return loadMorePowViewHolder.getNewInstance();
-        } else if (viewType == mHolderClasses.length + 1) {
-            return new IncludeTypeEmpty(parent);
-        } else if (viewType == mHolderClasses.length) {
-            return new IncludeTypeError(parent);
-        } else {
-            PowViewHolder holder;
-            try {
-                holder = mHolderClasses[viewType].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e.getMessage());
-            }
-
-            return holder.mViewHolder;
+                return holder.mViewHolder;
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int oriPosition) {
+        int position;
+        switch (holder.getItemViewType()) {
+            case ITYPE_Empty:
+                IncludeTypeEmpty empty = (IncludeTypeEmpty) holder;
+                empty.loadView();
+                break;
+            case ITYPE_ERROR:
+                position = mHasHead ? oriPosition - 1 : oriPosition;
+                IncludeTypeError error = (IncludeTypeError) holder;
+                error.loadData(mDataList.get(position));
+                break;
+            case ITYPE_LOAD:
+                IncludeTypeLoad load = (IncludeTypeLoad) holder;
+                mLoad = load;
+                load.progressBar.ensureAnimation(false);
+                load.ensureLoading();
+                break;
+            case ITYPE_HEAD:
+                IncludeTypeHead head = (IncludeTypeHead) holder;
+                head.loadView();
+                break;
+            case ITYPE_FOOT:
+                IncludeTypeFoot foot = (IncludeTypeFoot) holder;
+                foot.loadView();
+                break;
+            default:
+                position = mHasHead ? oriPosition - 1 : oriPosition;
+                T itemData = position < mDataList.size() ? mDataList.get(position) : null;
+                PowViewHolder<T> powViewHolder = ((RecycleViewHolder) holder).mPowViewHolder;
 
-        T itemData = position < mDataList.size() ? mDataList.get(position) : null;
-        PowViewHolder<T> powViewHolder = ((RecycleViewHolder) holder).mPowViewHolder;
-
-        if (position >= mDataList.size()) {
-            if (position >= mDataList.size() + mSpaceCount) {
-                ((LoadMorePowViewHolder.LoadProgressBar) holder.itemView).mIndex = position - (mDataList.size() + mSpaceCount);
-            }
-
-            if (mLoadStatus == LoadStatus.CONTINUE && mOnLoadMoreListener != null) {
-                mLoadStatus = null;
-                mOnLoadMoreListener.onLoadMore();
-            }
-
-        } else {
-            if (powViewHolder != null) {
                 powViewHolder.mData = itemData;
                 powViewHolder.mMultipleAdapter = this;
-                powViewHolder.mPosition = position;
-
-                if (mOnItemClickListener != null && powViewHolder.mRegisterMainItemClickStatus == 0) {
+                if (mOnItemClickListener != null) {
                     powViewHolder.registerAutoItemClick();
                 }
                 powViewHolder.loadData(this, itemData, position);
-            }
         }
     }
 
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
+        switch (holder.getItemViewType()) {
+            case ITYPE_LOAD:
+                IncludeTypeLoad load = (IncludeTypeLoad) holder;
+                load.progressBar.ensureStopAnimation();
+                break;
+        }
+    }
 
     private ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
         @Override
@@ -207,7 +245,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
-        return mDataList.size() + mSpaceCount + mLoadMoreCount;
+        return mSpaceEnable ? 1 : mDataList.size() + (mHasHead ? 1 : 0) + (mHasFoot ? 1 : 0) + (mHasLoad ? 1 : 0);
     }
 
     // holder 依附
@@ -230,54 +268,40 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         return date == null ? 0 : date.hashCode();
     }
 
-    private void ensureConfig() {
-        if (!mLoadEnableShow || mRecyclerView == null) {
-            mSpaceCount = 0;
-            mLoadMoreCount = 0;
-        } else {
-            RecyclerView.LayoutManager layoutManager = mRecyclerView.getLayoutManager();
-            if (layoutManager instanceof GridLayoutManager) {
-                GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
-                int spanCount = gridLayoutManager.getSpanCount();
-                int dataSize = mDataList.size();
-
-                mSpaceCount = dataSize % spanCount == 0 ? 0 : spanCount - dataSize % spanCount;
-                mLoadMoreCount = spanCount;
-            } else if (layoutManager instanceof LinearLayoutManager) {
-                mSpaceCount = 0;
-                mLoadMoreCount = 1;
-            } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-                // 待 完善 ；
-                mSpaceCount = 0;
-                mLoadMoreCount = 1;
-            } else {
-                mSpaceCount = 0;
-                mLoadMoreCount = 1;
-            }
-        }
-    }
 
     @SuppressWarnings("unchecked")
     @Override
     public int getItemViewType(int position) {
-        if (position >= mDataList.size()) {
 
-
-            if (position >= mDataList.size() + mSpaceCount) {
-                return mHolderInstances.length + 2;
-            } else {
-                return mHolderInstances.length + 1;
-            }
+        if (mSpaceEnable) {
+            return ITYPE_Empty;
         }
 
-        for (int i = 0; i < mHolderInstances.length; i++) {                        //返回能载入次数据的ViewHolderClass下标
-            T itemData = mDataList.get(position);
-            if (itemData != null && mHolderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && mHolderInstances[i].acceptData(itemData)) {
-                return i;
-            }
+        if (mHasHead) {
+            if (position == 0) return ITYPE_HEAD;
+            position--;
         }
 
-        return mHolderInstances.length;                                              //错误页面数据
+        if (position < mDataList.size()) {
+            for (int i = 0; i < mHolderInstances.length; i++) {                        //返回能载入次数据的ViewHolderClass下标
+                T itemData = mDataList.get(position);
+                if (itemData != null && mHolderGenericDataClass[i].isAssignableFrom(itemData.getClass()) && mHolderInstances[i].acceptData(itemData)) {
+                    return i;
+                }
+            }
+            return ITYPE_ERROR;
+        }
+
+        position -= mDataList.size();
+        if (mHasFoot) {
+            if (position == 0) return ITYPE_FOOT;
+            position--;
+        }
+
+        if (position == 0 && mHasLoad) return ITYPE_LOAD;
+
+        throw new RuntimeException(" what happer ?? ");
+
     }
 
     @Override
@@ -286,19 +310,22 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         mRecyclerView = null;
     }
 
-    final void invokeItemClick(PowViewHolder<T> powViewHolder, int index, int resId) {
+    final void invokeItemClick(PowViewHolder<T> powViewHolder, T data, int index, int resId) {
         if (mOnItemClickListener != null && index >= 0 && index < mDataList.size()) {
-            mOnItemClickListener.onClick(powViewHolder, mDataList.get(index), index, resId);
+            mOnItemClickListener.onClick(powViewHolder, data, index, resId);
         }
     }
 
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
+    //---------------------------------------------------------------数据-----------------------------------------------------------------------//
     // 获取数据
     @Override
     public List<T> getDataList() {
-        return mDataList;
+        ArrayList<T> arrayList = new ArrayList<T>();
+        arrayList.addAll(mDataList);
+        return arrayList;
     }
 
     @Override
@@ -311,7 +338,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void loadData(List<T> dataList) {
         mDataList.clear();
         mDataList.addAll(dataList);
-        ensureConfig();
         notifyDataSetChanged();
     }
 
@@ -321,25 +347,27 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void addData(int position, T data) {
         if (data == null) return;
         mDataList.add(position, data);
-        ensureConfig();
-        notifyDataSetChanged();
+        notifyItemInserted(mHasHead ? position + 1 : position);
     }
 
     // 添加数据
     @Override
     public void addData(int position, List<T> dataList) {
-        if(dataList==null) return;
-        mDataList.addAll(position,dataList);
-        ensureConfig();
+        if (dataList == null) return;
+        mDataList.addAll(position, dataList);
         notifyDataSetChanged();
+    }
+
+    @Override
+    public void addDataAtLast(List<T> dataList) {
+        addDataAtLast(dataList, null, 0);
     }
 
     // 加入尾部数据     delayTime 延迟加入 让上拉加载显示时间加长
     @Override
-    public void addDataAtLast(final List<T> dataList, final LoadStatus status, int delayTime) {
-        if (delayTime <= 10) {
+    public void addDataAtLast(final List<T> dataList, final LoadedStatus status, int delayTime) {
+        if (delayTime <= 0) {
             mDataList.addAll(mDataList.size(), dataList);
-            ensureConfig();
             notifyDataSetChanged();
             setLoadMoreStatus(status);
         } else {
@@ -347,7 +375,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 @Override
                 public void run() {
                     mDataList.addAll(mDataList.size(), dataList);
-                    ensureConfig();
                     notifyDataSetChanged();
                     setLoadMoreStatus(status);
                 }
@@ -359,7 +386,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public T removeData(int position) {
         T ret = mDataList.remove(position);
-        ensureConfig();
+        notifyItemRemoved(mHasHead ? position - 1 : position);
         notifyDataSetChanged();
         return ret;
     }
@@ -368,11 +395,11 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     // 删除数据
     @Override
     public void removeData(T data) {
-        mDataList.remove(data);
-        ensureConfig();
-        notifyDataSetChanged();
+        int index = mDataList.indexOf(data);
+        if (index >= 0) {
+            removeData(index);
+        }
     }
-
 
 
     // 清空数据
@@ -380,48 +407,35 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void clearData() {
         if (mDataList.size() != 0) {
             mDataList.clear();
-            ensureConfig();
             notifyDataSetChanged();
         }
     }
+    //---------------------------------------------------------------数据-----------------------------------------------------------------------//
 
-    // 设置是否展示不合法数据；
-    @Override
-    public void setShowErrorHolder(boolean show) {
-        if (mShowError != show) {
-            mShowError = show;
-            ensureConfig();
-            notifyDataSetChanged();
-        }
-    }
 
+    //---------------------------------------------------------------加载-----------------------------------------------------------------------//
     // 设置是否显示加载更多
     @Override
-    public void setShowLoadMore(boolean show) {
-        if (this.mLoadEnableShow != show) {
-            this.mLoadEnableShow = show;
-            ensureConfig();
+    public void enableLoadMore(boolean show) {
+        if (this.mHasLoad != show) {
+            this.mHasLoad = show;
             notifyDataSetChanged();
         }
     }
 
     @Override
-    public void setLoadMoreStatus(LoadStatus status) {
+    public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
-
         switch (status) {
             case CONTINUE:
-                mLoadStatus = LoadStatus.CONTINUE;
+                mLoadStatus = LoadedStatus.CONTINUE;
                 break;
-            case COMPLITE:
-                mLoadStatus = LoadStatus.COMPLITE;
+            case NO_MORE:
+                mLoadStatus = LoadedStatus.NO_MORE;
         }
 
-        if (loadMorePowViewHolder != null) {
-            loadMorePowViewHolder.ensureAnimation(false);
-            for (RecyclerView.ViewHolder holder : loadMorePowViewHolder.viewHolders) {
-                holder.itemView.invalidate();
-            }
+        if (mLoad != null) {
+            mLoad.progressBar.invalidate();
         }
     }
 
@@ -431,22 +445,96 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         this.mOnLoadMoreListener = loadMoreListener;
     }
 
+    //---------------------------------------------------------------加载-----------------------------------------------------------------------//
+
     // 设置ViewHolder 点击监听
-
-
     @Override
     public void setOnItemClickListener(OnItemClickListener<T> clickListener) {
         this.mOnItemClickListener = clickListener;
     }
 
-    // 0 空白页面
-    private class IncludeTypeEmpty extends RecycleViewHolder<Object> {
-        IncludeTypeEmpty(ViewGroup viewGroup) {
-            super(new Space(mActivity), null);
+
+    //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
+
+
+    @Override
+    public void setHeadView(View view) {
+        if (view == null) return;
+        mHasHead = true;
+        mHeadView = view;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void removeHeadView() {
+        if (!mHasHead) return;
+        mHasHead = false;
+        mHeadView = null;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void setFootView(View view) {
+        if (view == null) return;
+        mHasFoot = true;
+        mFootView = view;
+        notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void removeFootView() {
+        if (!mHasFoot) return;
+        mHasFoot = false;
+        mFootView = null;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void enableEmptyView(boolean show) {
+        if (mSpaceEnable != show) {
+            mSpaceEnable = show;
+            notifyDataSetChanged();
         }
     }
 
-    // 1 不合法信息展示类
+    @Override
+    public void setEmptyView(View view) {
+        if (view == null) return;
+        if (mSpaceView != view) {
+            mSpaceView = view;
+            notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> clickListener) {
+
+    }
+
+
+    // 0x110 空白页面
+    private class IncludeTypeEmpty extends RecycleViewHolder<Object> {
+        FrameLayout mainView;
+
+        IncludeTypeEmpty(ViewGroup viewGroup) {
+            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_empty, viewGroup, false), null);
+            mainView = (FrameLayout) itemView;
+        }
+
+        void loadView() {
+            if (mSpaceView != null) {
+                ViewParent parent = mSpaceView.getParent();
+                if (parent != null) {
+                    ((ViewGroup) parent).removeView(mSpaceView);
+                }
+                mainView.removeAllViews();
+                mainView.addView(mSpaceView, new FrameLayout.LayoutParams(-1, -1));
+            }
+        }
+    }
+
+    // 0x111 错误页面
     private class IncludeTypeError extends RecycleViewHolder<Object> {
         TextView errorInfo;
 
@@ -454,35 +542,101 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_err, viewGroup, false), null);
             errorInfo = (TextView) super.itemView.findViewById(R.id.powyin_scroll_err_text);
         }
+
+        private void loadData(T data) {
+            errorInfo.setText(data == null ? " you has one empty data inside " : data.toString());
+        }
+
     }
 
-    // 2 加载更多iew
-    private class LoadMorePowViewHolder {
+    // 0x112 加载更多
+    @SuppressWarnings("unchecked")
+    private class IncludeTypeLoad extends RecycleViewHolder<Object> {
+        LoadProgressBar progressBar;
 
+        IncludeTypeLoad(ViewGroup viewGroup) {
+            super(new LoadProgressBar(mActivity), null);
+            progressBar = (LoadProgressBar) itemView;
+        }
+
+        void ensureLoading() {
+            if (mLoadStatus == LoadedStatus.CONTINUE && mOnLoadMoreListener != null) {
+                mLoadStatus = null;
+                mOnLoadMoreListener.onLoadMore();
+            }
+        }
+    }
+
+    // 0x113 头部
+    private class IncludeTypeHead extends RecycleViewHolder<Object> {
+        FrameLayout frameLayout;
+
+        IncludeTypeHead(ViewGroup viewGroup) {
+            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_head, viewGroup, false), null);
+            frameLayout = (FrameLayout) itemView;
+        }
+
+        void loadView() {
+            if (mHeadView != null) {
+                ViewParent parent = mHeadView.getParent();
+                if (parent != null) {
+                    ((ViewGroup) parent).removeView(mHeadView);
+                }
+                frameLayout.removeAllViews();
+                frameLayout.addView(mHeadView, new FrameLayout.LayoutParams(-1, -2));
+            }
+        }
+
+    }
+
+    // 0x114 尾部
+    private class IncludeTypeFoot extends RecycleViewHolder<Object> {
+        FrameLayout frameLayout;
+
+        IncludeTypeFoot(ViewGroup viewGroup) {
+            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_foot, viewGroup, false), null);
+            frameLayout = (FrameLayout) itemView;
+        }
+
+        void loadView() {
+            if (mFootView != null) {
+                ViewParent parent = mFootView.getParent();
+                if (parent != null) {
+                    ((ViewGroup) parent).removeView(mFootView);
+                }
+                frameLayout.removeAllViews();
+                frameLayout.addView(mFootView, new FrameLayout.LayoutParams(-1, -2));
+            }
+        }
+
+    }
+
+
+    // 加载中
+    class LoadProgressBar extends View {
         boolean mAttached = false;
-
-        List<RecyclerView.ViewHolder> viewHolders = new ArrayList<>();
-
         ValueAnimator animator;
         Paint circlePaint;
         TextPaint textPaint;
         int canvasWei;
         int canvasHei;
-
         float canvasTextX;
         float canvasTextY;
-
         int ballCount = 10;
         float divide;
 
-        LoadMorePowViewHolder() {
+        private long beginShowTime = System.currentTimeMillis();
+
+        public LoadProgressBar(Context context) {
+            super(context);
+
             circlePaint = new Paint();
             circlePaint.setColor(0x99000000);
             circlePaint.setStrokeWidth(4);
             textPaint = new TextPaint();
             textPaint.setColor(0x99000000);
 
-            final float fontScale = mActivity.getResources().getDisplayMetrics().scaledDensity;
+            final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
             int target = (int) (13 * fontScale + 0.5f);
 
             textPaint.setTextSize(target);
@@ -490,17 +644,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             textPaint.setStrokeWidth(1);
         }
 
-
-        RecycleViewHolder getNewInstance() {
-            RecycleViewHolder holder = new RecycleViewHolder<Object>(new LoadProgressBar(mActivity), null);
-            viewHolders.add(holder);
-            return holder;
-        }
-
-
         private void ensureAnimation(boolean forceReStart) {
 
-            if (!mAttached || mLoadStatus == LoadStatus.COMPLITE) {
+            if (!mAttached || mLoadStatus == LoadedStatus.NO_MORE) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -521,41 +667,28 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
             animator = ValueAnimator.ofFloat(0, 1);
             animator.setDuration(2000);
-            animator.setRepeatCount(5);
+            animator.setRepeatCount(-1);
 
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
-                    for (RecyclerView.ViewHolder holder : viewHolders) {
-                        holder.itemView.invalidate();
-                    }
+                    invalidate();
                 }
             });
 
-            animator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (animation == animator) {
-                        ensureAnimation(true);
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            });
 
             animator.start();
         }
+
+
+        private void ensureStopAnimation() {
+            if (animator != null) {
+                animator.cancel();
+                animator = null;
+            }
+        }
+
 
         private float getSplit(float value) {
             int positive = value >= 0 ? 1 : -1;                                 //保存符号 判断正负
@@ -564,71 +697,96 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             return (float) Math.pow(value, 2) * positive;
         }
 
-        class LoadProgressBar extends View {              //刷新视图
-            int mIndex;
+        @Override
+        protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+            mAttached = true;
+            ensureAnimation(false);
+        }
 
-            public LoadProgressBar(Context context) {
-                super(context);
+        @Override
+        protected void onDetachedFromWindow() {
+            super.onDetachedFromWindow();
+            mAttached = false;
+            ensureStopAnimation();
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+            float scale = getContext().getResources().getDisplayMetrics().density;
+            int target = (int) (40 * scale + 0.5f);
+
+            setMeasuredDimension(getMeasuredWidth(), target);
+        }
+
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            if (beginShowTime == -1) {
+                return;
             }
 
-            @Override
-            protected void onAttachedToWindow() {
-                super.onAttachedToWindow();
-                mAttached = true;
-                ensureAnimation(false);
-            }
+            int timeBe = (int) (System.currentTimeMillis() - beginShowTime);
 
-            @Override
-            protected void onDetachedFromWindow() {
-                super.onDetachedFromWindow();
-                mAttached = false;
-                ensureAnimation(false);
-            }
+            float alpha = timeBe / 2000f;
+            alpha = alpha > 1 ? 1 : alpha;
+            alpha = alpha < 0 ? 1 : alpha;
 
-            @Override
-            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            int colorAlpha = (int)(alpha*200)                                                                  ;
 
-                float scale = getContext().getResources().getDisplayMetrics().density;
-                int target = (int) (40 * scale + 0.5f);
+            textPaint.setAlpha(colorAlpha);
+            circlePaint.setAlpha(colorAlpha);
 
-                setMeasuredDimension(getMeasuredWidth(), target);
-            }
+            if (mLoadStatus == LoadedStatus.NO_MORE) {
+                canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
+                canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
+                canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
 
-
-            @Override
-            protected void onDraw(Canvas canvas) {
-                super.onDraw(canvas);
-                if (mLoadStatus == LoadStatus.COMPLITE) {
-                    int diff = mIndex * getWidth();
-                    canvas.drawText(mLoadCompleteInfo, canvasTextX - diff, canvasTextY, textPaint);
-                    canvas.drawLine(20 - diff, canvasHei / 2, canvasTextX - 20 - diff, canvasHei / 2, textPaint);
-                    canvas.drawLine(canvasWei - canvasTextX + 20 - diff, canvasHei / 2, canvasWei - 20 - diff, canvasHei / 2, textPaint);
-
-                } else {
-                    for (int i = 0; i < ballCount; i++) {
-                        float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
-                        wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
-                        wei -= mIndex * getWidth();                               // good
-                        canvas.drawCircle(wei, canvasHei / 2, 8, circlePaint);
-                    }
+            }if(mLoadStatus == LoadedStatus.ERROR){
+                canvas.drawText(mLoadErrorInfo, canvasTextX, canvasTextY, textPaint);
+                canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
+                canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
+            } else {
+                for (int i = 0; i < ballCount; i++) {
+                    float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
+                    wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
+                    canvas.drawCircle(wei, canvasHei / 2 + 6, 8, circlePaint);
                 }
-            }
-
-            @Override
-            protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-                super.onLayout(changed, left, top, right, bottom);
-                canvasHei = getHeight();
-                canvasWei = getWidth() * mLoadMoreCount;
-
-                canvasTextX = canvasWei / 2 - textPaint.measureText(mLoadCompleteInfo) / 2;
-                canvasTextY = canvasHei / 2 + textPaint.getTextSize() / 2.55f;
-
-                ensureAnimation(false);
             }
         }
 
+
+        @Override
+        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+            super.onLayout(changed, left, top, right, bottom);
+            canvasHei = getHeight();
+            canvasWei = getWidth();
+
+            canvasTextX = canvasWei / 2 - textPaint.measureText(mLoadCompleteInfo) / 2;
+            canvasTextY = canvasHei / 2 + textPaint.getTextSize() / 2.55f;
+
+            if (bottom < ((ViewGroup) getParent()).getHeight()) {
+                beginShowTime = -1;
+            } else {
+                beginShowTime = System.currentTimeMillis();
+            }
+        }
     }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+

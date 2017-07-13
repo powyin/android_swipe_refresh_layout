@@ -1,6 +1,7 @@
 package com.powyin.scroll.adapter;
 
 import android.app.Activity;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,12 +15,12 @@ import java.lang.reflect.Field;
 public abstract class PowViewHolder<T> {
     final RecycleViewHolder<T> mViewHolder;
 
+    //public final RecyclerView.ViewHolder holder;
     public final View mItemView;
     protected final Activity mActivity;
 
-    protected T mData;
-    protected AdapterDelegate<T> mMultipleAdapter;
-    protected int mPosition;
+    public T mData;
+    public MultipleRecycleAdapter<T> mMultipleAdapter;
 
     int mRegisterMainItemClickStatus = 0;   //  if ==1 hasRegisterMainItemClick  if ==0 needTestRegisterMainItemClick  if ==-1 freeControl
 
@@ -28,11 +29,13 @@ public abstract class PowViewHolder<T> {
         if (getItemViewRes() == 0) {
             throw new RuntimeException("must provide View by getItemView() or gitItemViewRes()");
         }
-        mItemView = activity.getLayoutInflater().inflate(getItemViewRes(), viewGroup, false) ;
+        mItemView = activity.getLayoutInflater().inflate(getItemViewRes(), viewGroup, false);
         mViewHolder = new RecycleViewHolder<T>(mItemView, this);
     }
 
     final void registerAutoItemClick() {
+        if (mRegisterMainItemClickStatus != 0) return;
+
         if (getItemViewOnClickListener() == null) {
             mItemView.setOnClickListener(mOnClickListener);
             mRegisterMainItemClickStatus = +1;
@@ -71,16 +74,15 @@ public abstract class PowViewHolder<T> {
         @SuppressWarnings("unchecked")
         @Override
         public void onClick(View v) {
-            if (mMultipleAdapter != null && mMultipleAdapter instanceof MultipleRecycleAdapter) {
-                MultipleRecycleAdapter adapter = (MultipleRecycleAdapter) mMultipleAdapter;
-                adapter.invokeItemClick(PowViewHolder.this, mPosition, v.getId());
+            if (mMultipleAdapter != null) {
+                mMultipleAdapter.invokeItemClick(PowViewHolder.this, mData, mViewHolder.getAdapterPosition(), v.getId());
             }
         }
     };
 
 
     protected final void registerItemClick(int... viewIds) {
-        if (mRegisterMainItemClickStatus > 0 && mItemView.hasOnClickListeners() && getItemViewOnClickListener() == mOnClickListener) {
+        if (mRegisterMainItemClickStatus == 1 && mItemView.hasOnClickListeners() && getItemViewOnClickListener() == mOnClickListener) {
             mItemView.setOnClickListener(null);
         }
 
@@ -104,8 +106,6 @@ public abstract class PowViewHolder<T> {
     }
 
 
-
-
     protected abstract int getItemViewRes();
 
     public abstract void loadData(AdapterDelegate<? super T> multipleAdapter, T data, int position);
@@ -116,13 +116,19 @@ public abstract class PowViewHolder<T> {
     }
 
     // 是否支持拖动
-    protected boolean isEnableDragAndDrop(){
+    protected boolean isEnableDragAndDrop() {
         return false;
     }
 
+    public final int getItemPostion() {
+        int position = mViewHolder.getAdapterPosition();
+        return mMultipleAdapter.mHasHead ? position-1 : position;
+    }
+
+
     @SuppressWarnings("unchecked")
-    public <K  extends View> K findViewById(int resId){
-        return (K)mItemView.findViewById(resId);
+    public <K extends View> K findViewById(int resId) {
+        return (K) mItemView.findViewById(resId);
     }
 
     // holder 依附
@@ -134,8 +140,6 @@ public abstract class PowViewHolder<T> {
     protected void onViewDetachedFromWindow() {
 
     }
-
-
 
 
 }
