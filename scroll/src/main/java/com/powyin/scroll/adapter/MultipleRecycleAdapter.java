@@ -386,8 +386,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public T removeData(int position) {
         T ret = mDataList.remove(position);
-        notifyItemRemoved(mHasHead ? position - 1 : position);
-        notifyDataSetChanged();
+        notifyItemRemoved(mHasHead ? position + 1 : position);
         return ret;
     }
 
