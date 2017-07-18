@@ -49,6 +49,18 @@
             />
 
 
+        <TextView
+            android:id="@+id/click_me_to_swipe_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Adapter"
+            android:background="@drawable/button_bg"
+            />
+
+
 
     </LinearLayout>
 

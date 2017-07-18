@@ -115,6 +115,11 @@ public abstract class PowViewHolder<T> {
         return true;
     }
 
+
+    protected void recycleData(){
+
+    }
+
     // 是否支持拖动
     protected boolean isEnableDragAndDrop() {
         return false;

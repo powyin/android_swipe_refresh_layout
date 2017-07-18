@@ -213,7 +213,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
 
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
-            if (tryBackToRefreshing() || tryBackToFreshFinish()) {
+            if (tryBackToRefreshing() || tryBackToFreshFinish() || mDraggedDispatch || mDraggedIntercept) {
                 ev.setAction(MotionEvent.ACTION_CANCEL);
             }
         }

@@ -73,7 +73,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private boolean mSpaceEnable = false;
     boolean mHasHead = false;
     private boolean mHasFoot = false;
-    private boolean mHasLoad = true;                     // 是否展示加载更多
+    private boolean mHasLoad = false;                     // 是否展示加载更多
 
 
     @SuppressWarnings("unchecked")
@@ -198,6 +198,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 IncludeTypeLoad load = (IncludeTypeLoad) holder;
                 load.progressBar.ensureStopAnimation();
                 break;
+            case ITYPE_Empty:
+            case ITYPE_ERROR:
+            case ITYPE_HEAD:
+            case ITYPE_FOOT:
+                break;
+            default:
+                PowViewHolder<T> powViewHolder = ((RecycleViewHolder) holder).mPowViewHolder;
+                powViewHolder.recycleData();
         }
     }
 

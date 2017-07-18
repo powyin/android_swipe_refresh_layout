@@ -22,6 +22,8 @@
 
         <activity android:name=".SimpleMuiltpleAdapter"/>
 
+        <activity android:name=".SimpleSwipeRefreshNomal"/>
+
     </application>
 
 
