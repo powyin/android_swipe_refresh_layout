@@ -2,14 +2,14 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-## SwipeNest 垂直布局(1~N)个NestScrollChilder 实现下拉刷新
+## SwipeNest 支持混合普通View 滚动布局（recycleView scrollView listView等） 混合布局 自动处理滚动冲突  附带下拉刷新以及上拉加载
 ### MultipleListAdapter<T> 快速实现 ListView 多种类型展示 (自带上拉加载 可设置开启)
 ### MultipleRecycleAdapter<T>  快速实现  RecycleView多种类型展示 (自带上拉加载 可设置开启)
 
 Add Gradle dependency:
 ```gradle
 dependencies {
-      compile 'com.github.powyin:scroll:1.9.7'
+      compile 'com.github.powyin:scroll:2.0.0'
       compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
@@ -59,38 +59,47 @@ dependencies {
     
 ### how to use  SwipeNest 
 
-      <com.powyin.scroll.widget.SwipeNest
+        <com.powyin.scroll.widget.SwipeNest
         android:id="@+id/nest_combine"
         android:background="#e5e5e5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
-        <android.support.v4.widget.NestedScrollView
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:overScrollMode="never">
-
-            <FrameLayout
+            android:background="#b7b7b7"
+            android:clickable="true">
+            <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#b7b7b7"
-                android:clickable="true">
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:src="@drawable/pic_4"
-                    android:scaleType="centerCrop"
-                    />
-            </FrameLayout>
-        </android.support.v4.widget.NestedScrollView>
+                android:layout_height="300dp"
+                android:src="@drawable/pic_4"
+                android:scaleType="centerCrop"
+                />
+        </FrameLayout>
 
         <android.support.v7.widget.RecyclerView
             android:background="#ffffff"
             android:id="@+id/my_recycle"
             android:overScrollMode="never"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"/>
+
+        <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="#b7b7b7"-->
+            <!--android:clickable="true">-->
+            <!--<ImageView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="300dp"-->
+                <!--android:src="@drawable/pic_4"-->
+                <!--android:scaleType="centerCrop"-->
+                <!--/>-->
+        <!--</FrameLayout>-->
+
     </com.powyin.scroll.widget.SwipeNest>
     
 ### 设置刷新监听与刷新结果处理
