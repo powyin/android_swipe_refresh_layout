@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-### SwipeNest 支持混合普通View 滚动布局（recycleView scrollView listView等） 混合布局 自动处理滚动冲突  附带下拉刷新以及上拉加载
+### SwipeNest 支持普通View 滚动视图（recycleView scrollView listView等） 混合布局 自动处理滚动冲突  附带下拉刷新以及上拉加载
 ### MultipleListAdapter<T> 快速实现 ListView 多种类型展示 (自带上拉加载 可设置开启)
 ### MultipleRecycleAdapter<T>  快速实现  RecycleView多种类型展示 (自带上拉加载 可设置开启)
 
