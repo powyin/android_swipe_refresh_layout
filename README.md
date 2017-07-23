@@ -2,7 +2,7 @@
 
 
 ## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
-### SwipeNest 支持普通View 滚动视图（recycleView scrollView listView等） 混合布局 自动处理滚动冲突  附带下拉刷新以及上拉加载
+### SwipeNest 滚动视图（支持各种 普通View recycleView scrollView listView等 混合排列） 处理滚动冲突  附带下拉刷新以及上拉加载
 ### MultipleListAdapter<T> 快速实现 ListView 多种类型展示 (自带上拉加载 可设置开启)
 ### MultipleRecycleAdapter<T>  快速实现  RecycleView多种类型展示 (自带上拉加载 可设置开启)
 
@@ -104,9 +104,9 @@ dependencies {
     
 ### 设置刷新监听与刷新结果处理
 
-swipeRefresh
+ISwipe
 
-        swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
+        ISwipe.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 // 开始下拉刷新
@@ -118,9 +118,9 @@ swipeRefresh
             }
         });
         
-        swipeRefresh.setFreshStatue(ISwip.RreshStatus.SUCCESS);             //下拉刷新 完成
-        swipeRefresh.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL);  //下拉刷新 失败
-        swipeRefresh.setLoadMoreStatus(ISwipe.LoadedStatus.CONTINUE);       //已经获取更多数据   隐藏上拉加载进度条
+        ISwipe.setFreshStatue(ISwip.RreshStatus.SUCCESS);             //下拉刷新 完成
+        ISwipe.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL);  //下拉刷新 失败
+        ISwipe.setLoadMoreStatus(ISwipe.LoadedStatus.CONTINUE);       //已经获取更多数据   隐藏上拉加载进度条
         
         
         
@@ -129,7 +129,7 @@ swipeRefresh
 
 ```
 
-SwipeRefresh.setSwipeModel(SwipeControl.SwipeModel model)          
+ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          
 
 app:fresh_model=“ONLY_REFRESH”                                     
 
