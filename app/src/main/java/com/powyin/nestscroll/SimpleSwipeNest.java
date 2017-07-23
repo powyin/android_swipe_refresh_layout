@@ -9,6 +9,7 @@ import android.view.View;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Obj;
 import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
+import com.powyin.scroll.widget.ISwipe;
 import com.powyin.scroll.widget.SwipeNest;
 
 /**
@@ -33,7 +34,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
                 swipeNest.setSwipeControl(new SwipeControlStyle_Horizontal(this));
                 break;
             case R.id.click_me_to_stop_head:
-                swipeNest.finishRefresh();            //下拉刷新完成
+            //    swipeNest.finishRefresh();            //下拉刷新完成
                 break;
         }
     }
@@ -47,20 +48,23 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
 
     private void init(){
         initRecycle();
-        swipeNest.setOnRefreshListener(new SwipeNest.OnRefreshListener() {
+        swipeNest.setOnRefreshListener(new ISwipe.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                System.out.println("------------------------------------------------onRefresh----------------------->>>>>>>>");
-                //  开始下拉刷新
+
             }
 
+            @Override
+            public void onLoading(boolean isLoadViewShow) {
+
+            }
         });
     }
 
     private void initRecycle(){
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         MultipleRecycleAdapter<Object> multipleRecycleAdapter = new MultipleRecycleAdapter<>(this,TypePowViewHolder_Obj.class);
-        for (int i=0;i<35;i++){
+        for (int i=0;i<37;i++){
             multipleRecycleAdapter.addData(0,new Object());
         }
         mRecyclerView.setAdapter(multipleRecycleAdapter);

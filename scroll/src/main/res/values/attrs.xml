@@ -10,5 +10,14 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="SwipeNest">
+        <attr name="fresh">
+            <enum name="BOTH" value="0" />
+            <enum name="ONLY_REFRESH" value="1" />
+            <enum name="ONLY_LOADINN" value="2" />
+            <enum name="SWIPE_NONE" value="3" />
+        </attr>
+    </declare-styleable>
+
 
 </resources>
