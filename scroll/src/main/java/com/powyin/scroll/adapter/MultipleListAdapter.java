@@ -169,7 +169,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             } else {
                 try {
                     PowViewHolder holder = mHolderClasses[typeIndex].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
-                    convertView = holder.mViewHolder.itemView;
+                 //   convertView = holder.mViewHolder.itemView;
                     convertView.setTag(holder);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -194,12 +194,13 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             T itemData = mDataList.get(position);
             holder.mData = itemData;
 
-            if (holder.mRegisterMainItemClickStatus == 0) {
-                holder.registerAutoItemClick();
-            }
+
+//            if (holder.mRegisterMainItemClickStatus == 0) {
+//                holder.registerAutoItemClick();
+//            }
 
             holder.loadData(this, itemData, position);
-            return holder.mViewHolder.itemView;
+         //   return holder.mViewHolder.itemView;
         }
         return convertView;
     }

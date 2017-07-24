@@ -25,9 +25,8 @@ public interface AdapterDelegate<T> {
 
     // 长按点击
     interface OnItemLongClickListener<T>{
-        void onLongClick(PowViewHolder<T> holder, T data, int index, int resId);
+        boolean onLongClick(PowViewHolder<T> holder, T data, int index, int resId);
     }
-
 
     enum LoadedStatus{
         CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据

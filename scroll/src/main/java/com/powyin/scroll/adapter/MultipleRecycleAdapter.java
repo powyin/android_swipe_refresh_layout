@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextPaint;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -53,7 +54,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private Class[] mHolderGenericDataClass;                                                                           // viewHolder 携带泛型
     private Activity mActivity;
     private boolean isMovingEnable = false;                                                                            // 是否支持拖拽
-    private List<T> mDataList = new ArrayList<>();
+    List<T> mDataList = new ArrayList<>();
     private RecyclerView mRecyclerView;
 
 
@@ -62,7 +63,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private String mLoadCompleteInfo = "我是有底线的";
     private String mLoadErrorInfo = "加载失败";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
-    private OnItemClickListener<T> mOnItemClickListener;
+
+    OnItemClickListener<T> mOnItemClickListener;
+    OnItemLongClickListener<T> mOnItemLongClickListener;
 
     private IncludeTypeLoad mLoad;
 
@@ -125,7 +128,8 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case ITYPE_Empty:
-                return new IncludeTypeEmpty(parent);
+                FrameLayout contain = getSpaceContain(parent);
+                return new IncludeTypeEmpty(contain);
             case ITYPE_ERROR:
                 return new IncludeTypeError(parent);
             case ITYPE_LOAD:
@@ -182,9 +186,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
                 powViewHolder.mData = itemData;
                 powViewHolder.mMultipleAdapter = this;
+
                 if (mOnItemClickListener != null) {
                     powViewHolder.registerAutoItemClick();
                 }
+                if(mOnItemLongClickListener!=null){
+                    powViewHolder.registerAutoItemLongClick();
+                }
+
                 powViewHolder.loadData(this, itemData, position);
         }
     }
@@ -318,11 +327,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         mRecyclerView = null;
     }
 
-    final void invokeItemClick(PowViewHolder<T> powViewHolder, T data, int index, int resId) {
-        if (mOnItemClickListener != null && index >= 0 && index < mDataList.size()) {
-            mOnItemClickListener.onClick(powViewHolder, data, index, resId);
-        }
-    }
+
 
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
@@ -460,6 +465,12 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         this.mOnItemClickListener = clickListener;
     }
 
+    // 设置ViewHolder 长按点击
+    @Override
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> longClickListener) {
+        this.mOnItemLongClickListener = longClickListener;
+    }
+
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
@@ -514,19 +525,16 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    @Override
-    public void setOnItemLongClickListener(OnItemLongClickListener<T> clickListener) {
 
-    }
 
 
     // 0x110 空白页面
     private class IncludeTypeEmpty extends RecycleViewHolder<Object> {
         FrameLayout mainView;
 
-        IncludeTypeEmpty(ViewGroup viewGroup) {
-            super(mActivity.getLayoutInflater().inflate(R.layout.powyin_scroll_multiple_adapter_empty, viewGroup, false), null);
-            mainView = (FrameLayout) itemView;
+        IncludeTypeEmpty(FrameLayout viewGroup) {
+            super(viewGroup,null);
+            mainView =  viewGroup;
         }
 
         void loadView() {
@@ -539,6 +547,22 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 mainView.addView(mSpaceView, new FrameLayout.LayoutParams(-1, -1));
             }
         }
+    }
+
+    private FrameLayout getSpaceContain(ViewGroup viewGroup){
+        FrameLayout frameLayout = new FrameLayout(viewGroup.getContext()){
+            @Override
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec),MeasureSpec.EXACTLY);
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            }
+        };
+        TextView textView = new TextView(viewGroup.getContext());
+        textView.setText("space View");
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2,-2);
+        layoutParams.gravity = Gravity.CENTER;
+        frameLayout.addView(textView , layoutParams);
+        return frameLayout;
     }
 
     // 0x111 错误页面

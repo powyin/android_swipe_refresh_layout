@@ -22,7 +22,10 @@ public abstract class PowViewHolder<T> {
     public T mData;
     public MultipleRecycleAdapter<T> mMultipleAdapter;
 
-    int mRegisterMainItemClickStatus = 0;   //  if ==1 hasRegisterMainItemClick  if ==0 needTestRegisterMainItemClick  if ==-1 freeControl
+    // todo if ==1 hasRegisterMainItemClick  if ==0 needTestRegisterMainItemClick  if ==-1 freeControl
+    private int mRegisterMainItemClickStatus = 0;
+    // todo if ==1 hasRegisterMainItemLongClick  if ==0 needTestRegisterMainItemLongClick  if ==-1 freeControl
+    private int mRegisterMainItemLongClickStatus = 0;   //
 
     public PowViewHolder(Activity activity, ViewGroup viewGroup) {
         this.mActivity = activity;
@@ -35,7 +38,6 @@ public abstract class PowViewHolder<T> {
 
     final void registerAutoItemClick() {
         if (mRegisterMainItemClickStatus != 0) return;
-
         if (getItemViewOnClickListener() == null) {
             mItemView.setOnClickListener(mOnClickListener);
             mRegisterMainItemClickStatus = +1;
@@ -44,10 +46,19 @@ public abstract class PowViewHolder<T> {
         }
     }
 
-    private View.OnClickListener getItemViewOnClickListener() {
-        if (mItemView.hasOnClickListeners()) {
-            try {
+    final void registerAutoItemLongClick() {
+        if (mRegisterMainItemLongClickStatus != 0) return;
+        if (getItemViewOnLongClickListener() == null) {
+            mItemView.setOnLongClickListener(mOnLongClickListener);
+            mRegisterMainItemLongClickStatus = +1;
+        } else {
+            mRegisterMainItemLongClickStatus = -1;
+        }
+    }
 
+    private View.OnClickListener getItemViewOnClickListener() {
+        if (mItemView.isClickable()) {
+            try {
                 Field mListenerInfo = View.class.getDeclaredField("mListenerInfo");
                 mListenerInfo.setAccessible(true);
                 Object infoObject = mListenerInfo.get(mItemView);
@@ -70,22 +81,65 @@ public abstract class PowViewHolder<T> {
         return null;
     }
 
+    private View.OnLongClickListener getItemViewOnLongClickListener() {
+        if (mItemView.isLongClickable()) {
+            try {
+                Field mListenerInfo = View.class.getDeclaredField("mListenerInfo");
+                mListenerInfo.setAccessible(true);
+                Object infoObject = mListenerInfo.get(mItemView);
+
+                if (infoObject == null) return null;
+
+                Field clickListener = infoObject.getClass().getDeclaredField("mOnLongClickListener");
+                Object onClickObject = clickListener.get(infoObject);
+
+                if (onClickObject == null) return null;
+
+                if (onClickObject instanceof View.OnLongClickListener) {
+                    return (View.OnLongClickListener) onClickObject;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @SuppressWarnings("unchecked")
         @Override
         public void onClick(View v) {
-            if (mMultipleAdapter != null) {
-                mMultipleAdapter.invokeItemClick(PowViewHolder.this, mData, mViewHolder.getAdapterPosition(), v.getId());
+            if (mMultipleAdapter != null && mMultipleAdapter.mOnItemClickListener != null) {
+                int index = mViewHolder.getAdapterPosition();
+                if (mMultipleAdapter.mHasHead) index--;
+                AdapterDelegate.OnItemClickListener<T> onItemClickListener = mMultipleAdapter.mOnItemClickListener;
+                if (index >= 0 && index < mMultipleAdapter.mDataList.size()) {
+                    onItemClickListener.onClick(PowViewHolder.this, mData, index, v.getId());
+                }
             }
         }
     };
 
+    private final View.OnLongClickListener mOnLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            if (mMultipleAdapter != null && mMultipleAdapter.mOnItemLongClickListener != null) {
+                int index = mViewHolder.getAdapterPosition();
+                if (mMultipleAdapter.mHasHead) index--;
+                AdapterDelegate.OnItemLongClickListener<T> onItemLongClickListener = mMultipleAdapter.mOnItemLongClickListener;
+                if (index >= 0 && index < mMultipleAdapter.mDataList.size()) {
+                    return onItemLongClickListener.onLongClick(PowViewHolder.this, mData, index, v.getId());
+                }
+            }
+            return false;
+        }
+    };
 
     protected final void registerItemClick(int... viewIds) {
-        if (mRegisterMainItemClickStatus == 1 && mItemView.hasOnClickListeners() && getItemViewOnClickListener() == mOnClickListener) {
+        if (mRegisterMainItemClickStatus == 1 && mItemView.isClickable() && getItemViewOnClickListener() == mOnClickListener) {
             mItemView.setOnClickListener(null);
         }
-
         mRegisterMainItemClickStatus = -1;
 
         for (int i = 0; viewIds != null && i < viewIds.length; i++) {
@@ -96,11 +150,16 @@ public abstract class PowViewHolder<T> {
         }
     }
 
-    protected final void unRegisterItemClick(int... viewIds) {
+    protected final void registerItemLongClick(int... viewIds) {
+        if (mRegisterMainItemLongClickStatus == 1 && mItemView.isLongClickable() && getItemViewOnLongClickListener() == mOnLongClickListener) {
+            mItemView.setOnLongClickListener(null);
+        }
+        mRegisterMainItemLongClickStatus = -1;
+
         for (int i = 0; viewIds != null && i < viewIds.length; i++) {
             View item = mItemView.findViewById(viewIds[i]);
             if (item != null) {
-                mItemView.findViewById(viewIds[i]).setOnClickListener(null);
+                item.setOnLongClickListener(mOnLongClickListener);
             }
         }
     }
@@ -116,7 +175,7 @@ public abstract class PowViewHolder<T> {
     }
 
 
-    protected void recycleData(){
+    protected void recycleData() {
 
     }
 
@@ -127,7 +186,7 @@ public abstract class PowViewHolder<T> {
 
     public final int getItemPostion() {
         int position = mViewHolder.getAdapterPosition();
-        return mMultipleAdapter.mHasHead ? position-1 : position;
+        return mMultipleAdapter.mHasHead ? position - 1 : position;
     }
 
 
