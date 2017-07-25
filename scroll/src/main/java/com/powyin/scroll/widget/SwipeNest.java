@@ -287,7 +287,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             mDragBeginY = (int) ev.getY();
             mDragBeginDirect = 0;
             mIsTouchEventMode = true;
-            mDragLastY = (int) ev.getY();
+            mDragLastY = mDragBeginY;
             mShouldCancelMotionEvent = false;
 
 
@@ -321,18 +321,18 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
                     mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-                    mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                    mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                     mDragLastY = mDragBeginY;
                     break;
                 case MotionEventCompat.ACTION_POINTER_DOWN: {
                     int pointerIndex = MotionEventCompat.getActionIndex(ev);
                     mActivePointerId = ev.getPointerId(pointerIndex);
-                    mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                    mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                     mDragLastY = mDragBeginY;
                     break;
                 }
                 case MotionEvent.ACTION_MOVE:
-                    float y = getMotionEventY(ev, mActivePointerId);
+                    float y = ev.getY(ev.findPointerIndex(mActivePointerId));
                     float yDiff = mDragBeginY - y;
                     if (!mDraggedDispatch && Math.abs(yDiff) > mTouchSlop / 2) {
                         mDraggedDispatch = true;
@@ -377,8 +377,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mActivePointerId = ev.getPointerId(0);
-                mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                 mDragLastY = mDragBeginY;
+
                 if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
                     mScroller.abortAnimation();
                     mShouldCancelMotionEvent = true;
@@ -388,7 +389,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 int pointerIndex = MotionEventCompat.getActionIndex(ev);
                 mActivePointerId = ev.getPointerId(pointerIndex);
-                mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                 mDragLastY = mDragBeginY;
                 break;
             }
@@ -396,10 +397,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
             case MotionEvent.ACTION_MOVE:
 
-                float y = getMotionEventY(ev, mActivePointerId);
-                if (y == Integer.MAX_VALUE) {
-                    return false;
-                }
+                float y = ev.getY(ev.findPointerIndex(mActivePointerId));
+
 
                 final float yDiff = mDragBeginY - y;
                 if (!isSameDirection(mDragBeginDirect, -yDiff)) {
@@ -448,7 +447,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         switch (MotionEventCompat.getActionMasked(ev)) {
             case MotionEvent.ACTION_DOWN:
                 mActivePointerId = ev.getPointerId(0);
-                mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
 
                 if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
                     mScroller.abortAnimation();
@@ -460,16 +459,14 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 int pointerIndex = MotionEventCompat.getActionIndex(ev);
                 mActivePointerId = ev.getPointerId(pointerIndex);
-                mDragBeginY = getMotionEventY(ev, mActivePointerId);
+                mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                 mDragLastY = mDragBeginY;
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
-                float y = getMotionEventY(ev, mActivePointerId);
-                if (y == Integer.MAX_VALUE) {
-                    return false;
-                }
+                float y = ev.getY(ev.findPointerIndex(mActivePointerId));
+
                 int deltaY = (int) mDragBeginY - (int) y;
                 if (!mDraggedIntercept && Math.abs(deltaY) > mTouchSlop) {
                     final ViewParent parent = getParent();
@@ -552,15 +549,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     private boolean canChildScrollUp() {
         return mTargetView != null && (ViewCompat.canScrollVertically(mTargetView, 1));
-    }
-
-
-    private float getMotionEventY(MotionEvent ev, int activePointerId) {
-        final int index = ev.findPointerIndex(activePointerId);
-        if (index < 0) {
-            return Integer.MAX_VALUE;
-        }
-        return ev.getY(index);
     }
 
 

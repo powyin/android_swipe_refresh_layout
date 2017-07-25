@@ -558,10 +558,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             }
         };
         TextView textView = new TextView(viewGroup.getContext());
-        textView.setText("space View");
+        textView.setText("space");
+        textView.setTextColor(0xff000000);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2,-2);
         layoutParams.gravity = Gravity.CENTER;
         frameLayout.addView(textView , layoutParams);
+        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(-1,-1);
+        frameLayout.setLayoutParams(params);
         return frameLayout;
     }
 
