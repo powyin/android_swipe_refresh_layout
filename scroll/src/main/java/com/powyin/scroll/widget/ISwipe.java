@@ -1,5 +1,7 @@
 package com.powyin.scroll.widget;
 
+import com.powyin.scroll.adapter.AdapterDelegate;
+
 /**
  * Created by powyin on 2017/4/17.  用于控制刷新结果
  */
@@ -13,15 +15,20 @@ public interface ISwipe {
     }
 
     enum FreshStatus {
-        CONTINUE,                                                       //重置下拉刷新 可以继续触发 （ERROR_FIXED 会使下拉刷新不再触发）
-        ERROR_AUTO_CANCEL,                                              //下拉刷新失败
-        ERROR_FIXED,                                                    //下拉刷新失败 并且不可再触发
+        CONTINUE,                                                       //重置下拉刷新 可以继续触发 （ERROR_NET 会使下拉刷新不再触发）
+        ERROR,                                                          //下拉刷新失败
+        ERROR_NET,                                                      //下拉刷新失败 网络异常
         SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
     }
 
 
+
+
     // 设置刷新控制监听
     void setOnRefreshListener(OnRefreshListener onRefreshListener);
+
+    // 设置被动监听
+    void setOnStatusListener(OnStatusListener onStatusListener);
 
     // 设置下拉刷新结果
     void setFreshStatue(FreshStatus statue);
@@ -42,4 +49,10 @@ public interface ISwipe {
         //TODO  isLoadViewShow  上拉进度条是否正在显示  不考虑UI和谐的话 可以直接不管它
         void onLoading(boolean isLoadViewShow);
     }
+
+    public interface OnStatusListener {
+        void onFreshStatue(FreshStatus status);
+    }
+
+
 }

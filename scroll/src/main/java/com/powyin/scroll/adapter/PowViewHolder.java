@@ -20,7 +20,9 @@ public abstract class PowViewHolder<T> {
     protected final Activity mActivity;
 
     public T mData;
-    public MultipleRecycleAdapter<T> mMultipleAdapter;
+
+    MultipleRecycleAdapter<T> mMultipleAdapter;
+    MultipleListAdapter<T> mMultipleListAdapter;
 
     // todo if ==1 hasRegisterMainItemClick  if ==0 needTestRegisterMainItemClick  if ==-1 freeControl
     private int mRegisterMainItemClickStatus = 0;
@@ -118,6 +120,14 @@ public abstract class PowViewHolder<T> {
                     onItemClickListener.onClick(PowViewHolder.this, mData, index, v.getId());
                 }
             }
+            if (mMultipleListAdapter != null && mMultipleListAdapter.mOnItemClickListener != null) {
+                int index = mViewHolder.getAdapterPosition();
+                if (mMultipleListAdapter.mHasHead) index--;
+                AdapterDelegate.OnItemClickListener<T> onItemClickListener = mMultipleListAdapter.mOnItemClickListener;
+                if (index >= 0 && index < mMultipleListAdapter.mDataList.size()) {
+                    onItemClickListener.onClick(PowViewHolder.this, mData, index, v.getId());
+                }
+            }
         }
     };
 
@@ -132,6 +142,16 @@ public abstract class PowViewHolder<T> {
                     return onItemLongClickListener.onLongClick(PowViewHolder.this, mData, index, v.getId());
                 }
             }
+
+            if (mMultipleListAdapter != null && mMultipleListAdapter.mOnItemLongClickListener != null) {
+                int index = mViewHolder.getAdapterPosition();
+                if (mMultipleListAdapter.mHasHead) index--;
+                AdapterDelegate.OnItemLongClickListener<T> onItemLongClickListener = mMultipleListAdapter.mOnItemLongClickListener;
+                if (index >= 0 && index < mMultipleListAdapter.mDataList.size()) {
+                    return onItemLongClickListener.onLongClick(PowViewHolder.this, mData, index, v.getId());
+                }
+            }
+
             return false;
         }
     };
@@ -174,10 +194,6 @@ public abstract class PowViewHolder<T> {
         return true;
     }
 
-
-    protected void recycleData() {
-
-    }
 
     // 是否支持拖动
     protected boolean isEnableDragAndDrop() {

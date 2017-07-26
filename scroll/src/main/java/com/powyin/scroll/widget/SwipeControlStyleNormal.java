@@ -1,7 +1,6 @@
 package com.powyin.scroll.widget;
 
 import android.content.Context;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -125,7 +124,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                     textInfo.setText("刷新成功");
                 }
                 break;
-            case SWIPE_HEAD_COMPLETE_ERROR_AUTO_CANCEL:
+            case SWIPE_HEAD_COMPLETE_ERROR:
 
                 statusPre.setVisibility(View.INVISIBLE);
                 statusLoad.clearAnimation();
@@ -139,7 +138,7 @@ public class SwipeControlStyleNormal implements SwipeControl {
                 }
 
                 break;
-            case SWIPE_HEAD_COMPLETE_ERROR_FIXED:
+            case SWIPE_HEAD_COMPLETE_ERROR_NET:
 
                 statusPre.setVisibility(View.INVISIBLE);
                 statusLoad.clearAnimation();

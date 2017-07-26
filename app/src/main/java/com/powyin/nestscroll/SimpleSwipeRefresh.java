@@ -74,14 +74,14 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         findViewById(R.id.click_me_to_stop_head).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_fresh).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_over).setOnClickListener(this);
-    //    listView = (ListView)findViewById(R.id.my_list);
-        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
+        listView = (ListView)findViewById(R.id.my_list);
+    //    mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
         swipeRefresh = (SwipeRefresh)findViewById(R.id.re);
     }
 
     private void init(){
-        initRecycleView();
-     //   initListView();
+     //   initRecycleView();
+        initListView();
         swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -95,7 +95,6 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                 // 开始加载更多
             }
         });
-
     }
 
     private void initListView(){
@@ -104,7 +103,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         listView.setAdapter(multipleListAdapter);
         for(int i=0;i<3;i++){
             int rad = (int)(Math.random()*10)%3+1;
-            multipleListAdapter.addData(multipleListAdapter.getDataCount()-1,new DataModel(rad));
+            multipleListAdapter.addData(0,new DataModel(rad));
         }
 
         multipleListAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener() {

@@ -44,7 +44,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <T, N extends T> MultipleRecycleAdapter<N> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
+    public static <T> MultipleRecycleAdapter<T> getByViewHolder(Activity activity, Class<? extends PowViewHolder<? extends T>>... arrClass) {
         return new MultipleRecycleAdapter(activity, arrClass);
     }
 
@@ -190,7 +190,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 if (mOnItemClickListener != null) {
                     powViewHolder.registerAutoItemClick();
                 }
-                if(mOnItemLongClickListener!=null){
+                if (mOnItemLongClickListener != null) {
                     powViewHolder.registerAutoItemLongClick();
                 }
 
@@ -207,14 +207,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 IncludeTypeLoad load = (IncludeTypeLoad) holder;
                 load.progressBar.ensureStopAnimation();
                 break;
-            case ITYPE_Empty:
-            case ITYPE_ERROR:
-            case ITYPE_HEAD:
-            case ITYPE_FOOT:
-                break;
-            default:
-                PowViewHolder<T> powViewHolder = ((RecycleViewHolder) holder).mPowViewHolder;
-                powViewHolder.recycleData();
         }
     }
 
@@ -281,8 +273,30 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public long getItemId(int position) {
-        T date = position < mDataList.size() ? mDataList.get(position) : null;
-        return date == null ? 0 : date.hashCode();
+        if(mSpaceEnable){
+            return ITYPE_Empty;
+        }
+
+        if (mHasHead) {
+            if (position == 0) {
+                return  ITYPE_HEAD;
+            }
+            position--;
+        }
+
+        if (position < mDataList.size()) {
+            T data = mDataList.get(position);
+            return data == null ? 0 : data.hashCode();
+        } else {
+            position = position - mDataList.size();
+            if (mHasFoot) {
+                if (position == 0) {
+                    return  ITYPE_FOOT;
+                }
+            }
+            return ITYPE_LOAD;
+        }
+
     }
 
 
@@ -317,7 +331,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
         if (position == 0 && mHasLoad) return ITYPE_LOAD;
 
-        throw new RuntimeException(" what happer ?? ");
+        throw new RuntimeException(" what happen ");
 
     }
 
@@ -326,8 +340,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         super.onDetachedFromRecyclerView(recyclerView);
         mRecyclerView = null;
     }
-
-
 
 
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
@@ -526,15 +538,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     }
 
 
-
-
     // 0x110 空白页面
     private class IncludeTypeEmpty extends RecycleViewHolder<Object> {
         FrameLayout mainView;
 
         IncludeTypeEmpty(FrameLayout viewGroup) {
-            super(viewGroup,null);
-            mainView =  viewGroup;
+            super(viewGroup, null);
+            mainView = viewGroup;
         }
 
         void loadView() {
@@ -549,21 +559,21 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
-    private FrameLayout getSpaceContain(ViewGroup viewGroup){
-        FrameLayout frameLayout = new FrameLayout(viewGroup.getContext()){
+    private FrameLayout getSpaceContain(ViewGroup viewGroup) {
+        FrameLayout frameLayout = new FrameLayout(viewGroup.getContext()) {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-                heightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec),MeasureSpec.EXACTLY);
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.EXACTLY);
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             }
         };
         TextView textView = new TextView(viewGroup.getContext());
         textView.setText("space");
         textView.setTextColor(0xff000000);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2,-2);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-2, -2);
         layoutParams.gravity = Gravity.CENTER;
-        frameLayout.addView(textView , layoutParams);
-        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(-1,-1);
+        frameLayout.addView(textView, layoutParams);
+        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(-1, -1);
         frameLayout.setLayoutParams(params);
         return frameLayout;
     }
@@ -770,7 +780,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             alpha = alpha > 1 ? 1 : alpha;
             alpha = alpha < 0 ? 1 : alpha;
 
-            int colorAlpha = (int)(alpha*200)                                                                  ;
+            int colorAlpha = (int) (alpha * 200);
 
             textPaint.setAlpha(colorAlpha);
             circlePaint.setAlpha(colorAlpha);
@@ -780,7 +790,8 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
 
-            }if(mLoadStatus == LoadedStatus.ERROR){
+            }
+            if (mLoadStatus == LoadedStatus.ERROR) {
                 canvas.drawText(mLoadErrorInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);

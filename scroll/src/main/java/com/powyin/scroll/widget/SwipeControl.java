@@ -19,8 +19,8 @@ public interface SwipeControl {
         SWIPE_HEAD_TOAST,                          //提示: 下拉刷新
         SWIPE_HEAD_LOADING,                        //提示: 刷新中
         SWIPE_HEAD_COMPLETE_OK,                    //提示: 刷新完成
-        SWIPE_HEAD_COMPLETE_ERROR_AUTO_CANCEL,     //提示: 刷新失败  再次下拉自动重置
-        SWIPE_HEAD_COMPLETE_ERROR_FIXED,           //提示: 刷新失败  无法自动重置
+        SWIPE_HEAD_COMPLETE_ERROR,     //提示: 刷新失败  再次下拉自动重置
+        SWIPE_HEAD_COMPLETE_ERROR_NET,           //提示: 刷新失败  无法自动重置
         // 下拉加载
         SWIPE_LOAD_LOADING,
         SWIPE_LOAD_NO_MORE,
