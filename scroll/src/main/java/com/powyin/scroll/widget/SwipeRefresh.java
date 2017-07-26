@@ -94,29 +94,29 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         initSwipeControl();
     }
 
-    private void ensureTarget() {
-        if (mTargetView == null) {
-            for (int i = 0; i < getChildCount(); i++) {
-                View child = getChildAt(i);
-                if (child != mViewTop && child != mViewBottom) {
-                    mTargetView = child;
-                }
-            }
-
-            mTargetView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                @Override
-                public void onScrollChanged() {
-                    if (!mNestedScrollInProgress && !mLoadedStatusContinueRunning &&
-                            !mDraggedDispatch && !mDraggedIntercept && mOnRefreshListener != null &&
-                            !canChildScrollUp() && canChildScrollDown()) {
-                        mLoadedStatusContinueRunning = true;
-                        mOnRefreshListener.onLoading(false);
-                    }
-                }
-            });
-
-        }
-    }
+//    private void ensureTarget() {
+//        if (mTargetView == null) {
+//            for (int i = 0; i < getChildCount(); i++) {
+//                View child = getChildAt(i);
+//                if (child != mViewTop && child != mViewBottom) {
+//                    mTargetView = child;
+//                }
+//            }
+//
+//            mTargetView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+//                @Override
+//                public void onScrollChanged() {
+//                    if (!mNestedScrollInProgress && !mLoadedStatusContinueRunning &&
+//                            !mDraggedDispatch && !mDraggedIntercept && mOnRefreshListener != null &&
+//                            !canChildScrollUp() && canChildScrollDown()) {
+//                        mLoadedStatusContinueRunning = true;
+//                        mOnRefreshListener.onLoading(false);
+//                    }
+//                }
+//            });
+//
+//        }
+//    }
 
 
     private void initSwipeControl() {
@@ -132,40 +132,19 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthTarget = MeasureSpec.getSize(widthMeasureSpec);
         final int heightTarget = MeasureSpec.getSize(heightMeasureSpec);
-        int childWidMeasure = MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY);
-        int spHei = MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST);
-        int targetHei = heightTarget;
 
-        System.out.println(":                " + widthTarget + "          "+ heightTarget);
+        final int childWidMeasure = MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY);
+        final int spHei = MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST);
 
         for (int i = 0; i < getChildCount(); ++i) {
-
             final View child = getChildAt(i);
             if (child.getVisibility() == View.GONE) {
                 continue;
             }
+            if (mViewTop == child || mViewBottom == child) continue;
 
-            if (mViewTop == child || mViewBottom == child) {
-                continue;
-            }
-
-            final LayoutParams lp = child.getLayoutParams();
-            switch (lp.height) {
-                case -2:
-                    child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.UNSPECIFIED));
-                    targetHei = child.getMeasuredHeight();
-                    break;
-                case -1:
-                    child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.EXACTLY));
-                    targetHei = child.getMeasuredHeight();
-                    break;
-                default:
-                    child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY));
-                    targetHei = child.getMeasuredHeight();
-                    break;
-            }
+            child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.EXACTLY));
         }
-
 
         if (mViewTop != null) {
             mViewTop.measure(childWidMeasure, spHei);
@@ -174,16 +153,14 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             mViewBottom.measure(childWidMeasure, spHei);
         }
 
-        System.out.println(":     XXXXX           " + widthTarget + "          "+ targetHei);
-
-        setMeasuredDimension(widthTarget, targetHei);
+        setMeasuredDimension(widthTarget, heightTarget);
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        ensureTarget();
+
         if (getChildCount() > 3) {
-            throw new RuntimeException("can not holder only one View");
+            throw new RuntimeException("only one View is support");
         }
 
         contentScroll = 0;
@@ -191,11 +168,14 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         overScrollBottom = mViewBottom.getMeasuredHeight();
 
 
+
+        for(int i=0;i<getChildCount();i++){
+            View child = getChildAt(i);
+            if(child == mViewTop || child == mViewBottom) continue;
+            child.layout(0, 0, right - left, bottom - top);
+        }
+
         mViewTop.layout(left, -mViewTop.getMeasuredHeight(), right, 0);
-
-        System.out.println("            "+mTargetView);
-
-        mTargetView.layout(0, 0, right - left, bottom - top);
 
         mViewBottom.layout(0, bottom - top, right - left, bottom - top + overScrollBottom);
 
@@ -221,6 +201,18 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             mDragBeginDirect = 0;
             mIsTouchEventMode = true;
             mDragLastY = mDragBeginY;
+
+            mTargetView = null;
+            int x = (int) ev.getX();
+            int y = (int) ev.getY();
+            for (int i = 0; i < getChildCount(); i++) {
+                int scrollY = getScrollY();
+                View child = getChildAt(i);
+                boolean isSelect = !(y < child.getTop() - scrollY || y >= child.getBottom() - scrollY || x < child.getLeft() || x >= child.getRight());
+                if (isSelect) {
+                    mTargetView = child;
+                }
+            }
         }
 
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
@@ -284,8 +276,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-
-        ensureTarget();
         if (mNestedScrollInProgress || !isEnabled() || (canChildScrollDown() && canChildScrollUp())) {
             return false;
         }
@@ -391,6 +381,14 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         return true;
     }
 
+    @Override
+    public void addView(View child, int index, LayoutParams params) {
+        if(getChildCount()>=3){
+            throw new RuntimeException("only one View is support");
+        }
+        super.addView(child, index, params);
+    }
+
     private boolean isSameDirection(float arg1, float arg2) {
         return arg1 == 0 || (arg1 > 0 && arg2 > 0) || (arg1 < 0 && arg2 < 0);
     }
@@ -408,18 +406,15 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
 
     private boolean canChildScrollDown() {
-        ensureTarget();
-        return ViewCompat.canScrollVertically(mTargetView, -1);
+        return mTargetView!=null && ViewCompat.canScrollVertically(mTargetView, -1);
     }
 
     private boolean canChildScrollUp() {
-        ensureTarget();
-        return ViewCompat.canScrollVertically(mTargetView, 1);
+        return mTargetView !=null && ViewCompat.canScrollVertically(mTargetView, 1);
     }
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean b) {
-        ensureTarget();
         if (mTargetView == null || mTargetView instanceof NestedScrollingChild) {
             super.requestDisallowInterceptTouchEvent(b);
         }
@@ -434,6 +429,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     @Override
     public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes) {
+        mTargetView = target;
         mParentHelper.onNestedScrollAccepted(child, target, nestedScrollAxes);
         mNestedScrollInProgress = true;
         stopAllScroll();
@@ -807,7 +803,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             case CONTINUE:
                 lab:
                 {
-                    ensureTarget();
                     int currentScrollY = getScrollY();
                     if (currentScrollY <= 0) {
                         break lab;

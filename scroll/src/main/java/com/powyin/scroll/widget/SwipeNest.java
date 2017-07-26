@@ -141,7 +141,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     @Override
     public void onStopNestedScroll(View target) {
-        mTargetView = null;
         mParentHelper.onStopNestedScroll(target);
         mNestedScrollInProgress = false;
         if (!tryBackToRefreshing()) {
@@ -203,7 +202,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         final int widthTarget = MeasureSpec.getSize(widthMeasureSpec);
         final int heightTarget = MeasureSpec.getSize(heightMeasureSpec);
 
-        int childWidMeasure = MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY);
+        final int childWidMeasure = MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY);
+        final int spHei = MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST);
 
         int mTotalLength = 0;
         for (int i = 0; i < getChildCount(); ++i) {
@@ -212,6 +212,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             if (child.getVisibility() == View.GONE) {
                 continue;
             }
+
+            if(child==mViewTop || child==mViewBottom) continue;
 
             final LayoutParams lp = child.getLayoutParams();
             switch (lp.height) {
@@ -227,6 +229,13 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             }
 
             mTotalLength = Math.max(mTotalLength, mTotalLength + child.getMeasuredHeight());
+        }
+
+        if (mViewTop != null) {
+            mViewTop.measure(childWidMeasure, spHei);
+        }
+        if (mViewBottom != null) {
+            mViewBottom.measure(childWidMeasure, spHei);
         }
 
 
