@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Obj;
-import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
+import com.powyin.nestscroll.refresh.SwipeControllerStyle_Horizontal;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.widget.ISwipe;
 import com.powyin.scroll.widget.SwipeNest;
@@ -31,7 +31,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.click_me_to_set_swipe_control:
-                swipeNest.setSwipeControl(new SwipeControlStyle_Horizontal(this));
+                swipeNest.setSwipeController(new SwipeControllerStyle_Horizontal(this));
                 break;
             case R.id.click_me_to_stop_head:
             //    swipeNest.finishRefresh();            //下拉刷新完成
@@ -55,7 +55,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
             }
 
             @Override
-            public void onLoading(boolean isLoadViewShow) {
+            public void onLoading() {
 
             }
         });

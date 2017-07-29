@@ -12,7 +12,7 @@ import com.powyin.nestscroll.adapter.TypePowViewHolder_Pic_1;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Text;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Pic_4;
 import com.powyin.nestscroll.net.DataModel;
-import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
+import com.powyin.nestscroll.refresh.SwipeControllerStyle_Horizontal;
 import com.powyin.scroll.adapter.AdapterDelegate;
 import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
@@ -42,7 +42,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.click_me_to_set_swipe_control:
-                swipeRefresh.setSwipeControl(new SwipeControlStyle_Horizontal(this));               //设置定义刷新样式
+                swipeRefresh.setSwipeController(new SwipeControllerStyle_Horizontal(this));               //设置定义刷新样式
                 break;
             case R.id.click_me_to_stop_head:
                 swipeRefresh.setFreshStatue(ISwipe.FreshStatus.SUCCESS);                    //下拉刷新完成
@@ -90,7 +90,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
             }
 
             @Override
-            public void onLoading(boolean isLoadViewShow) {
+            public void onLoading() {
                 System.out.println("------------------------------------------------onLoading----------------------->>>>>>>>");
                 // 开始加载更多
             }

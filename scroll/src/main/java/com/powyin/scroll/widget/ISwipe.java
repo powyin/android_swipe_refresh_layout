@@ -1,7 +1,5 @@
 package com.powyin.scroll.widget;
 
-import com.powyin.scroll.adapter.AdapterDelegate;
-
 /**
  * Created by powyin on 2017/4/17.  用于控制刷新结果
  */
@@ -27,8 +25,6 @@ public interface ISwipe {
     // 设置刷新控制监听
     void setOnRefreshListener(OnRefreshListener onRefreshListener);
 
-    // 设置被动监听
-    void setOnStatusListener(OnStatusListener onStatusListener);
 
     // 设置下拉刷新结果
     void setFreshStatue(FreshStatus statue);
@@ -38,19 +34,27 @@ public interface ISwipe {
 
 
     // 设置刷新模式
-    public void setSwipeModel(SwipeControl.SwipeModel model);
+    public void setSwipeModel(SwipeController.SwipeModel model);
 
     // 设置自定义刷新视图
-    public void setSwipeControl(SwipeControl control);
+    public void setSwipeController(SwipeController controller);
+
+    // 设置空白页面控制器
+    public void setEmptyController(EmptyController controller);
+
+    public void setShowEmptyView(boolean show);
+
 
     public interface OnRefreshListener {
         //TODO  刷新开始
         void onRefresh();
         //TODO  isLoadViewShow  上拉进度条是否正在显示  不考虑UI和谐的话 可以直接不管它
-        void onLoading(boolean isLoadViewShow);
+        void onLoading();
     }
 
+    @Deprecated
     public interface OnStatusListener {
+        @Deprecated
         void onFreshStatue(FreshStatus status);
     }
 

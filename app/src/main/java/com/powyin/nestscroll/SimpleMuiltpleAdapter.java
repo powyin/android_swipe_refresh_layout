@@ -7,19 +7,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ListView;
 
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Pic_1;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Text;
 import com.powyin.nestscroll.adapter.TypePowViewHolder_Pic_4;
 import com.powyin.nestscroll.net.DataModel;
-import com.powyin.nestscroll.refresh.SwipeControlStyle_Horizontal;
 import com.powyin.scroll.adapter.AdapterDelegate;
-import com.powyin.scroll.adapter.MultipleListAdapter;
 import com.powyin.scroll.adapter.MultipleRecycleAdapter;
 import com.powyin.scroll.adapter.PowViewHolder;
-import com.powyin.scroll.widget.ISwipe;
-import com.powyin.scroll.widget.SwipeRefresh;
 
 /**
  * Created by powyin on 2016/7/27.
