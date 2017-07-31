@@ -73,6 +73,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
     private View mViewBottom;
     private View mTargetView;
     private View mEmptyView;
+    private View mEmptyReplaceView;
 
 
     public SwipeNest(Context context) {
@@ -119,7 +120,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     @Override
     public void onNestedScrollAccepted(View child, View target, int nestedScrollAxes) {
-        if (target != mEmptyView) {
+        if (target != mEmptyView && (target != mEmptyReplaceView || !mShowEmptyView)) {
             mTargetView = target;
         }
         mParentHelper.onNestedScrollAccepted(child, target, nestedScrollAxes);
@@ -230,15 +231,18 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
         final int widthTarget = MeasureSpec.getSize(widthMeasureSpec);
         final int heightTarget = MeasureSpec.getSize(heightMeasureSpec);
-
         final int childWidMeasure = MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY);
         final int spHei = MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST);
 
         int mTotalLength = 0;
         int normalIndex = 0;
-        for (int i = 0; i < getChildCount(); ++i) {
+        int childCount = getChildCount();
+
+        mEmptyReplaceView = null;
+        for (int i = 0; i < childCount; ++i) {
             final View child = getChildAt(i);
             if (child == mViewTop || child == mViewBottom || child == mEmptyView) {
                 continue;
@@ -259,17 +263,20 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 }
 
                 int childMeasureHei = child.getMeasuredHeight();
+                childMeasureHei = childMeasureHei > 0 ? childMeasureHei : 0;
+                mTotalLength = mTotalLength + childMeasureHei;
 
-                if (mEmptyViewIndex == normalIndex && mShowEmptyView && mEmptyView != null) {
-                    mEmptyView.measure(MeasureSpec.makeMeasureSpec(child.getMeasuredWidth(), MeasureSpec.EXACTLY),
+                if (mEmptyViewIndex == normalIndex && mEmptyView != null) {
+                    // 处理空白页面为最后一项 让其充分展开
+                    if (normalIndex == (childCount - 3)) {
+                        childMeasureHei = heightTarget > mTotalLength ? childMeasureHei + (heightTarget - mTotalLength) : childMeasureHei;
+                    }
+                    mEmptyView.measure(MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY),
                             MeasureSpec.makeMeasureSpec(childMeasureHei, MeasureSpec.EXACTLY));
+                    mEmptyReplaceView = child;
                 }
-
-                mTotalLength = childMeasureHei > 0 ? mTotalLength + childMeasureHei : mTotalLength;
             }
-
             normalIndex++;
-
         }
 
         if (mViewTop != null) {
@@ -278,7 +285,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if (mViewBottom != null) {
             mViewBottom.measure(childWidMeasure, spHei);
         }
-
+        if (mEmptyReplaceView == null && mEmptyView != null) {
+            mEmptyView.measure(childWidMeasure, spHei);
+        }
 
         int endHei = Math.max(mTotalLength, getSuggestedMinimumHeight());
         int endWid = Math.max(widthTarget, getSuggestedMinimumWidth());
@@ -290,31 +299,41 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int currentHei = 0;
-        int normalIndex = 0;
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
-            if (child == mViewTop || child == mViewBottom || child == mEmptyView) {
+            if (child == mViewTop || child == mViewBottom || child == mEmptyView || child.getVisibility() == GONE) {
                 continue;
             }
-            int itemHei = child.getMeasuredHeight();
-            if (child.getVisibility() != GONE) {
-                if (normalIndex == mEmptyViewIndex && mShowEmptyView) {
+
+            if (child == mEmptyReplaceView) {
+                if (mShowEmptyView) {
                     if (mEmptyView != null) {
-                        mEmptyView.layout(0, currentHei, r - l, currentHei + itemHei);
+                        int itemEmptyHei = mEmptyView.getMeasuredHeight();
+                        mEmptyView.layout(0, currentHei, r - l, currentHei + itemEmptyHei);
+                        currentHei += itemEmptyHei;
                     }
-                    currentHei += itemHei;
-                    child.setTag(1 << 30, currentHei - (b - t));
+                    int itemHei = child.getMeasuredHeight();
+                    child.layout(r - l, currentHei, 2 * (r - l), currentHei + itemHei);
+                    child.setTag(1 << 30, currentHei + itemHei - (b - t));
                 } else {
+                    int itemHei = child.getMeasuredHeight();
                     child.layout(0, currentHei, r - l, currentHei + itemHei);
                     currentHei += itemHei;
                     child.setTag(1 << 30, currentHei - (b - t));
                 }
+            } else {
+                int itemHei = child.getMeasuredHeight();
+                child.layout(0, currentHei, r - l, currentHei + itemHei);
+                currentHei += itemHei;
+                child.setTag(1 << 30, currentHei - (b - t));
             }
-            normalIndex++;
         }
+
 
         boolean canOverScrollBottom = currentHei >= (b - t);
         contentScroll = canOverScrollBottom ? currentHei - (b - t) : 0;
+
+
         overScrollTop = mViewTop.getMeasuredHeight();
         overScrollBottom = mViewBottom.getMeasuredHeight();
 
@@ -322,6 +341,10 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         mViewTop.setTag(1 << 30, 0);
         mViewBottom.layout(0, b - t + contentScroll, r - l, b - t + contentScroll + overScrollBottom);
         mViewTop.setTag(1 << 30, contentScroll + overScrollBottom);
+
+        if (!mShowEmptyView && mEmptyView != null) {
+            mEmptyView.layout(r - l, 0, 2 * (r - l), mEmptyView.getMeasuredHeight());
+        }
 
         if (mModel == SwipeController.SwipeModel.SWIPE_NONE || mModel == SwipeController.SwipeModel.SWIPE_ONLY_LOADINN) {
             overScrollTop = 0;
@@ -349,7 +372,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
 
             mTargetView = null;
-            int normalIndex = 0;
+
             int x = (int) ev.getX();
             int y = (int) ev.getY();
             for (int i = 0; i < getChildCount(); i++) {
@@ -358,12 +381,12 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 if (child == mViewTop || child == mViewBottom || child == mEmptyView) continue;
                 boolean isSelect = !(y < child.getTop() - scrollY || y >= child.getBottom() - scrollY || x < child.getLeft() || x >= child.getRight());
                 if (isSelect) {
-                    if (normalIndex == mEmptyViewIndex && mShowEmptyView) {
+                    if (child == mEmptyReplaceView) {
                         break;
                     }
                     mTargetView = child;
+                    break;
                 }
-                normalIndex++;
             }
         }
 
@@ -703,9 +726,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if (0 > willTo && willTo > middleHei && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
                 || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                                 //重置下拉刷新状态
             mFreshStatus = ISwipe.FreshStatus.CONTINUE;
-            if (mEmptyController != null) {
-                mEmptyController.onSwipeStatue(mFreshStatus);
-            }
         }
         if (0 > willTo) {                                                                                                                            //刷新下拉状态
             int swipeViewVisibilityHei = 0 - willTo;
@@ -756,8 +776,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
     }
 
     private boolean tryBackToRefreshing() {
-
-
         if (mIsTouchEventMode || mFreshStatus == ISwipe.FreshStatus.SUCCESS || mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET)
             return false;
         int scrollY = getScrollY();
@@ -786,9 +804,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                                 mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, mViewTop.getHeight(), mViewTop.getHeight());
                                 break;
                         }
-
                         if (!mRefreshStatusContinueRunning) {
                             mRefreshStatusContinueRunning = true;
+                            if (mEmptyController != null) {
+                                mEmptyController.onSwipeStatue(FreshStatus.CONTINUE);
+                            }
                             if (mOnRefreshListener != null) {
                                 mOnRefreshListener.onRefresh();
                             }
@@ -823,7 +843,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         int scrollY = getScrollY();
         int middleHei = overScrollTop != 0 ? -overScrollTop + mSwipeController.getOverScrollHei() : 0;
 
-        if ((mFreshStatus == ISwipe.FreshStatus.CONTINUE) && scrollY == middleHei)
+        if (mFreshStatus == ISwipe.FreshStatus.CONTINUE  &&  mRefreshStatusContinueRunning  &&  scrollY == middleHei)
             return false;
 
         if (scrollY < 0) {
@@ -1064,22 +1084,12 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     // 设置是否显示空白页面
     @Override
-    public void setShowEmptyView(boolean show) {
+    public void enableEmptyView(boolean show) {
         if (mShowEmptyView != show) {
             mShowEmptyView = show;
             requestLayout();
-
-            View select = null;
-            int normalIndex = mEmptyViewIndex;
-            for (int i = 0; i < getChildCount(); i++) {
-                View child = getChildAt(i);
-                if (child == mViewTop || child == mViewBottom || child == mEmptyView) continue;
-                if (i == normalIndex) {
-                    select = child;
-                    break;
-                }
-            }
-            if (select == mTargetView) {
+            // TODO release mTargetView  this is no be layout any more;
+            if (mEmptyReplaceView == mTargetView && mShowEmptyView) {
                 mTargetView = null;
             }
 

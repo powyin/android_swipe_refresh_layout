@@ -207,9 +207,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             if (0 > willTo && willTo > middleHei && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
                     || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                              //重置下拉刷新状态
                 mFreshStatus = ISwipe.FreshStatus.CONTINUE;
-                if(mEmptyController!=null){
-                    mEmptyController.onSwipeStatue(mFreshStatus);
-                }
+
             }
             if (0 > willTo) {                                                                                                                     //刷新下拉状态
                 int swipeViewVisibilityHei = 0 - willTo;
@@ -291,6 +289,9 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
                         if (!mRefreshStatusContinueRunning) {
                             mRefreshStatusContinueRunning = true;
+                            if(mEmptyController!=null){
+                                mEmptyController.onSwipeStatue(mFreshStatus);
+                            }
                             if (mOnRefreshListener != null) {
                                 mOnRefreshListener.onRefresh();
                             }
@@ -325,7 +326,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         int scrollY = getScrollY();
         int middleHei = overScrollTop != 0 ? -overScrollTop + mSwipeController.getOverScrollHei() : 0;
 
-        if ((mFreshStatus == FreshStatus.CONTINUE) && scrollY == middleHei)
+        if (mFreshStatus == FreshStatus.CONTINUE && mRefreshStatusContinueRunning && scrollY == middleHei)
             return false;
 
         if (scrollY < 0) {
@@ -427,15 +428,22 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         for(int i=0;i<getChildCount();i++){
             View child = getChildAt(i);
             if(child == mViewTop || child == mViewBottom || child == mEmptyView) continue;
-            if(!mShowEmptyView){
+            if(mShowEmptyView){
+                child.layout(right - left, 0, 2*(right - left), bottom - top);
+            }else {
                 child.layout(0, 0, right - left, bottom - top);
             }
         }
 
         mViewTop.layout(left, -mViewTop.getMeasuredHeight(), right, 0);
         mViewBottom.layout(0, bottom - top, right - left, bottom - top + overScrollBottom);
-        if(mEmptyView !=null && mShowEmptyView){
-            mEmptyView.layout(0, 0, right - left, bottom - top);
+
+        if(mEmptyView !=null ){
+            if(mShowEmptyView){
+                mEmptyView.layout(0, 0, right - left, bottom - top);
+            }else {
+                mEmptyView.layout(right - left, 0, 2*(right - left), bottom - top);
+            }
         }
 
         if (mModel == SwipeController.SwipeModel.SWIPE_NONE || mModel == SwipeController.SwipeModel.SWIPE_ONLY_LOADINN) {
@@ -663,7 +671,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     @Override
     public void requestDisallowInterceptTouchEvent(boolean b) {
-        if (mTargetView == null || mTargetView instanceof NestedScrollingChild) {
+        if (mShowEmptyView || mTargetView == null || mTargetView instanceof NestedScrollingChild) {
             super.requestDisallowInterceptTouchEvent(b);
         }
     }
@@ -841,7 +849,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     // 设置是否展示空白页面
     @Override
-    public void setShowEmptyView(boolean show) {
+    public void enableEmptyView(boolean show) {
         if(mShowEmptyView !=show){
             mShowEmptyView = show;
             requestLayout();

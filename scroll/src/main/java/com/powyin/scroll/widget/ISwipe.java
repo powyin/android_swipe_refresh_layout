@@ -42,7 +42,7 @@ public interface ISwipe {
     // 设置空白页面控制器
     public void setEmptyController(EmptyController controller);
 
-    public void setShowEmptyView(boolean show);
+    public void enableEmptyView(boolean show);
 
 
     public interface OnRefreshListener {
