@@ -7,13 +7,11 @@ package com.powyin.scroll.widget;
 public interface ISwipe {
 
     enum LoadedStatus {
-        CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
         ERROR,                                                          //上拉加载失败
         NO_MORE                                                         //数据全部加载完毕
     }
 
     enum FreshStatus {
-        CONTINUE,                                                       //重置下拉刷新 可以继续触发 （ERROR_NET 会使下拉刷新不再触发）
         ERROR,                                                          //下拉刷新失败
         ERROR_NET,                                                      //下拉刷新失败 网络异常
         SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
@@ -22,15 +20,19 @@ public interface ISwipe {
 
 
 
-    // 设置刷新控制监听
+    // 设置刷新控制监听   注意: OnRefreshListener可能会马上被调用刷新方法
     void setOnRefreshListener(OnRefreshListener onRefreshListener);
 
+    // 清除下拉刷新结果
+    void cleanFreshResult();
 
     // 设置下拉刷新结果
-    void setFreshStatue(FreshStatus statue);
+    void setFreshResult(FreshStatus statue);
 
+    // 清除上拉加载结果
+    void cleanLoadMoreResult();
     // 设置上拉加载结果
-    void setLoadMoreStatus(LoadedStatus status);
+    void setLoadMoreResult(LoadedStatus status);
 
 
     // 设置刷新模式
@@ -42,13 +44,14 @@ public interface ISwipe {
     // 设置空白页面控制器
     public void setEmptyController(EmptyController controller);
 
+    // 启动空白页面显示
     public void enableEmptyView(boolean show);
 
 
     public interface OnRefreshListener {
-        //TODO  刷新开始
+        //TODO  下拉刷新开始
         void onRefresh();
-        //TODO  isLoadViewShow  上拉进度条是否正在显示  不考虑UI和谐的话 可以直接不管它
+        //TODO 上拉加载开始
         void onLoading();
     }
 

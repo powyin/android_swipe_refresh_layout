@@ -14,8 +14,8 @@ public interface AdapterDelegate<T> {
 
     // 加载更多监听
     interface OnLoadMoreListener {
-        void onLoadBegin();
-        void onLoadEnd();
+        void onLoadTop();
+        void onLoadBottom();
     }
 
     // 点击
@@ -30,12 +30,12 @@ public interface AdapterDelegate<T> {
     }
 
     enum LoadedStatus{
-        END_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
-        EDN_ERROR,                                                          //上拉加载失败
-        EDN_NO_MORE,                                                        //数据全部加载完毕
-        BEGIN_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
-        BEGIN_ERROR,                                                          //上拉加载失败
-        BEGIN_NO_MORE,                                                        //数据全部加载完毕
+        BOTTOM_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
+        BOTTOM_ERROR,                                                          //上拉加载失败
+        BOTTOM_NO_MORE,                                                        //数据全部加载完毕
+        TOP_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
+        TOP_ERROR,                                                          //上拉加载失败
+        TOP_NO_MORE,                                                        //数据全部加载完毕
     }
 
     //------------------------------------------------------ 数据配置--------------------------------------------------------//

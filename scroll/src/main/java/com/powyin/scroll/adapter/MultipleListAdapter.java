@@ -58,7 +58,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     List<T> mDataList = new ArrayList<>();
 
     // 上拉加载实现
-    private LoadedStatus mLoadStatus = LoadedStatus.END_CONTINUE;
+    private LoadedStatus mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
     private String mLoadCompleteInfo = "我是有底线的";
     private String mLoadErrorInfo = "加载失败";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
@@ -462,11 +462,11 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
         switch (status) {
-            case END_CONTINUE:
-                mLoadStatus = LoadedStatus.END_CONTINUE;
+            case BOTTOM_CONTINUE:
+                mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
                 break;
-            case EDN_NO_MORE:
-                mLoadStatus = LoadedStatus.EDN_NO_MORE;
+            case BOTTOM_NO_MORE:
+                mLoadStatus = LoadedStatus.BOTTOM_NO_MORE;
         }
 
         if (mLoad != null) {
@@ -615,9 +615,9 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         }
 
         void ensureLoading() {
-            if (mLoadStatus == LoadedStatus.END_CONTINUE && mOnLoadMoreListener != null) {
+            if (mLoadStatus == LoadedStatus.BOTTOM_CONTINUE && mOnLoadMoreListener != null) {
                 mLoadStatus = null;
-                mOnLoadMoreListener.onLoadEnd();
+                mOnLoadMoreListener.onLoadBottom();
             }
         }
     }
@@ -701,7 +701,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
         private void ensureAnimation(boolean forceReStart) {
 
-            if (!mAttached || mLoadStatus == LoadedStatus.EDN_NO_MORE) {
+            if (!mAttached || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -796,13 +796,13 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             textPaint.setAlpha(colorAlpha);
             circlePaint.setAlpha(colorAlpha);
 
-            if (mLoadStatus == LoadedStatus.EDN_NO_MORE) {
+            if (mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
                 canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
 
             }
-            if (mLoadStatus == LoadedStatus.EDN_ERROR) {
+            if (mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
                 canvas.drawText(mLoadErrorInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);

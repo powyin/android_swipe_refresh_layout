@@ -45,7 +45,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                 swipeRefresh.setSwipeController(new SwipeControllerStyle_Horizontal(this));               //设置定义刷新样式
                 break;
             case R.id.click_me_to_stop_head:
-                swipeRefresh.setFreshStatue(ISwipe.FreshStatus.SUCCESS);                    //下拉刷新完成
+                swipeRefresh.setFreshResult(ISwipe.FreshStatus.SUCCESS);                    //下拉刷新完成
                 break;
             case R.id.click_me_to_stop_foot_fresh:
                 if(multipleListAdapter!=null){
@@ -60,10 +60,10 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                     multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(-1));                              //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
                     multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(3));
                 }
-                swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.CONTINUE);                 //已经获取更多数据   隐藏上拉加载进度条
+                swipeRefresh.cleanLoadMoreResult();                 //已经获取更多数据   隐藏上拉加载进度条
                 break;
             case R.id.click_me_to_stop_foot_over:
-                swipeRefresh.setLoadMoreStatus(SwipeRefresh.LoadedStatus.NO_MORE);                  //已经没有更多数据   全部数据已经获得
+                swipeRefresh.setLoadMoreResult(SwipeRefresh.LoadedStatus.NO_MORE);                  //已经没有更多数据   全部数据已经获得
                 break;
         }
     }
