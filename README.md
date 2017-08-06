@@ -9,7 +9,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-      compile 'com.github.powyin:scroll:2.5.7'
+      compile 'com.github.powyin:scroll:2.5.9'
       compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
