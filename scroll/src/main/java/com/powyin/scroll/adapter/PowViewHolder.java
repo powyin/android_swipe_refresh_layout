@@ -1,7 +1,6 @@
 package com.powyin.scroll.adapter;
 
 import android.app.Activity;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,12 +12,13 @@ import java.lang.reflect.Field;
  * 使用时：必须确定泛型类型
  */
 public abstract class PowViewHolder<T> {
-    final RecycleViewHolder<T> mViewHolder;
+    RecycleViewHolder<T> mViewHolder;
+    int mPosition = -1;
+
 
     //public final RecyclerView.ViewHolder holder;
     public final View mItemView;
     protected final Activity mActivity;
-
     public T mData;
 
     MultipleRecycleAdapter<T> mMultipleAdapter;
@@ -113,7 +113,7 @@ public abstract class PowViewHolder<T> {
         @Override
         public void onClick(View v) {
             if (mMultipleAdapter != null && mMultipleAdapter.mOnItemClickListener != null) {
-                int index = mViewHolder.getAdapterPosition();
+                int index = mViewHolder!=null ? mViewHolder.getAdapterPosition() : mPosition;
                 if (mMultipleAdapter.mHasHead) index--;
                 AdapterDelegate.OnItemClickListener<T> onItemClickListener = mMultipleAdapter.mOnItemClickListener;
                 if (index >= 0 && index < mMultipleAdapter.mDataList.size()) {
@@ -121,7 +121,7 @@ public abstract class PowViewHolder<T> {
                 }
             }
             if (mMultipleListAdapter != null && mMultipleListAdapter.mOnItemClickListener != null) {
-                int index = mViewHolder.getAdapterPosition();
+                int index = mViewHolder!=null ? mViewHolder.getAdapterPosition() : mPosition;
                 if (mMultipleListAdapter.mHasHead) index--;
                 AdapterDelegate.OnItemClickListener<T> onItemClickListener = mMultipleListAdapter.mOnItemClickListener;
                 if (index >= 0 && index < mMultipleListAdapter.mDataList.size()) {
@@ -135,7 +135,7 @@ public abstract class PowViewHolder<T> {
         @Override
         public boolean onLongClick(View v) {
             if (mMultipleAdapter != null && mMultipleAdapter.mOnItemLongClickListener != null) {
-                int index = mViewHolder.getAdapterPosition();
+                int index = mViewHolder!=null ? mViewHolder.getAdapterPosition() : mPosition;
                 if (mMultipleAdapter.mHasHead) index--;
                 AdapterDelegate.OnItemLongClickListener<T> onItemLongClickListener = mMultipleAdapter.mOnItemLongClickListener;
                 if (index >= 0 && index < mMultipleAdapter.mDataList.size()) {
@@ -144,7 +144,7 @@ public abstract class PowViewHolder<T> {
             }
 
             if (mMultipleListAdapter != null && mMultipleListAdapter.mOnItemLongClickListener != null) {
-                int index = mViewHolder.getAdapterPosition();
+                int index = mViewHolder!=null ? mViewHolder.getAdapterPosition() : mPosition;
                 if (mMultipleListAdapter.mHasHead) index--;
                 AdapterDelegate.OnItemLongClickListener<T> onItemLongClickListener = mMultipleListAdapter.mOnItemLongClickListener;
                 if (index >= 0 && index < mMultipleListAdapter.mDataList.size()) {
@@ -201,8 +201,11 @@ public abstract class PowViewHolder<T> {
     }
 
     public final int getItemPostion() {
-        int position = mViewHolder.getAdapterPosition();
-        return mMultipleAdapter.mHasHead ? position - 1 : position;
+        if(mViewHolder!=null){
+            int position = mViewHolder.getAdapterPosition();
+            return mMultipleAdapter.mHasHead ? position - 1 : position;
+        }
+        return mPosition;
     }
 
 

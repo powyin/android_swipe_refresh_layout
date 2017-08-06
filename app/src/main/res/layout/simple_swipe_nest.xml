@@ -32,20 +32,79 @@
             android:id="@+id/my_recycle"
             android:overScrollMode="never"
             android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#b7b7b7"
+            android:clickable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:src="@drawable/pic_4"
+                android:scaleType="centerCrop"
+                />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="#ff00ff00"
+
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:background="#ffffff"
+                android:id="@+id/my_recycle2"
+                android:overScrollMode="never"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"/>
+
+        </LinearLayout>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#b7b7b7"
+            android:clickable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:src="@drawable/pic_4"
+                android:scaleType="centerCrop"
+                />
+        </FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:background="#ffffff"
+            android:id="@+id/my_recycle3"
+            android:overScrollMode="never"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!--<FrameLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="#b7b7b7"-->
-            <!--android:clickable="true">-->
-            <!--<ImageView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="300dp"-->
-                <!--android:src="@drawable/pic_4"-->
-                <!--android:scaleType="centerCrop"-->
-                <!--/>-->
-        <!--</FrameLayout>-->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#b7b7b7"
+            android:clickable="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:src="@drawable/pic_4"
+                android:scaleType="centerCrop"
+                />
+        </FrameLayout>
+
+
+
 
     </com.powyin.scroll.widget.SwipeNest>
 

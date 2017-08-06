@@ -1,6 +1,5 @@
 package com.powyin.scroll.adapter;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
@@ -13,10 +12,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.powyin.scroll.R;
@@ -59,7 +55,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
 
     // 上拉加载实现
-    private LoadedStatus mLoadStatus = LoadedStatus.CONTINUE;
+    private LoadedStatus mLoadStatus = LoadedStatus.END_CONTINUE;
     private String mLoadCompleteInfo = "我是有底线的";
     private String mLoadErrorInfo = "加载失败";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
@@ -341,7 +337,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         mRecyclerView = null;
     }
 
-
     //---------------------------------------------------------------AdapterDelegate------------------------------------------------------------//
 
     //---------------------------------------------------------------数据-----------------------------------------------------------------------//
@@ -392,15 +387,21 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public void addDataAtLast(final List<T> dataList, final LoadedStatus status, int delayTime) {
         if (delayTime <= 0) {
-            mDataList.addAll(mDataList.size(), dataList);
-            notifyDataSetChanged();
+            if(dataList!=null && dataList.size()>0){
+                mDataList.addAll(mDataList.size(), dataList);
+                notifyItemRangeInserted(mDataList.size(),dataList.size());
+            }
             setLoadMoreStatus(status);
         } else {
             mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mDataList.addAll(mDataList.size(), dataList);
-                    notifyDataSetChanged();
+                    if(dataList!=null && dataList.size()>0){
+                        mDataList.addAll(mDataList.size(), dataList);
+                        notifyDataSetChanged();
+                    }
+
+
                     setLoadMoreStatus(status);
                 }
             }, delayTime);
@@ -451,15 +452,15 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
         switch (status) {
-            case CONTINUE:
-                mLoadStatus = LoadedStatus.CONTINUE;
+            case END_CONTINUE:
+                mLoadStatus = LoadedStatus.END_CONTINUE;
                 break;
-            case NO_MORE:
-                mLoadStatus = LoadedStatus.NO_MORE;
+            case EDN_NO_MORE:
+                mLoadStatus = LoadedStatus.EDN_NO_MORE;
         }
 
         if (mLoad != null) {
-            mLoad.progressBar.invalidate();
+            mLoad.progressBar.ensureAnimation(false);
         }
     }
 
@@ -604,9 +605,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
 
         void ensureLoading() {
-            if (mLoadStatus == LoadedStatus.CONTINUE && mOnLoadMoreListener != null) {
+            if (mLoadStatus == LoadedStatus.END_CONTINUE && mOnLoadMoreListener != null) {
                 mLoadStatus = null;
-                mOnLoadMoreListener.onLoadMore();
+                mOnLoadMoreListener.onLoadEnd();
             }
         }
     }
@@ -678,7 +679,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             circlePaint.setColor(0x99000000);
             circlePaint.setStrokeWidth(4);
             textPaint = new TextPaint();
-            textPaint.setColor(0x99000000);
+            textPaint.setColor(0x99ffffff);
 
             final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
             int target = (int) (13 * fontScale + 0.5f);
@@ -690,11 +691,12 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
         private void ensureAnimation(boolean forceReStart) {
 
-            if (!mAttached || mLoadStatus == LoadedStatus.NO_MORE) {
+            if (!mAttached || mLoadStatus == LoadedStatus.EDN_NO_MORE || mLoadStatus == LoadedStatus.EDN_ERROR) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
                 }
+                invalidate();
                 return;
             }
 
@@ -708,19 +710,24 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                     return;
                 }
             }
-
-            animator = ValueAnimator.ofFloat(0, 1);
+            final ValueAnimator reMain = ValueAnimator.ofFloat(0, 1);
+            animator = reMain;
             animator.setDuration(2000);
             animator.setRepeatCount(-1);
 
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    if(reMain !=animator){
+                        reMain.cancel();
+                        return;
+                    }
                     divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
-                    invalidate();
+                    if(beginShowTime !=-1){
+                        invalidate();
+                    }
                 }
             });
-
 
             animator.start();
         }
@@ -775,27 +782,29 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             }
 
             int timeBe = (int) (System.currentTimeMillis() - beginShowTime);
-
             float alpha = timeBe / 2000f;
             alpha = alpha > 1 ? 1 : alpha;
             alpha = alpha < 0 ? 1 : alpha;
-
             int colorAlpha = (int) (alpha * 200);
-
-            textPaint.setAlpha(colorAlpha);
             circlePaint.setAlpha(colorAlpha);
 
-            if (mLoadStatus == LoadedStatus.NO_MORE) {
+
+//            textPaint.setAlpha(colorAlpha);
+
+
+            if (mLoadStatus == LoadedStatus.EDN_NO_MORE) {
                 canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
-
             }
-            if (mLoadStatus == LoadedStatus.ERROR) {
-                canvas.drawText(mLoadErrorInfo, canvasTextX, canvasTextY, textPaint);
+
+            if (mLoadStatus == LoadedStatus.EDN_ERROR) {
+                canvas.drawText("error", canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
-            } else {
+            }
+
+            if(mLoadStatus == LoadedStatus.END_CONTINUE){
                 for (int i = 0; i < ballCount; i++) {
                     float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
                     wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
