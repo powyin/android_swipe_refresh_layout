@@ -1,15 +1,15 @@
 
 
 
-## SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
+### SwipeRefresh 支持单个View 的下拉刷新以及上拉加载
 ### SwipeNest 滚动视图（支持各种 普通View recycleView scrollView listView等 混合排列） 处理滚动冲突  附带下拉刷新以及上拉加载
-### MultipleListAdapter<T> 快速实现 ListView 多种类型展示 (自带上拉加载 可设置开启)
-### MultipleRecycleAdapter<T>  快速实现  RecycleView多种类型展示 (自带上拉加载 可设置开启)
+### MultipleListAdapter<T> 简单快速实现 ListView 多种类型展示
+### MultipleRecycleAdapter<T>  简单快速实现  RecycleView多种类型展示 
 
 Add Gradle dependency:
 ```gradle
 dependencies {
-      compile 'com.github.powyin:scroll:2.0.0'
+      compile 'com.github.powyin:scroll:2.5.7'
       compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
@@ -160,21 +160,6 @@ app:fresh_model=“ONLY_REFRESH”
         PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
         AdapterDelegate<T>  此接口定义了ListAdapter 与 RecycleView.Adatper 公共数据操作；
     
-
-
-### 注意
-```
-  一：SwipeRefresh 只有当包含的子View有足够内容进行独立滑动时 下拉加载才启动有效
-  二：SwipeRefresh 调用finishRefresh()后；将自动触发setIsLoadComplete(false)；如果不需要， 可设反；
-  三：SwipeNest 不支持上拉加载; 请用其他方式实现  比如：
-          (1) Adater的getView(getView(int postion) postion 为数据列表的最后一项时可以进行上拉加载操作）
-          (2) 设置ViewTreeObserver.addOnGlobalLayoutListener 监听当ViewcanScrollVertically（-1） 与 Adater.getCount() 判断当前是否可以开始上拉加载；
-          (3) 直接使用RecyleView();
-  四：SwipeNest 目前只支持NestedScrollingChild继承类作为子View；
-  五：MultipleListAdapter<T>&MultipleRecycleAdapter<T> 只是 把各种Adapter的处理逻辑 代理到 ViewHolder 上了；MultipleAdapter会根据 不同的数据类型 分别找到能装载此Data的ViewHolder，再通过ViewHolder.loadData() 做刷新操作； 设计思路类似RecycleView.ViewHolder；
-
-```
-
 
 
 
