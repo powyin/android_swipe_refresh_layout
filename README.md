@@ -119,29 +119,14 @@ ISwipe
         });
         
         ISwipe.setFreshStatue(ISwip.RreshStatus.SUCCESS);             //下拉刷新 完成
-        ISwipe.setFreshStatue(ISwipe.RreshStatus.ERROR_AUTO_CANCEL);  //下拉刷新 失败
-        ISwipe.setLoadMoreStatus(ISwipe.LoadedStatus.CONTINUE);       //已经获取更多数据   隐藏上拉加载进度条
+        ISwipe.setFreshStatue(ISwipe.RreshStatus.ERROR);              //下拉刷新 失败
+ 
         
         
-        
-        
 ### SwipeRefresh设置刷新模式
 
 ```
-
-ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          
-
-app:fresh_model=“ONLY_REFRESH”                                     
-
-    <declare-styleable name="SwipeRefresh">
-        <attr name="fresh_model">
-            <enum name="BOTH" value="0" />
-            <enum name="ONLY_REFRESH" value="1" />
-            <enum name="ONLY_LOADINN" value="2" />
-            <enum name="SWIPE_NONE" value="3" />
-        </attr>
-    </declare-styleable>
-
+ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          /
 (BOTH = SwipeModel.SWIPE_BOTH)                    同时支持下拉刷新与上拉加载  
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_REFRESH))  只支持下拉刷新 
 (ONLY_REFRESH == SwipeModel.SWIPE_ONLY_LOADINN)   只支持上拉加载 
