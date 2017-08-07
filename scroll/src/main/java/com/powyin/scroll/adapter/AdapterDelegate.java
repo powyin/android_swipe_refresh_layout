@@ -14,8 +14,14 @@ public interface AdapterDelegate<T> {
 
     // 加载更多监听
     interface OnLoadMoreListener {
+        void resetTop();
         void onLoadTop();
+
+
+        void resetBottom();
         void onLoadBottom();
+
+
     }
 
     // 点击
@@ -72,6 +78,8 @@ public interface AdapterDelegate<T> {
 
     // 设置加载状态
     void setLoadMoreStatus(LoadedStatus status);
+
+    void refreshBottom();
 
     // 设置加载更多监听
     void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener);

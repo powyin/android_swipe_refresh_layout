@@ -1090,20 +1090,15 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
     // ----------------------------------------------------------------ISwipeIMP-------------------------------------------------------------------//
 
-    // 设置刷新控制监听   注意: OnRefreshListener可能会马上被调用刷新方法
+    // 设置刷新控制监听
     @Override
     public void setOnRefreshListener(ISwipe.OnRefreshListener onRefreshListener) {
         this.mOnRefreshListener = onRefreshListener;
-        if (mOnRefreshListener != null &&
-                (mModel == SwipeController.SwipeModel.SWIPE_BOTH || mModel == SwipeController.SwipeModel.SWIPE_ONLY_REFRESH)
-                && !mRefreshStatusContinueRunning) {
-            mOnRefreshListener.onRefresh();
-        }
     }
 
-    // 清除下拉刷新结果
+    // 开始刷新
     @Override
-    public void cleanFreshResult() {
+    public void refresh() {
         mFreshStatus = null;
         if (mEmptyController != null) {
             mEmptyController.onSwipeStatue(mFreshStatus);
@@ -1121,6 +1116,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         tryBackToRefreshing();
     }
 
+    // 设置下拉刷新结果
     @Override
     public void setFreshResult(ISwipe.FreshStatus statue) {
         switch (statue) {
@@ -1186,12 +1182,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
     }
 
-    // 清除上拉加载结果
+    // 清除上拉加载中状态
     @Override
-    public void cleanLoadMoreResult() {
+    public void clearLoadMore() {
         lab:
         {
-
             int currentScrollY = getScrollY() - mContentScroll;
             if (currentScrollY <= 0) {
                 break lab;

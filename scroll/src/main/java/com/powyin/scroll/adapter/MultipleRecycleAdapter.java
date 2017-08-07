@@ -464,6 +464,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
+    @Override
+    public void refreshBottom() {
+        if(this.mOnLoadMoreListener!=null){
+            this.mOnLoadMoreListener.resetBottom();
+            this.mOnLoadMoreListener.onLoadBottom();
+        }
+    }
+
     // 设置显示更多监听
     @Override
     public void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {

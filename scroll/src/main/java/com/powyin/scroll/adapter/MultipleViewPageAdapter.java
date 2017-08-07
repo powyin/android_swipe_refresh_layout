@@ -249,6 +249,11 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
     }
 
     @Override
+    public void refreshBottom() {
+
+    }
+
+    @Override
     public void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {
 
     }

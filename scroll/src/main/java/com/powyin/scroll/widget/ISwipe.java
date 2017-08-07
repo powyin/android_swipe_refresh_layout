@@ -20,17 +20,17 @@ public interface ISwipe {
 
 
 
-    // 设置刷新控制监听   注意: OnRefreshListener可能会马上被调用刷新方法
+    // 设置刷新控制监听
     void setOnRefreshListener(OnRefreshListener onRefreshListener);
 
-    // 清除下拉刷新结果
-    void cleanFreshResult();
+    // 开始刷新
+    void refresh();
 
     // 设置下拉刷新结果
     void setFreshResult(FreshStatus statue);
 
-    // 清除上拉加载结果
-    void cleanLoadMoreResult();
+    // 清除上拉加载中状态
+    void clearLoadMore();
     // 设置上拉加载结果
     void setLoadMoreResult(LoadedStatus status);
 

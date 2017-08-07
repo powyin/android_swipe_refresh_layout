@@ -474,6 +474,12 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         }
     }
 
+
+    @Override
+    public void refreshBottom() {
+
+    }
+
     // 设置显示更多监听
     @Override
     public void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {

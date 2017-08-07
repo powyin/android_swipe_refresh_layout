@@ -60,7 +60,7 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
                     multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(-1));                              //特意加入的无法展示的数据类型；  可以通过multipleAdapter.setShowErrorHolder(false) 关闭无法展示数据的显示
                     multipleRecycleAdapter.addData(multipleRecycleAdapter.getDataCount(),new DataModel(3));
                 }
-                swipeRefresh.cleanLoadMoreResult();                 //已经获取更多数据   隐藏上拉加载进度条
+                swipeRefresh.clearLoadMore();                 //已经获取更多数据   隐藏上拉加载进度条
                 break;
             case R.id.click_me_to_stop_foot_over:
                 swipeRefresh.setLoadMoreResult(SwipeRefresh.LoadedStatus.NO_MORE);                  //已经没有更多数据   全部数据已经获得
