@@ -119,24 +119,8 @@ public class SimpleMuiltpleAdapter extends Activity implements View.OnClickListe
         //   initListView();
 
         multipleRecycleAdapter.setOnLoadMoreListener(new AdapterDelegate.OnLoadMoreListener() {
-
             @Override
-            public void resetTop() {
-
-            }
-
-            @Override
-            public void resetBottom() {
-
-            }
-
-            @Override
-            public void onLoadTop() {
-
-            }
-
-            @Override
-            public void onLoadBottom() {
+            public void onLoadMore() {
                 System.out.println("llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
             }
         });

@@ -58,7 +58,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     List<T> mDataList = new ArrayList<>();
 
     // 上拉加载实现
-    private LoadedStatus mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
+    private LoadedStatus mLoadStatus;
     private String mLoadCompleteInfo = "我是有底线的";
     private String mLoadErrorInfo = "加载失败";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
@@ -462,9 +462,6 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
         switch (status) {
-            case BOTTOM_CONTINUE:
-                mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
-                break;
             case BOTTOM_NO_MORE:
                 mLoadStatus = LoadedStatus.BOTTOM_NO_MORE;
         }
@@ -476,7 +473,13 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
 
     @Override
-    public void refreshBottom() {
+    public void loadMore() {
+
+    }
+
+
+    @Override
+    public void completeLoadMore() {
 
     }
 
@@ -621,9 +624,9 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         }
 
         void ensureLoading() {
-            if (mLoadStatus == LoadedStatus.BOTTOM_CONTINUE && mOnLoadMoreListener != null) {
+            if (mLoadStatus == null && mOnLoadMoreListener != null) {
                 mLoadStatus = null;
-                mOnLoadMoreListener.onLoadBottom();
+                mOnLoadMoreListener.onLoadMore();
             }
         }
     }

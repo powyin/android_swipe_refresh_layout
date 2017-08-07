@@ -1182,9 +1182,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
     }
 
-    // 清除上拉加载中状态
+    // 清除上拉加载中状态 完成加载
     @Override
-    public void clearLoadMore() {
+    public void completeLoadMore() {
         lab:
         {
             int currentScrollY = getScrollY() - mContentScroll;

@@ -249,7 +249,12 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
     }
 
     @Override
-    public void refreshBottom() {
+    public void loadMore() {
+
+    }
+
+    @Override
+    public void completeLoadMore() {
 
     }
 

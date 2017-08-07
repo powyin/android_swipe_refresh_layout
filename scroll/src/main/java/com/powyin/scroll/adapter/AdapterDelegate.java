@@ -12,16 +12,13 @@ import java.util.List;
  */
 public interface AdapterDelegate<T> {
 
+    interface OnRefreshListener{
+        void onRefresh();
+    }
+
     // 加载更多监听
     interface OnLoadMoreListener {
-        void resetTop();
-        void onLoadTop();
-
-
-        void resetBottom();
-        void onLoadBottom();
-
-
+        void onLoadMore();
     }
 
     // 点击
@@ -35,13 +32,15 @@ public interface AdapterDelegate<T> {
         boolean onLongClick(PowViewHolder<T> holder, T data, int index, int resId);
     }
 
+
+    enum FreshStatus {
+        ERROR,                                                          //下拉刷新失败
+        SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
+    }
+
     enum LoadedStatus{
-        BOTTOM_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
         BOTTOM_ERROR,                                                          //上拉加载失败
         BOTTOM_NO_MORE,                                                        //数据全部加载完毕
-        TOP_CONTINUE,                                                       //上拉加载成功 继续上拉可以获取更多数据
-        TOP_ERROR,                                                          //上拉加载失败
-        TOP_NO_MORE,                                                        //数据全部加载完毕
     }
 
     //------------------------------------------------------ 数据配置--------------------------------------------------------//
@@ -79,7 +78,10 @@ public interface AdapterDelegate<T> {
     // 设置加载状态
     void setLoadMoreStatus(LoadedStatus status);
 
-    void refreshBottom();
+    void loadMore();
+
+    // 清除上拉加载中状态
+    void completeLoadMore();
 
     // 设置加载更多监听
     void setOnLoadMoreListener(OnLoadMoreListener loadMoreListener);

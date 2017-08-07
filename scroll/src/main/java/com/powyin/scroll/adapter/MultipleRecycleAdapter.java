@@ -55,7 +55,10 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
 
     // 上拉加载实现
-    private LoadedStatus mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
+    private LoadedStatus mLoadStatus = null;
+    private boolean mIsProgressLoadMore = false;
+    private long mLoadViewBeginShowTime = -1;
+
     private String mLoadCompleteInfo = "我是有底线的";
     private String mLoadErrorInfo = "加载失败";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
@@ -165,7 +168,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 IncludeTypeLoad load = (IncludeTypeLoad) holder;
                 mLoad = load;
                 load.progressBar.ensureAnimation(false);
-                load.ensureLoading();
+                load.progressBar.ensureLoading();
                 break;
             case ITYPE_HEAD:
                 IncludeTypeHead head = (IncludeTypeHead) holder;
@@ -269,13 +272,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public long getItemId(int position) {
-        if(mSpaceEnable){
+        if (mSpaceEnable) {
             return ITYPE_Empty;
         }
 
         if (mHasHead) {
             if (position == 0) {
-                return  ITYPE_HEAD;
+                return ITYPE_HEAD;
             }
             position--;
         }
@@ -287,7 +290,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             position = position - mDataList.size();
             if (mHasFoot) {
                 if (position == 0) {
-                    return  ITYPE_FOOT;
+                    return ITYPE_FOOT;
                 }
             }
             return ITYPE_LOAD;
@@ -387,16 +390,16 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public void addDataAtLast(final List<T> dataList, final LoadedStatus status, int delayTime) {
         if (delayTime <= 0) {
-            if(dataList!=null && dataList.size()>0){
+            if (dataList != null && dataList.size() > 0) {
                 mDataList.addAll(mDataList.size(), dataList);
-                notifyItemRangeInserted(mDataList.size(),dataList.size());
+                notifyItemRangeInserted(mDataList.size(), dataList.size());
             }
             setLoadMoreStatus(status);
         } else {
             mActivity.getWindow().getDecorView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if(dataList!=null && dataList.size()>0){
+                    if (dataList != null && dataList.size() > 0) {
                         mDataList.addAll(mDataList.size(), dataList);
                         notifyDataSetChanged();
                     }
@@ -452,9 +455,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
         switch (status) {
-            case BOTTOM_CONTINUE:
-                mLoadStatus = LoadedStatus.BOTTOM_CONTINUE;
-                break;
             case BOTTOM_NO_MORE:
                 mLoadStatus = LoadedStatus.BOTTOM_NO_MORE;
         }
@@ -465,10 +465,18 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     }
 
     @Override
-    public void refreshBottom() {
-        if(this.mOnLoadMoreListener!=null){
-            this.mOnLoadMoreListener.resetBottom();
-            this.mOnLoadMoreListener.onLoadBottom();
+    public void loadMore() {
+        if (this.mOnLoadMoreListener != null) {
+            mIsProgressLoadMore = true;
+            this.mOnLoadMoreListener.onLoadMore();
+        }
+    }
+
+    @Override
+    public void completeLoadMore() {
+        mIsProgressLoadMore = false;
+        if(mLoad!=null){
+            mLoad.progressBar.ensureLoading();
         }
     }
 
@@ -612,12 +620,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             progressBar = (LoadProgressBar) itemView;
         }
 
-        void ensureLoading() {
-            if (mLoadStatus == LoadedStatus.BOTTOM_CONTINUE && mOnLoadMoreListener != null) {
-                mLoadStatus = null;
-                mOnLoadMoreListener.onLoadBottom();
-            }
-        }
     }
 
     // 0x113 头部
@@ -678,7 +680,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         int ballCount = 10;
         float divide;
 
-        private long beginShowTime = System.currentTimeMillis();
+
 
         public LoadProgressBar(Context context) {
             super(context);
@@ -726,12 +728,12 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    if(reMain !=animator){
+                    if (reMain != animator) {
                         reMain.cancel();
                         return;
                     }
                     divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
-                    if(beginShowTime !=-1){
+                    if (mLoadViewBeginShowTime != -1) {
                         invalidate();
                     }
                 }
@@ -785,20 +787,16 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
-            if (beginShowTime == -1) {
+            if (mLoadViewBeginShowTime == -1) {
                 return;
             }
 
-            int timeBe = (int) (System.currentTimeMillis() - beginShowTime);
+            int timeBe = (int) (System.currentTimeMillis() - mLoadViewBeginShowTime);
             float alpha = timeBe / 2000f;
             alpha = alpha > 1 ? 1 : alpha;
             alpha = alpha < 0 ? 1 : alpha;
             int colorAlpha = (int) (alpha * 200);
             circlePaint.setAlpha(colorAlpha);
-
-
-//            textPaint.setAlpha(colorAlpha);
-
 
             if (mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
                 canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
@@ -812,7 +810,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
             }
 
-            if(mLoadStatus == LoadedStatus.BOTTOM_CONTINUE){
+            if (mLoadStatus == null) {
                 for (int i = 0; i < ballCount; i++) {
                     float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
                     wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
@@ -832,9 +830,18 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             canvasTextY = canvasHei / 2 + textPaint.getTextSize() / 2.55f;
 
             if (bottom < ((ViewGroup) getParent()).getHeight()) {
-                beginShowTime = -1;
+                mLoadViewBeginShowTime = -1;
             } else {
-                beginShowTime = System.currentTimeMillis();
+                mLoadViewBeginShowTime = System.currentTimeMillis();
+            }
+
+            ensureLoading();
+        }
+
+        void ensureLoading() {
+            if (mOnLoadMoreListener != null && mLoadStatus == null && !mIsProgressLoadMore && mAttached && mLoadViewBeginShowTime!=-1) {
+                mIsProgressLoadMore = true;
+                mOnLoadMoreListener.onLoadMore();
             }
         }
     }

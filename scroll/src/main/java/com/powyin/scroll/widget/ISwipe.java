@@ -29,8 +29,8 @@ public interface ISwipe {
     // 设置下拉刷新结果
     void setFreshResult(FreshStatus statue);
 
-    // 清除上拉加载中状态
-    void clearLoadMore();
+    // 清除上拉加载中状态 完成加载
+    void completeLoadMore();
     // 设置上拉加载结果
     void setLoadMoreResult(LoadedStatus status);
 
