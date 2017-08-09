@@ -6,6 +6,9 @@ package com.powyin.scroll.widget;
 
 public interface ISwipe {
 
+    // todo UI开始下拉刷新后  必须调用 setFreshResult 结束下拉刷新
+    // todo UI开始上拉加载后  必须调用completeLoadMore  或者  setLoadMoreResult 结束上拉加载
+
     enum LoadedStatus {
         ERROR,                                                          //上拉加载失败
         NO_MORE                                                         //数据全部加载完毕
@@ -17,8 +20,12 @@ public interface ISwipe {
         SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
     }
 
-
-
+    public interface OnRefreshListener {
+        //TODO  下拉刷新开始
+        void onRefresh();
+        //TODO 上拉加载开始
+        void onLoading();
+    }
 
     // 设置刷新控制监听
     void setOnRefreshListener(OnRefreshListener onRefreshListener);
@@ -26,14 +33,14 @@ public interface ISwipe {
     // 开始刷新
     void refresh();
 
-    // 设置下拉刷新结果
+    // 结束刷新 设置下拉刷新结果
     void setFreshResult(FreshStatus statue);
 
-    // 清除上拉加载中状态 完成加载
+    // 结束加载 清除上拉加载中状态
     void completeLoadMore();
-    // 设置上拉加载结果
-    void setLoadMoreResult(LoadedStatus status);
 
+    // 结束加载 设置上拉加载结果
+    void setLoadMoreResult(LoadedStatus status);
 
     // 设置刷新模式
     public void setSwipeModel(SwipeController.SwipeModel model);
@@ -46,20 +53,5 @@ public interface ISwipe {
 
     // 启动空白页面显示
     public void enableEmptyView(boolean show);
-
-
-    public interface OnRefreshListener {
-        //TODO  下拉刷新开始
-        void onRefresh();
-        //TODO 上拉加载开始
-        void onLoading();
-    }
-
-    @Deprecated
-    public interface OnStatusListener {
-        @Deprecated
-        void onFreshStatue(FreshStatus status);
-    }
-
 
 }

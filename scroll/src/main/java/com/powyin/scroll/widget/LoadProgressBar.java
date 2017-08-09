@@ -5,15 +5,23 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.powyin.scroll.widget.ISwipe;
+import com.powyin.scroll.widget.SwipeNest;
+import com.powyin.scroll.widget.SwipeRefresh;
 
 /**
- * Created by powyin on 2016/7/21.
+ * Created by whoha on 2017/8/8.
  */
-class LoadProgressBar extends View {              //刷新视图
+
+public class LoadProgressBar extends View {
+
     public LoadProgressBar(Context context) {
         this(context, null);
     }
@@ -25,7 +33,7 @@ class LoadProgressBar extends View {              //刷新视图
     public LoadProgressBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         circlePaint = new Paint();
-        circlePaint.setColor(0x99000000);
+        circlePaint.setColor(0x85ffffff);
         circlePaint.setStrokeWidth(4);
     }
 
@@ -41,18 +49,20 @@ class LoadProgressBar extends View {              //刷新视图
     }
 
 
-    ValueAnimator animator;
-    Paint circlePaint;
-    int canvasWei;
-    int canvasHei;
+    private ValueAnimator animator;
+    private Paint circlePaint;
+    private boolean mAttach = false;
+    private int canvasWei;
+    private int canvasHei;
 
-    int ballCount = 8;
-    float divide;
+    private final int ballCount = 12;
+    private float divide;
+
+    private int mVisibility = 0;
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         for (int i = 0; i < ballCount; i++) {
             float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
             wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
@@ -60,47 +70,59 @@ class LoadProgressBar extends View {              //刷新视图
         }
     }
 
-    void ensureAnimation() {
-        ensureAnimation(false);
-    }
 
-    private void ensureAnimation(boolean forceReStart) {
+    public void ensureAnimation(boolean forceReStart) {
         if (forceReStart) {
             if (animator != null) {
                 animator.cancel();
+                animator = null;
             }
         } else {
-            if (animator != null && animator.isRunning()) {
+            if (animator != null && animator.isStarted()) {
                 return;
             }
         }
 
         animator = ValueAnimator.ofFloat(0, 1);
         animator.setDuration(2000);
-        animator.setRepeatCount(5);
+        animator.setRepeatCount(1);
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+            public void onAnimationUpdate(ValueAnimator animation) {
                 divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
                 invalidate();
             }
         });
+
         animator.addListener(new Animator.AnimatorListener() {
+            boolean isDeprecated = false;
             @Override
             public void onAnimationStart(Animator animation) {
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (isDeprecated || !mAttach || animator != animation || mVisibility == INVISIBLE || mVisibility == GONE)
+                    return;
+                isDeprecated = true;
                 ViewParent parent = getParent();
-                while (parent != null && !(parent instanceof SwipeRefresh) && !(parent instanceof SwipeNest)) {
+                while (parent != null && !(parent instanceof ISwipe)) {
                     parent = parent.getParent();
                 }
-                if (parent == null) return;
-                View viewParent = (View) parent;
-                if (viewParent.getScrollY() > 0 && animation == animator) {
-                    ensureAnimation(true);
+
+                if (parent instanceof SwipeNest) {
+                    SwipeNest swipeNest = (SwipeNest) parent;
+                    if (swipeNest.getScrollY() > swipeNest.computeVerticalScrollRange() - swipeNest.computeVerticalScrollExtent()) {
+                        ensureAnimation(true);
+                    }
+                    return;
+                }
+
+                if (parent instanceof SwipeRefresh) {
+                    if (((SwipeRefresh) parent).getScrollY() > 0) {
+                        ensureAnimation(true);
+                    }
                 }
             }
 
@@ -111,10 +133,31 @@ class LoadProgressBar extends View {              //刷新视图
             @Override
             public void onAnimationRepeat(Animator animation) {
             }
+
         });
 
         animator.start();
     }
+
+
+
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView,  int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        mVisibility = visibility;
+
+
+        if ((visibility == GONE || visibility == INVISIBLE) && animator != null) {
+            animator.cancel();
+            animator = null;
+        }
+
+        if (visibility == VISIBLE) {
+            ensureAnimation(false);
+        }
+    }
+
 
     private float getSplit(float value) {
         int positive = value >= 0 ? 1 : -1;                                 //保存符号 判断正负
@@ -124,12 +167,25 @@ class LoadProgressBar extends View {              //刷新视图
     }
 
 
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mAttach = true;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mAttach = false;
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         canvasWei = right - left;
         canvasHei = bottom - top;
-        ensureAnimation();
+        ensureAnimation(false);
     }
 
 

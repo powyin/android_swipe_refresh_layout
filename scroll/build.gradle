@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "2.6.5"
+version = "2.9.7"
 
 android {
 
@@ -13,15 +13,17 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 265
-        versionName "265"
+        versionCode 297
+        versionName "297"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {

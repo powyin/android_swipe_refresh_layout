@@ -154,7 +154,7 @@ public class SwipeControllerStyleNormal implements SwipeController {
 
             case SWIPE_LOAD_LOADING:
                 loadProgressBar.setVisibility(View.VISIBLE);
-                loadProgressBar.ensureAnimation();
+                loadProgressBar.ensureAnimation(false);
                 textLoad.setVisibility(View.GONE);
                 break;
             case SWIPE_LOAD_NO_MORE:

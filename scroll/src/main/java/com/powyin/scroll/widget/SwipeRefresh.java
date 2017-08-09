@@ -731,6 +731,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         tryBackToRefreshing();
     }
 
+    // 结束刷新 设置下拉刷新结果
     @Override
     public void setFreshResult(FreshStatus statue) {
         switch (statue) {
@@ -795,7 +796,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
     }
 
-    // 清除上拉加载中状态 完成加载
+    // 结束加载 清除上拉加载中状态
     @Override
     public void completeLoadMore() {
         lab:
@@ -865,7 +866,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
     }
 
-    // 自定义空白页面展示
+    // 设置空白页面控制器
     @Override
     public void setEmptyController(EmptyController controller) {
         if (controller != null && this.mEmptyController != controller) {
@@ -879,7 +880,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
     }
 
-    // 设置是否展示空白页面
+    // 启动空白页面显示
     @Override
     public void enableEmptyView(boolean show) {
         if (mShowEmptyView != show) {

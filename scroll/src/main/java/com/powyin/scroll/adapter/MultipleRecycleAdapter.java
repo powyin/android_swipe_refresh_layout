@@ -167,7 +167,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             case ITYPE_LOAD:
                 IncludeTypeLoad load = (IncludeTypeLoad) holder;
                 mLoad = load;
-                load.progressBar.ensureAnimation(false);
                 load.progressBar.ensureLoading();
                 break;
             case ITYPE_HEAD:
@@ -454,14 +453,11 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
-        switch (status) {
-            case BOTTOM_NO_MORE:
-                mLoadStatus = LoadedStatus.BOTTOM_NO_MORE;
-        }
 
-        if (mLoad != null) {
-            mLoad.progressBar.ensureAnimation(false);
-        }
+        mLoadStatus = status;
+        mIsProgressLoadMore = false;
+        mLoad.progressBar.invalidate();
+
     }
 
     @Override
@@ -475,7 +471,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     @Override
     public void completeLoadMore() {
         mIsProgressLoadMore = false;
-        if(mLoad!=null){
+        if (mLoad != null) {
             mLoad.progressBar.ensureLoading();
         }
     }
@@ -666,7 +662,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     }
 
-
     // 加载中
     class LoadProgressBar extends View {
         boolean mAttached = false;
@@ -677,16 +672,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         int canvasHei;
         float canvasTextX;
         float canvasTextY;
-        int ballCount = 10;
+        int ballCount = 13;
         float divide;
-
-
 
         public LoadProgressBar(Context context) {
             super(context);
 
             circlePaint = new Paint();
-            circlePaint.setColor(0x99000000);
+            circlePaint.setColor(0x77000000);
             circlePaint.setStrokeWidth(4);
             textPaint = new TextPaint();
             textPaint.setColor(0x99ffffff);
@@ -699,9 +692,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             textPaint.setStrokeWidth(1);
         }
 
-        private void ensureAnimation(boolean forceReStart) {
+        @Override
+        public void addOnLayoutChangeListener(OnLayoutChangeListener listener) {
+            super.addOnLayoutChangeListener(listener);
+        }
 
-            if (!mAttached || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE || mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+        private void ensureAnimation() {
+            if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE || mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -710,38 +707,34 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 return;
             }
 
-            if (forceReStart) {
-                if (animator != null) {
-                    animator.cancel();
-                    animator = null;
-                }
-            } else {
-                if (animator != null && animator.isRunning()) {
-                    return;
-                }
+            if (animator != null && animator.isStarted()) {
+                return;
             }
-            final ValueAnimator reMain = ValueAnimator.ofFloat(0, 1);
-            animator = reMain;
-            animator.setDuration(2000);
-            animator.setRepeatCount(-1);
 
+            animator = ValueAnimator.ofFloat(0, 1);
+            animator.setDuration(2500);
+            animator.setRepeatCount(-1);
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    if (reMain != animator) {
-                        reMain.cancel();
+                    if (valueAnimator != animator) {
+                        valueAnimator.cancel();
                         return;
                     }
-                    divide = 8 * ((System.currentTimeMillis() % 3000) - 1500) / 3000f;
-                    if (mLoadViewBeginShowTime != -1) {
+                    if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE || mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+                        if (animator != null) {
+                            animator.cancel();
+                            animator = null;
+                        }
                         invalidate();
+                        return;
                     }
+                    divide = 10f * ((System.currentTimeMillis() % 3200) - 1600) / 3200f;
+                    invalidate();
                 }
             });
-
             animator.start();
         }
-
 
         private void ensureStopAnimation() {
             if (animator != null) {
@@ -749,7 +742,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 animator = null;
             }
         }
-
 
         private float getSplit(float value) {
             int positive = value >= 0 ? 1 : -1;                                 //保存符号 判断正负
@@ -762,7 +754,6 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
             mAttached = true;
-            ensureAnimation(false);
         }
 
         @Override
@@ -812,7 +803,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
             if (mLoadStatus == null) {
                 for (int i = 0; i < ballCount; i++) {
-                    float wei = 4 * (1f * i / ballCount - 0.5f) + divide;
+                    float wei = 5 * (1f * i / ballCount - 0.5f) + divide;
                     wei = canvasWei / 2 + getSplit(wei) * canvasWei * 0.08f;
                     canvas.drawCircle(wei, canvasHei / 2 + 6, 8, circlePaint);
                 }
@@ -823,6 +814,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         @Override
         protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
             super.onLayout(changed, left, top, right, bottom);
+
             canvasHei = getHeight();
             canvasWei = getWidth();
 
@@ -833,13 +825,14 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                 mLoadViewBeginShowTime = -1;
             } else {
                 mLoadViewBeginShowTime = System.currentTimeMillis();
+                ensureAnimation();
             }
 
             ensureLoading();
         }
 
         void ensureLoading() {
-            if (mOnLoadMoreListener != null && mLoadStatus == null && !mIsProgressLoadMore && mAttached && mLoadViewBeginShowTime!=-1) {
+            if (mOnLoadMoreListener != null && mLoadStatus == null && !mIsProgressLoadMore && mAttached && mLoadViewBeginShowTime != -1) {
                 mIsProgressLoadMore = true;
                 mOnLoadMoreListener.onLoadMore();
             }
