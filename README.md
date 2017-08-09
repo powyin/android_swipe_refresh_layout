@@ -9,7 +9,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-      compile 'com.github.powyin:scroll:2.5.9'
+      compile 'com.github.powyin:scroll:2.9.7'
       compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
@@ -30,76 +30,19 @@ dependencies {
 
 ### how to use  SwipeRefresh
 
-   
-      <com.powyin.scroll.widget.SwipeRefresh
-        android:id = "@+id/re"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:fresh_model="BOTH" >
-
-
-        <!--<ListView-->
-            <!--android:id="@+id/my_list"-->
-            <!--android:background="#ffffffff"-->
-            <!--android:overScrollMode="never"-->
-            <!--android:dividerHeight="0dp"-->
-            <!--android:divider="#00000000"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
-
-        <!--或者是RecyclerView-->
-        <android.support.v7.widget.RecyclerView
-            android:background="#ffffff"
-            android:id="@+id/my_recycle"
-            android:overScrollMode="never"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
+    <com.powyin.scroll.widget.SwipeRefresh>
+        <!--ListView-->
+        <android.support.v7.widget.RecyclerView/>
     </com.powyin.scroll.widget.SwipeRefresh>
     
 ### how to use  SwipeNest 
 
-        <com.powyin.scroll.widget.SwipeNest
-        android:id="@+id/nest_combine"
-        android:background="#e5e5e5"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#b7b7b7"
-            android:clickable="true">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:src="@drawable/pic_4"
-                android:scaleType="centerCrop"
-                />
+     <com.powyin.scroll.widget.SwipeNest>
+        <FrameLayout>
+            <ImageView />
         </FrameLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:background="#ffffff"
-            android:id="@+id/my_recycle"
-            android:overScrollMode="never"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <!--<FrameLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="#b7b7b7"-->
-            <!--android:clickable="true">-->
-            <!--<ImageView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="300dp"-->
-                <!--android:src="@drawable/pic_4"-->
-                <!--android:scaleType="centerCrop"-->
-                <!--/>-->
-        <!--</FrameLayout>-->
-
+        <android.support.v7.widget.RecyclerView/>
+        <ImageView />
     </com.powyin.scroll.widget.SwipeNest>
     
 ### 设置刷新监听与刷新结果处理
@@ -134,19 +77,7 @@ ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          /
 ```
 
 
-### how to use  MultipleRecycleAdapter&MultipleListAdapter
-
-        MultipleRecycleAdapter multipleRecycleAdapter = new MultipleRecycleAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
-        mRecyclerView.setAdapter(multipleRecycleAdapter);
-        
-        MultipleListAdapter multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
-        listView.setAdapter(multipleListAdapter);
+### MultipleRecycleAdapter&MultipleListAdapter&MultipleViewPageAdapter
         
         PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
-        AdapterDelegate<T>  此接口定义了ListAdapter 与 RecycleView.Adatper 公共数据操作；
-    
-
-
-
-
-
+        AdapterDelegate<T>  此接口定义了 ListAdapter 与 RecycleView.Adatper 与 PagerAdapter 公共数据操作；
