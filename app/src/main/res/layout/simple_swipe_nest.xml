@@ -11,8 +11,7 @@
         android:background="#e5e5e5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
-
+        app:fresh="ONLY_LOADINN">
 
         <FrameLayout
             android:layout_width="match_parent"

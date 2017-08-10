@@ -124,6 +124,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
 
         mTargetView = target;
+        mTargetViewContain = child;
         mNestedScrollInProgress = true;
         stopAllScroll();
 
@@ -491,6 +492,55 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     }
 
+
+    private View findScrollView(View view, int centerX, int centerY, int direction) {
+        if (view.getVisibility() == INVISIBLE || view.getVisibility() == GONE) return null;
+        if (view == mViewTop || view == mViewBottom || view == mEmptyView) return null;
+        int tem[] = new int[2];
+        view.getLocationInWindow(tem);
+        if (tem[0] < centerX && centerX < tem[0] + view.getWidth() && tem[1] < centerY && centerY < tem[1] + view.getHeight()) {
+
+
+            System.out.println("0000000000000000000000"+view);
+            System.out.println("11111111111111111111"+view.canScrollVertically(-1));
+            System.out.println("11111111111111111111"+view.canScrollVertically(1));
+
+            if(direction == 0){
+                if (view.canScrollVertically(-1) || view.canScrollVertically(1)) {
+                    return view;
+                } else {
+                    if (view instanceof ViewGroup) {
+                        ViewGroup group = (ViewGroup) view;
+                        for (int i = 0; i < group.getChildCount(); i++) {
+                            View child = findScrollView(group.getChildAt(i), centerX, centerY, direction);
+                            if (child != null)
+                                return child;
+                        }
+                    }
+                    return null;
+                }
+
+            }else {
+                if (view.canScrollVertically(direction)) {
+                    return view;
+                } else {
+                    if (view instanceof ViewGroup) {
+                        ViewGroup group = (ViewGroup) view;
+                        for (int i = 0; i < group.getChildCount(); i++) {
+                            View child = findScrollView(group.getChildAt(i), centerX, centerY, direction);
+                            if (child != null)
+                                return child;
+                        }
+                    }
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
@@ -503,7 +553,11 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             mIsTouchEventMode = true;
             mDragLastY = mDragBeginY;
 
-            mTargetView = mTargetViewContain;
+
+            mTargetView = findScrollView(this, (int)ev.getX(), (int)ev.getY(), 0);
+
+            System.out.println("--------------------"+mTargetView);
+
         }
 
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
