@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingParent;
 
 import android.support.v4.view.NestedScrollingParentHelper;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 
@@ -407,7 +409,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 final LayoutParams lp = child.getLayoutParams();
                 switch (lp.height) {
                     case -2:
-                        child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST));
+                        if(child instanceof AbsListView || child instanceof NestedScrollingChild){
+                            child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST));
+                        }else {
+                            child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.UNSPECIFIED));
+                        }
                         break;
                     case -1:
                         child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.EXACTLY));
