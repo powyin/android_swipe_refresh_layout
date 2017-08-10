@@ -32,15 +32,16 @@ public interface AdapterDelegate<T> {
         boolean onLongClick(PowViewHolder<T> holder, T data, int index, int resId);
     }
 
-
+    // 未实现 等待完善
     enum FreshStatus {
         ERROR,                                                          //下拉刷新失败
         SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
     }
 
+    // 加载更多状态枚举
     enum LoadedStatus{
-        BOTTOM_ERROR,                                                          //上拉加载失败
-        BOTTOM_NO_MORE,                                                        //数据全部加载完毕
+        ERROR,                                                          //上拉加载失败
+        NO_MORE,                                                        //数据全部加载完毕
     }
 
     //------------------------------------------------------ 数据配置--------------------------------------------------------//
@@ -78,6 +79,7 @@ public interface AdapterDelegate<T> {
     // 设置加载状态
     void setLoadMoreStatus(LoadedStatus status);
 
+    // 手动调用加载更多
     void loadMore();
 
     // 清除上拉加载中状态

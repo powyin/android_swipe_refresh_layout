@@ -460,6 +460,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
     }
 
+    // 手动调用加载更多
     @Override
     public void loadMore() {
         if (this.mOnLoadMoreListener != null) {
@@ -468,6 +469,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
+    // 清除上拉加载中状态
     @Override
     public void completeLoadMore() {
         mIsProgressLoadMore = false;
@@ -698,7 +700,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
         }
 
         private void ensureAnimation() {
-            if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE || mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+            if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.NO_MORE || mLoadStatus == LoadedStatus.ERROR) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -721,7 +723,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
                         valueAnimator.cancel();
                         return;
                     }
-                    if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE || mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+                    if (!mAttached || mLoadViewBeginShowTime == -1 || mLoadStatus == LoadedStatus.NO_MORE || mLoadStatus == LoadedStatus.ERROR) {
                         if (animator != null) {
                             animator.cancel();
                             animator = null;
@@ -789,13 +791,13 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
             int colorAlpha = (int) (alpha * 200);
             circlePaint.setAlpha(colorAlpha);
 
-            if (mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
+            if (mLoadStatus == LoadedStatus.NO_MORE) {
                 canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
             }
 
-            if (mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+            if (mLoadStatus == LoadedStatus.ERROR) {
                 canvas.drawText("error", canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);

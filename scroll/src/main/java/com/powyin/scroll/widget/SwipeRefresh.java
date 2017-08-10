@@ -500,11 +500,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         view.getLocationInWindow(tem);
         if (tem[0] < centerX && centerX < tem[0] + view.getWidth() && tem[1] < centerY && centerY < tem[1] + view.getHeight()) {
 
-
-            System.out.println("0000000000000000000000"+view);
-            System.out.println("11111111111111111111"+view.canScrollVertically(-1));
-            System.out.println("11111111111111111111"+view.canScrollVertically(1));
-
             if(direction == 0){
                 if (view.canScrollVertically(-1) || view.canScrollVertically(1)) {
                     return view;
@@ -556,7 +551,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
             mTargetView = findScrollView(this, (int)ev.getX(), (int)ev.getY(), 0);
 
-            System.out.println("--------------------"+mTargetView);
 
         }
 

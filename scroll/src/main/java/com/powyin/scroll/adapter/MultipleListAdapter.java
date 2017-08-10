@@ -462,8 +462,8 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     public void setLoadMoreStatus(LoadedStatus status) {
         if (status == null) return;
         switch (status) {
-            case BOTTOM_NO_MORE:
-                mLoadStatus = LoadedStatus.BOTTOM_NO_MORE;
+            case NO_MORE:
+                mLoadStatus = LoadedStatus.NO_MORE;
         }
 
         if (mLoad != null) {
@@ -472,12 +472,13 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
     }
 
 
+    // 手动调用加载更多
     @Override
     public void loadMore() {
 
     }
 
-
+    // 清除上拉加载中状态
     @Override
     public void completeLoadMore() {
 
@@ -710,7 +711,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
         private void ensureAnimation(boolean forceReStart) {
 
-            if (!mAttached || mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
+            if (!mAttached || mLoadStatus == LoadedStatus.NO_MORE) {
                 if (animator != null) {
                     animator.cancel();
                     animator = null;
@@ -805,13 +806,13 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             textPaint.setAlpha(colorAlpha);
             circlePaint.setAlpha(colorAlpha);
 
-            if (mLoadStatus == LoadedStatus.BOTTOM_NO_MORE) {
+            if (mLoadStatus == LoadedStatus.NO_MORE) {
                 canvas.drawText(mLoadCompleteInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
 
             }
-            if (mLoadStatus == LoadedStatus.BOTTOM_ERROR) {
+            if (mLoadStatus == LoadedStatus.ERROR) {
                 canvas.drawText(mLoadErrorInfo, canvasTextX, canvasTextY, textPaint);
                 canvas.drawLine(20, canvasHei / 2, canvasTextX - 20, canvasHei / 2, textPaint);
                 canvas.drawLine(canvasWei - canvasTextX + 20, canvasHei / 2, canvasWei - 20, canvasHei / 2, textPaint);
