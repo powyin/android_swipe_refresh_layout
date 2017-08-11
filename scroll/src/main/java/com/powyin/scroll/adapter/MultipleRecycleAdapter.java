@@ -456,7 +456,9 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
 
         mLoadStatus = status;
         mIsProgressLoadMore = false;
-        mLoad.progressBar.invalidate();
+        if (mLoad != null) {
+            mLoad.progressBar.invalidate();
+        }
 
     }
 

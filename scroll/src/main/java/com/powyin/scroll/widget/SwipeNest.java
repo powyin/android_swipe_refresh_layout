@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingParent;
 
 import android.support.v4.view.NestedScrollingParentHelper;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 
@@ -51,7 +49,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
 
     private int mContentScroll;
-    private int overScrollTop;
+    private int mOverScrollTop;
+    private int mOverScrollTopMiddleTop;
     private int overScrollBottom;
 
     private ScrollerCompat mScroller;
@@ -86,6 +85,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
     private int mMaxFlingScrollButton = 0;
     private View mMaxFlingScrollDesView;
 
+    private int mPreScrollY = 0;
     private OnScrollListener mOnScrollListener;
 
     public SwipeNest(Context context) {
@@ -319,7 +319,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         int tem[] = new int[2];
         view.getLocationInWindow(tem);
         if (tem[0] < centerX && centerX < tem[0] + view.getWidth() && tem[1] < centerY && centerY < tem[1] + view.getHeight()) {
-            if(direction == 0){
+            if (direction == 0) {
                 if (view.canScrollVertically(-1) || view.canScrollVertically(1)) {
                     return view;
                 } else {
@@ -334,7 +334,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     return null;
                 }
 
-            }else {
+            } else {
                 if (view.canScrollVertically(direction)) {
                     return view;
                 } else {
@@ -352,7 +352,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
         return null;
     }
-
 
 
     // -------------------------------------------------------ScrollingView---------------------------------------------------------//
@@ -409,11 +408,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 final LayoutParams lp = child.getLayoutParams();
                 switch (lp.height) {
                     case -2:
-                        if(child instanceof AbsListView || child instanceof NestedScrollingChild){
-                            child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST));
-                        }else {
-                            child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.UNSPECIFIED));
-                        }
+                        child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.AT_MOST));
                         break;
                     case -1:
                         child.measure(childWidMeasure, MeasureSpec.makeMeasureSpec(heightTarget, MeasureSpec.EXACTLY));
@@ -434,20 +429,13 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     if (mEmptyView != null) {
                         hasMeasureEmptyView = true;
                         if (normalIndex == (childCount - 4)) {
-
                             int preLen = mTotalLength - childMeasureHei;
-
-
                             if (heightTarget - preLen > 0) {
                                 childMeasureHei = heightTarget - preLen;
                             }
-//
-//                            childMeasureHei = heightTarget > mTotalLength ? childMeasureHei + (heightTarget - mTotalLength) : childMeasureHei;
-
                         }
                         mEmptyView.measure(MeasureSpec.makeMeasureSpec(widthTarget, MeasureSpec.EXACTLY),
                                 MeasureSpec.makeMeasureSpec(childMeasureHei, MeasureSpec.EXACTLY));
-
                     }
                 }
             }
@@ -529,10 +517,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         boolean canOverScrollBottom = currentHei >= (b - t);
         mContentScroll = canOverScrollBottom ? currentHei - (b - t) : 0;
 
-        overScrollTop = mViewTop.getMeasuredHeight();
+        mOverScrollTop = mViewTop.getMeasuredHeight();
         overScrollBottom = mViewBottom.getMeasuredHeight();
+        mOverScrollTopMiddleTop = mOverScrollTop != 0 ? -mOverScrollTop + mSwipeController.getOverScrollHei() : 0;
 
-        mViewTop.layout(0, -overScrollTop, r - l, 0);
+        mViewTop.layout(0, -mOverScrollTop, r - l, 0);
         mViewTop.setTag(1 << 30, 0);
         mViewBottom.layout(0, b - t + mContentScroll, r - l, b - t + mContentScroll + overScrollBottom);
         mViewTop.setTag(1 << 30, mContentScroll + overScrollBottom);
@@ -542,7 +531,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
 
         if (mModel == SwipeController.SwipeModel.SWIPE_NONE || mModel == SwipeController.SwipeModel.SWIPE_ONLY_LOADINN) {
-            overScrollTop = 0;
+            mOverScrollTop = 0;
         }
 
         if (!canOverScrollBottom || mModel == SwipeController.SwipeModel.SWIPE_NONE || mModel == SwipeController.SwipeModel.SWIPE_ONLY_REFRESH) {
@@ -578,7 +567,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             int x = (int) ev.getX();
             int y = (int) ev.getY();
 
-            mTargetView = findScrollView(this,x,y,0);
+            mTargetView = findScrollView(this, x, y, 0);
 
             for (int i = 0; i < getChildCount(); i++) {
                 int scrollY = getScrollY();
@@ -804,7 +793,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         return true;
     }
 
-
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         if (disallowIntercept) {
@@ -815,7 +803,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
-
 
     @Override
     public void computeScroll() {
@@ -860,25 +847,62 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 scrollTo(0, y);
                 scrollY = y;
             }
-
         }
 
-        // ---------------------------------------------------------------------------------------------------------------- 》》上拉
-        if (scrollY > mContentScroll && !mLoadedStatusContinueRunning && mOnRefreshListener != null) {                                                                                    //重置上拉刷新状态
-            mLoadedStatusContinueRunning = true;
-            mOnRefreshListener.onLoading();
-        }
+        if (mPreScrollY != scrollY) {
+            mPreScrollY = scrollY;
 
-        if (scrollY > mContentScroll) {
-            if (mLoadedStatus == ISwipe.LoadedStatus.NO_MORE) {
-                mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_NO_MORE, scrollY - mContentScroll, overScrollBottom);
-            } else if (mLoadedStatus == ISwipe.LoadedStatus.ERROR) {
-                mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_ERROR, scrollY - mContentScroll, overScrollBottom);
-            } else if (mLoadedStatus == null) {
-                mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_LOADING, scrollY - mContentScroll, overScrollBottom);
+            // ----------------------------------------------------------------------------------------------------------------》》下拉
+            if (0 > mPreScrollY && mPreScrollY > mOverScrollTopMiddleTop && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
+                    || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                                 //重置下拉刷新状态
+                mFreshStatus = null;
             }
+            if (0 > mPreScrollY) {                                                                                                                            //刷新下拉状态
+                int swipeViewVisibilityHei = 0 - mPreScrollY;
+
+                if (mFreshStatus == null) {
+                    if (mRefreshStatusContinueRunning) {
+                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, mOverScrollTop);
+                    } else if (mPreScrollY < mOverScrollTopMiddleTop) {
+                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, mOverScrollTop);
+                    } else {
+                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei, mOverScrollTop);
+                    }
+                } else {
+                    switch (mFreshStatus) {
+                        case SUCCESS:
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_OK, swipeViewVisibilityHei, mOverScrollTop);
+                            break;
+                        case ERROR:
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR, swipeViewVisibilityHei, mOverScrollTop);
+                            break;
+                        case ERROR_NET:
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR_NET, swipeViewVisibilityHei, mOverScrollTop);
+                            break;
+                    }
+                }
+            }
+            // ----------------------------------------------------------------------------------------------------------------《《 下拉
+
+            // ---------------------------------------------------------------------------------------------------------------- 》》上拉
+            if (mPreScrollY > mContentScroll && !mLoadedStatusContinueRunning && mOnRefreshListener != null) {                                                                                    //重置上拉刷新状态
+                mLoadedStatusContinueRunning = true;
+                mOnRefreshListener.onLoading();
+            }
+
+            if (mPreScrollY > mContentScroll) {
+                if (mLoadedStatus == ISwipe.LoadedStatus.NO_MORE) {
+                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_NO_MORE, mPreScrollY - mContentScroll, overScrollBottom);
+                } else if (mLoadedStatus == ISwipe.LoadedStatus.ERROR) {
+                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_ERROR, mPreScrollY - mContentScroll, overScrollBottom);
+                } else if (mLoadedStatus == null) {
+                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_LOAD_LOADING, mPreScrollY - mContentScroll, overScrollBottom);
+                }
+            }
+            // ---------------------------------------------------------------------------------------------------------------- 《《上拉
+
+            mOnScrollListener.onScroll(mPreScrollY, mContentScroll);
         }
-        // ---------------------------------------------------------------------------------------------------------------- 《《上拉
     }
 
 
@@ -920,7 +944,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 break lab;
             }
 
-
             Integer scroll = mTargetViewContain != null ? (Integer) mTargetViewContain.getTag(1 << 30) : null;
             scroll = scroll == null ? Integer.MAX_VALUE : scroll;
 
@@ -941,16 +964,15 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         int deltaY = deltaOriginY;
         if (deltaOriginY == 0) return 0;
 
-        int middleHei = -overScrollTop != 0 ? -overScrollTop + mSwipeController.getOverScrollHei() : 0;
-        if (deltaOriginY < 0 && currentScrollY < middleHei) {                                                                                //过度拉伸 阻尼效果
-            deltaY = (int) (deltaY * Math.pow((mSwipeController.getOverScrollHei() - (middleHei - currentScrollY)) * 1f
+        if (deltaOriginY < 0 && currentScrollY < mOverScrollTopMiddleTop) {                                                                                //过度拉伸 阻尼效果
+            deltaY = (int) (deltaY * Math.pow((mSwipeController.getOverScrollHei() - (mOverScrollTopMiddleTop - currentScrollY)) * 1f
                     / mSwipeController.getOverScrollHei(), 2));
         }
 
-
         int willTo = currentScrollY + deltaY;
-        willTo = Math.min(willTo, overScrollBottom + mContentScroll);
-        willTo = Math.max(willTo, -overScrollTop);
+
+        willTo = willTo < overScrollBottom + mContentScroll ? willTo : overScrollBottom + mContentScroll;
+        willTo = willTo > -mOverScrollTop ? willTo : -mOverScrollTop;
 
 
         Integer maxScroll = mTargetViewContain != null ? (Integer) mTargetViewContain.getTag(1 << 30) : null;                                   //确保scroll值经过敏感过渡区
@@ -958,7 +980,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if ((currentScrollY > maxScroll && willTo < maxScroll) || (currentScrollY < maxScroll && willTo > maxScroll)) {
             willTo = maxScroll;
         }
-
 
         if (mDragBeginDirect > 0 && willTo > mContentScroll) {                                                                                //确保上拉加载独立
             willTo = mContentScroll;
@@ -989,41 +1010,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
 
         scrollTo(0, willTo);
-        if (mOnScrollListener != null) {
-            mOnScrollListener.onScroll(willTo, mContentScroll);
-        }
 
-        // ----------------------------------------------------------------------------------------------------------------》》下拉
-        if (0 > willTo && willTo > middleHei && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
-                || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                                 //重置下拉刷新状态
-            mFreshStatus = null;
-        }
-        if (0 > willTo) {                                                                                                                            //刷新下拉状态
-            int swipeViewVisibilityHei = 0 - willTo;
-
-            if (mFreshStatus == null) {
-                if (mRefreshStatusContinueRunning) {
-                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, overScrollTop);
-                } else if (willTo < middleHei) {
-                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, overScrollTop);
-                } else {
-                    mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei, overScrollTop);
-                }
-            } else {
-                switch (mFreshStatus) {
-                    case SUCCESS:
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_OK, swipeViewVisibilityHei, overScrollTop);
-                        break;
-                    case ERROR:
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR, swipeViewVisibilityHei, overScrollTop);
-                        break;
-                    case ERROR_NET:
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR_NET, swipeViewVisibilityHei, overScrollTop);
-                        break;
-                }
-            }
-        }
-        // ----------------------------------------------------------------------------------------------------------------《《 下拉
 
         return (deltaOriginY);
     }
@@ -1032,11 +1019,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if (mIsTouchEventMode || mFreshStatus == ISwipe.FreshStatus.SUCCESS || mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET)
             return false;
         int scrollY = getScrollY();
-        int middleHei = overScrollTop != 0 ? -overScrollTop + mSwipeController.getOverScrollHei() : 0;
-        boolean isOverProgress = scrollY < middleHei;
+
+        boolean isOverProgress = scrollY < mOverScrollTopMiddleTop;
         if (isOverProgress) {
             stopAllScroll();
-            animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, middleHei);
+            animationReBackToRefreshing = ValueAnimator.ofInt(scrollY, mOverScrollTopMiddleTop);
             animationReBackToRefreshing.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
@@ -1053,7 +1040,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 public void onAnimationEnd(Animator animation) {
                     if (!isCancel) {
                         if (mFreshStatus == null) {
-                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, overScrollTop, overScrollTop);
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, mOverScrollTop, mOverScrollTop);
                         }
                         if (!mRefreshStatusContinueRunning) {
                             mRefreshStatusContinueRunning = true;
@@ -1081,7 +1068,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 public void onAnimationRepeat(Animator animation) {
                 }
             });
-            animationReBackToRefreshing.setDuration(Math.abs(550 * (middleHei - scrollY) / overScrollTop));
+            animationReBackToRefreshing.setDuration(Math.abs(550 * (mOverScrollTopMiddleTop - scrollY) / mOverScrollTop));
             animationReBackToRefreshing.start();
         }
         return isOverProgress;
@@ -1091,12 +1078,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
         if (mIsTouchEventMode) return false;
         int scrollY = getScrollY();
-        int middleHei = overScrollTop != 0 ? -overScrollTop + mSwipeController.getOverScrollHei() : 0;
 
-        if (mFreshStatus == null && mRefreshStatusContinueRunning && scrollY == middleHei)
+        if (mFreshStatus == null && mRefreshStatusContinueRunning && scrollY == mOverScrollTopMiddleTop)
             return false;
 
-        if (scrollY < 0) {
+        if (scrollY < 0 && mOverScrollTopMiddleTop < 0) {
             stopAllScroll();
             animationReBackToTop = ValueAnimator.ofInt(scrollY, 0);
             animationReBackToTop.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -1117,7 +1103,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     if (!isCancel) {
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, 0, overScrollTop);
+                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, 0, mOverScrollTop);
                     }
                     isCancel = true;
                 }
@@ -1134,8 +1120,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             });
 
 
-            if (scrollY == middleHei) {
-                animationReBackToTop.setDuration(Math.abs(550 * (0 - scrollY) / overScrollTop));
+            if (scrollY == mOverScrollTopMiddleTop) {
+                animationReBackToTop.setDuration(Math.abs(550 * (0 - scrollY) / mOverScrollTop));
                 animationReBackToTop.setStartDelay(650);
             } else {
                 animationReBackToTop.setDuration(320);
@@ -1182,7 +1168,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         }
 
         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING,
-                -getScrollY(), overScrollTop);
+                -getScrollY(), mOverScrollTop);
         tryBackToRefreshing();
     }
 
@@ -1203,7 +1189,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                         mLoadedStatus = null;
                         mLoadedStatusContinueRunning = false;
                         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_OK,
-                                -getScrollY(), overScrollTop);
+                                -getScrollY(), mOverScrollTop);
                         tryBackToFreshFinish();
                     }
                 }, 1000);
@@ -1223,7 +1209,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                         mLoadedStatus = null;
                         mLoadedStatusContinueRunning = false;
                         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR_NET,
-                                -getScrollY(), overScrollTop);
+                                -getScrollY(), mOverScrollTop);
                         tryBackToFreshFinish();
                     }
                 }, 1000);
@@ -1244,7 +1230,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                         mLoadedStatus = null;
                         mLoadedStatusContinueRunning = false;
                         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR,
-                                -getScrollY(), overScrollTop);
+                                -getScrollY(), mOverScrollTop);
                         tryBackToFreshFinish();
                     }
                 }, 1000);

@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.widget.NestedScrollView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 
 /**
  * Created by MT3020 on 2016/3/10.
@@ -18,6 +20,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         findView();
+
+        FrameLayout view = null;
+
 
 
 
