@@ -1,56 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f1f1f1">
+    android:background="#f1f1f1"
+    android:orientation="vertical">
 
     <com.powyin.scroll.widget.SwipeNest
         android:id="@+id/nest_combine"
-        android:background="#e5e5e5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#e5e5e5"
         app:fresh="ONLY_LOADINN">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#b7b7b7"
-            android:clickable="true">
+            android:clickable="true"
+            android:orientation="vertical"
+            app:layout_expend="true">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/pic_4"
                 android:scaleType="centerCrop"
-                />
-        </FrameLayout>
+                android:src="@drawable/pic_4" />
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/pic_4" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/pic_4" />
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:background="#ffffff"
             android:id="@+id/my_recycle"
-            android:overScrollMode="never"
             android:layout_width="match_parent"
-            android:layout_height="200dp"/>
+            app:layout_expend="true"
+            android:layout_height="200dp"
+            android:background="#ffffff"
+            android:overScrollMode="never" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#b7b7b7"
             android:clickable="true">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/pic_4"
                 android:scaleType="centerCrop"
-                />
+                android:src="@drawable/pic_4" />
         </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -60,11 +76,11 @@
                 />
 
             <android.support.v7.widget.RecyclerView
-                android:background="#ffffff"
                 android:id="@+id/my_recycle2"
-                android:overScrollMode="never"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="200dp"
+                android:background="#ffffff"
+                android:overScrollMode="never" />
 
         </LinearLayout>
 
@@ -74,35 +90,33 @@
             android:layout_height="wrap_content"
             android:background="#b7b7b7"
             android:clickable="true">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/pic_4"
                 android:scaleType="centerCrop"
-                />
+                android:src="@drawable/pic_4" />
         </FrameLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:background="#ffffff"
             android:id="@+id/my_recycle3"
-            android:overScrollMode="never"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:overScrollMode="never" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#b7b7b7"
             android:clickable="true">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/pic_4"
                 android:scaleType="centerCrop"
-                />
+                android:src="@drawable/pic_4" />
         </FrameLayout>
-
-
 
 
     </com.powyin.scroll.widget.SwipeNest>
@@ -111,31 +125,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center_vertical"
-        android:gravity="center"
         android:background="#514a4c4a"
-        android:orientation="vertical"
-        >
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/click_me_to_set_swipe_control"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text="切换自定义刷新"
-            android:gravity="center"
             android:background="#85e6f3"
-            />
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="切换自定义刷新" />
 
         <TextView
             android:id="@+id/click_me_to_stop_head"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="15dp"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:text="停止刷新"
             android:background="#85e6f3"
-            />
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="停止刷新" />
 
 
     </LinearLayout>

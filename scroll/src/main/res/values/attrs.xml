@@ -19,5 +19,11 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="SwipeNest_Layout">
+
+        <attr name="layout_expend" format="boolean"/>
+
+    </declare-styleable>
+
 
 </resources>
