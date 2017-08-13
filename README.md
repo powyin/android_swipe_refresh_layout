@@ -37,6 +37,7 @@ dependencies {
     
 ### how to use  SwipeNest 
 
+
      <com.powyin.scroll.widget.SwipeNest>
         <FrameLayout>
             <ImageView />
