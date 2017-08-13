@@ -28,6 +28,6 @@ dependencies {
     compile 'com.android.support:design:24.0.0'
     compile project(path: ':scroll')
 //    or
-//    compile 'com.github.powyin:scroll:3.0.5'
+//    compile 'com.github.powyin:scroll:3.0.6'
 
 }

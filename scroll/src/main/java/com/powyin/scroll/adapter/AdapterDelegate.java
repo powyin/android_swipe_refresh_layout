@@ -12,10 +12,6 @@ import java.util.List;
  */
 public interface AdapterDelegate<T> {
 
-    interface OnRefreshListener{
-        void onRefresh();
-    }
-
     // 加载更多监听
     interface OnLoadMoreListener {
         void onLoadMore();
@@ -30,12 +26,6 @@ public interface AdapterDelegate<T> {
     // 长按点击
     interface OnItemLongClickListener<T>{
         boolean onLongClick(PowViewHolder<T> holder, T data, int index, int resId);
-    }
-
-    // 未实现 等待完善
-    enum FreshStatus {
-        ERROR,                                                          //下拉刷新失败
-        SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
     }
 
     // 加载更多状态枚举
