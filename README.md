@@ -27,7 +27,6 @@ dependencies {
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_1.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_2.gif)|
 
-
 ### how to use  SwipeRefresh
 
     <com.powyin.scroll.widget.SwipeRefresh>
