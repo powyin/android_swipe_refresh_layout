@@ -23,7 +23,7 @@ dependencies {
 
 ### SwipeNest UI
 
-|刷新（可自定义）|平滑多个NestScrollChilder之间的滚动|自定义刷新范例|
+|刷新（可自定义）|平滑各种View之间的滚动冲突|自定义刷新范例|
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_1.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_2.gif)|
 
