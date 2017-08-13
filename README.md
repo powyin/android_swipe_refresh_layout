@@ -37,16 +37,14 @@ dependencies {
     
 ### how to use  SwipeNest 
 
-
-     <com.powyin.scroll.widget.SwipeNest>
+    <com.powyin.scroll.widget.SwipeNest>
         <FrameLayout>
             <ImageView />
         </FrameLayout>
         <android.support.v7.widget.RecyclerView/>
         <ImageView />
     </com.powyin.scroll.widget.SwipeNest>
-    
-    
+
 ### 设置刷新监听与刷新结果处理
 
 ISwipe
