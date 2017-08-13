@@ -79,5 +79,6 @@ ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          /
 
 ### MultipleRecycleAdapter&MultipleListAdapter&MultipleViewPageAdapter
         
+        
         PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
         AdapterDelegate<T>  此接口定义了 ListAdapter 与 RecycleView.Adatper 与 PagerAdapter 公共数据操作；
