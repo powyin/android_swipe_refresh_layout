@@ -27,24 +27,27 @@ dependencies {
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_1.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/nest_pre_2.gif)|
 
-
 ### how to use  SwipeRefresh
 
+```
     <com.powyin.scroll.widget.SwipeRefresh>
         <!--ListView-->
         <android.support.v7.widget.RecyclerView/>
     </com.powyin.scroll.widget.SwipeRefresh>
+```
     
 ### how to use  SwipeNest 
 
-     <com.powyin.scroll.widget.SwipeNest>
+```
+    <com.powyin.scroll.widget.SwipeNest>
         <FrameLayout>
             <ImageView />
         </FrameLayout>
         <android.support.v7.widget.RecyclerView/>
         <ImageView />
     </com.powyin.scroll.widget.SwipeNest>
-    
+```
+
 ### 设置刷新监听与刷新结果处理
 
 ISwipe
@@ -79,5 +82,7 @@ ISwipe.setSwipeModel(SwipeControl.SwipeModel model)          /
 
 ### MultipleRecycleAdapter&MultipleListAdapter&MultipleViewPageAdapter
         
-        PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
-        AdapterDelegate<T>  此接口定义了 ListAdapter 与 RecycleView.Adatper 与 PagerAdapter 公共数据操作；
+PowViewHolder<T>    此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item的必须条件；使用时：必须确定泛型类型
+AdapterDelegate<T>  此接口定义了 ListAdapter 与 RecycleView.Adatper 与 PagerAdapter 公共数据操作；
+        
+        
