@@ -20,7 +20,7 @@ public interface ISwipe {
         SUCCESS                                                         //下拉刷新成功 普通业务只需要使用这个
     }
 
-    public interface OnRefreshListener {
+    interface OnRefreshListener {
         //TODO  下拉刷新开始
         void onRefresh();
         //TODO 上拉加载开始
@@ -43,15 +43,18 @@ public interface ISwipe {
     void setLoadMoreResult(LoadedStatus status);
 
     // 设置刷新模式
-    public void setSwipeModel(SwipeController.SwipeModel model);
+    void setSwipeModel(SwipeController.SwipeModel model);
 
     // 设置自定义刷新视图
-    public void setSwipeController(SwipeController controller);
+    void setSwipeController(SwipeController controller);
 
     // 设置空白页面控制器
-    public void setEmptyController(EmptyController controller);
+    void setEmptyController(EmptyController controller);
 
     // 启动空白页面显示
-    public void enableEmptyView(boolean show);
+    void enableEmptyView(boolean show);
+
+    // 是否支持上拉加载过度拉升
+    void enableLoadMoreOverScroll(boolean enable);
 
 }
