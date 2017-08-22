@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingParent;
@@ -11,9 +12,11 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -33,26 +36,28 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     private int mTouchSlop;
     private final NestedScrollingParentHelper mParentHelper;
     private boolean mNestedScrollInProgress = false;
-    private int mActivePointerId = -1;                                             //多手指移动中取值ID
+    private int mActivePointerId = -1;                                                    //多手指移动中取值ID
 
-    private float mDragBeginY;                                                      //DispatchTouchEvent
-    private float mDragBeginDirect;                                                 //InterceptTouchEvent
-    private float mDragLastY;                                                       //TouchEvent
+    private float mDragBeginY;                                                            //DispatchTouchEvent
+    private float mDragBeginDirect;                                                       //InterceptTouchEvent
+    private float mDragLastY;                                                             //TouchEvent
 
-    private boolean mIsTouchEventMode = false;                                      //DispatchTouchEvent  是否在进行TouchEvent传递
-    private boolean mPreScroll;                                                     //DispatchTouchEvent  是否预滚动
-    private boolean mDraggedDispatch;                                               //DispatchTouchEvent  已经打断
-    private boolean mDraggedIntercept;                                              //InterceptTouchEvent 打断
+    private ScrollerCompat mScroller;
+    private VelocityTracker mVelocityTracker;
+    private boolean mIsTouchEventMode = false;                                            //DispatchTouchEvent  是否在进行TouchEvent传递
+    private boolean mPreScroll;                                                           //DispatchTouchEvent  是否预滚动
+    private boolean mDraggedDispatch;                                                     //DispatchTouchEvent  已经打断
+    private boolean mDraggedIntercept;                                                    //InterceptTouchEvent 打断
 
-    private SwipeController mSwipeController;                                       //刷新头部控制器
-    private EmptyController mEmptyController;                                       //空白控制器
-    private ValueAnimator animationScrollY;                                         //滚动 显示正在刷新状态
+    private SwipeController mSwipeController;                                             //刷新头部控制器
+    private EmptyController mEmptyController;                                             //空白控制器
+    private ValueAnimator animationScrollY;                                               //滚动 显示正在刷新状态
 
-    private boolean mRefreshStatusContinueRunning = false;                          //下拉刷新 正在刷新
-    private FreshStatus mFreshStatus = null;                        //下拉刷新状态
+    private boolean mRefreshStatusContinueRunning = false;                                //下拉刷新 正在刷新
+    private FreshStatus mFreshStatus = null;                                              //下拉刷新状态
 
-    private boolean mLoadedStatusContinueRunning = false;                           //上拉加载 正在加载
-    private ISwipe.LoadedStatus mLoadedStatus = null;              //下拉刷新状态;
+    private boolean mLoadedStatusContinueRunning = false;                                 //上拉加载 正在加载
+    private ISwipe.LoadedStatus mLoadedStatus = null;                                     //下拉刷新状态;
 
     private SwipeController.SwipeModel mModel = SwipeController.SwipeModel.SWIPE_BOTH;    //刷新模式设置
 
@@ -63,7 +68,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     private View mEmptyView;
 
     private View mTargetView;
-    private View mTargetViewContain;
 
     private boolean mShowEmptyView;
     private int mContentScroll;
@@ -72,7 +76,9 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     private int mOverScrollTopMiddle;
     private int mOverScrollBottomMiddle;
     private int mOverScrollBottom;
-    private boolean mLoadMoreOverScroll;
+    private boolean mLoadMoreOverScroll = true;
+
+    private int mMaxFlingDirection = 0;
 
     public SwipeRefresh(Context context) {
         this(context, null);
@@ -92,7 +98,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             }
             a.recycle();
         }
-
+        mScroller = ScrollerCompat.create(getContext(), null);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         mParentHelper = new NestedScrollingParentHelper(this);
         initSwipeControl();
@@ -127,7 +133,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         }
 
         mTargetView = target;
-        mTargetViewContain = child;
         mNestedScrollInProgress = true;
         stopAllScroll();
 
@@ -142,8 +147,10 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
         int delta = offSetScroll(dy, true);
+
         consumed[1] = delta;
     }
+
 
     @Override
     public int getNestedScrollAxes() {
@@ -155,9 +162,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     public void onStopNestedScroll(View target) {
         mParentHelper.onStopNestedScroll(target);
         mNestedScrollInProgress = false;
-
-        if (!tryBackToRefreshing()) {
-            tryBackToFreshFinish();
+        if (tryBackToRefreshing() || tryBackToFreshFinish() || tryBackToLoading()) {
         }
     }
 
@@ -194,7 +199,27 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     @Override
     public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-        return getScrollY() != 0;
+        int scrollY = getScrollY();
+        if (scrollY > 0 && scrollY < mOverScrollBottomMiddle) {
+            fling((int) velocityY);
+        }
+        return scrollY != 0;
+    }
+
+
+    private void fling(int velocityY) {
+        if (animationScrollY != null && animationScrollY.isStarted() || velocityY == 0) {
+            return;
+        }
+
+        int currentScrollY = getScrollY();
+        if (mContentScroll == 0 && currentScrollY == 0 && velocityY > 0 && !canChildScrollDown()) {                                          //没有足够容量禁止上拉
+            return;
+        }
+
+        mMaxFlingDirection = velocityY > 0 ? 1 : -1;
+        mScroller.fling(0, currentScrollY, 0, velocityY, 0, 0, -1000000, 1000000, 0, 0);
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
 
@@ -204,20 +229,18 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
         int currentScrollY = getScrollY();
 
-        if (deltaOriginY < 0 && currentScrollY < -mOverScrollTopMiddle && (mOverScrollTop - mOverScrollTopMiddle != 0)) {                      //下拉刷新过度拉伸 阻尼效果
+        if (deltaOriginY < 0 && currentScrollY < -mOverScrollTopMiddle && (mOverScrollTop != mOverScrollTopMiddle)) {                      //下拉刷新过度拉伸 阻尼效果
             deltaY = (int) (deltaY * Math.pow((-mOverScrollTop - currentScrollY) * 1f
                     / (mOverScrollTop - mOverScrollTopMiddle), 3));
-            deltaY = deltaY < 0 ? deltaY : -deltaY;
         }
 
         if (deltaOriginY > 0 && currentScrollY > (mOverScrollBottomMiddle + mContentScroll) &&                                                //上拉加载过度拉伸 阻尼效果
-                (mOverScrollBottom - mOverScrollBottomMiddle) != 0) {
+                (mOverScrollBottom != mOverScrollBottomMiddle)) {
             deltaY = (int) (deltaY * Math.pow((mOverScrollBottom + mContentScroll - currentScrollY) * 1f
                     / (mOverScrollBottom - mOverScrollBottomMiddle), 3));
-            deltaY = deltaY > 0 ? deltaY : -deltaY;
         }
 
-        if (!(currentScrollY == 0 || currentScrollY == mContentScroll) || !pre) {
+        if (!(currentScrollY == mContentScroll) || !pre) {
             int willTo = currentScrollY + deltaY;
             willTo = Math.min(willTo, mOverScrollBottom);
             willTo = Math.max(willTo, -mOverScrollTop);
@@ -423,9 +446,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
     }
 
     private boolean tryBackToLoading() {
-
         int scrollY = getScrollY();
-        if (mIsTouchEventMode || scrollY <= mContentScroll + mOverScrollBottomMiddle || mOverScrollBottomMiddle == mOverScrollBottom)
+        if (mIsTouchEventMode || mOverScrollBottomMiddle == 0 || scrollY < mContentScroll + mOverScrollBottomMiddle || mOverScrollBottomMiddle == mOverScrollBottom)
             return false;
 
         stopAllScroll();
@@ -447,6 +469,8 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         if (animationScrollY != null) {
             animationScrollY.cancel();
         }
+
+        mScroller.abortAnimation();
     }
 
 
@@ -489,7 +513,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
         mOverScrollBottomMiddle = mViewBottom.getMeasuredHeight();
         mOverScrollBottom = mLoadMoreOverScroll ? mOverScrollBottomMiddle + (int) ((bottom - top) * 0.2f) : mOverScrollBottomMiddle;
 
-        mTargetViewContain = null;
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             if (child == mViewTop || child == mViewBottom || child == mEmptyView) continue;
@@ -497,7 +520,6 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                 child.layout(right - left, 0, 2 * (right - left), bottom - top);
             } else {
                 child.layout(0, 0, right - left, bottom - top);
-                mTargetViewContain = child;
             }
         }
 
@@ -569,6 +591,7 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        int action = MotionEventCompat.getActionMasked(ev);
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             mDraggedIntercept = false;
             mPreScroll = false;
@@ -593,29 +616,34 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             return super.dispatchTouchEvent(ev);
         }
 
-        if (ev.getAction() == MotionEvent.ACTION_DOWN && getScrollY() != 0) {
+
+        if (action == MotionEvent.ACTION_DOWN && (getScrollY() != 0)) {
             mPreScroll = true;
+            if (mVelocityTracker == null) {
+                mVelocityTracker = VelocityTracker.obtain();
+            } else {
+                mVelocityTracker.clear();
+            }
+            mVelocityTracker.addMovement(ev);
         }
 
         if (mPreScroll) {
-            int action = MotionEventCompat.getActionMasked(ev);
             switch (action) {
                 case MotionEvent.ACTION_DOWN:
                     mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                     mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                     mDragLastY = mDragBeginY;
                     break;
-                case MotionEventCompat.ACTION_POINTER_DOWN: {
+                case MotionEventCompat.ACTION_POINTER_DOWN:
                     int pointerIndex = MotionEventCompat.getActionIndex(ev);
                     mActivePointerId = ev.getPointerId(pointerIndex);
                     mDragBeginY = ev.getY(ev.findPointerIndex(mActivePointerId));
                     mDragLastY = mDragBeginY;
                     break;
-                }
                 case MotionEvent.ACTION_MOVE:
                     float y = ev.getY(ev.findPointerIndex(mActivePointerId));
                     float yDiff = mDragBeginY - y;
-                    if (Math.abs(yDiff) > mTouchSlop / 2 && !mDraggedDispatch) {
+                    if (!mDraggedDispatch && Math.abs(yDiff) > mTouchSlop / 2) {
                         mDraggedDispatch = true;
                         mDragLastY = y;
                     }
@@ -626,17 +654,31 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
                             mPreScroll = false;
                         }
                         mDragLastY = y;
+                        mVelocityTracker.addMovement(ev);
                         return true;
                     }
                     break;
                 case MotionEventCompat.ACTION_POINTER_UP:
                     onSecondaryPointerUp(ev);
                     break;
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    ev.setAction(MotionEvent.ACTION_CANCEL);
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.addMovement(ev);
+                        mVelocityTracker.computeCurrentVelocity(1000, 20000);
+                        mVelocityTracker.getYVelocity();
+                        int initialVelocity = (int) mVelocityTracker.getYVelocity();
+                        fling(-initialVelocity);
+                        mVelocityTracker.recycle();
+                        mVelocityTracker = null;
+                    }
+                    break;
             }
         }
 
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
-            if (tryBackToRefreshing() || tryBackToFreshFinish() || mDraggedDispatch || mDraggedIntercept) {
+            if (tryBackToRefreshing() || tryBackToFreshFinish() || tryBackToLoading() || mDraggedDispatch || mDraggedIntercept) {
                 ev.setAction(MotionEvent.ACTION_CANCEL);
             }
         }
@@ -751,6 +793,63 @@ public class SwipeRefresh extends ViewGroup implements NestedScrollingParent, IS
             throw new RuntimeException("only one View is support");
         }
         super.addView(child, index, params);
+    }
+
+
+    @Override
+    public void computeScroll() {
+        int scrollY = getScrollY();
+
+
+        if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
+            int y = mScroller.getCurrY();
+
+            if (y < 0 || y > mContentScroll + mOverScrollBottomMiddle) {
+                y = y < 0 ? 0 : y;
+                y = y > mContentScroll + mOverScrollBottomMiddle ? mContentScroll + mOverScrollBottomMiddle : y;
+
+                if (scrollY != y) {
+                    scrollTo(0, y);
+                }
+
+                int remainVelocity = (int) (mMaxFlingDirection * mScroller.getCurrVelocity());
+
+                lab:
+                if (mTargetView != null) {
+                    if (mTargetView instanceof RecyclerView) {
+                        RecyclerView recyclerView = (RecyclerView) mTargetView;
+                        recyclerView.fling(0, remainVelocity);
+                        break lab;
+                    }
+                    if (mTargetView instanceof ListView) {
+                        if (Build.VERSION.SDK_INT >= 21) {
+                            ListView listView = (ListView) mTargetView;
+                            listView.fling(remainVelocity);
+                        }
+                        break lab;
+                    }
+                    if (mTargetView instanceof ScrollView) {
+                        ScrollView scrollView = (ScrollView) mTargetView;
+                        scrollView.fling(remainVelocity);
+                        break lab;
+                    }
+                    if (mTargetView instanceof NestedScrollView) {
+                        NestedScrollView nestedScrollView = (NestedScrollView) mTargetView;
+                        nestedScrollView.fling(remainVelocity);
+                    }
+                }
+
+                mScroller.abortAnimation();
+            } else {
+                if (y == scrollY) {
+                    ViewCompat.postInvalidateOnAnimation(this);
+                } else {
+                    scrollTo(0, y);
+                }
+            }
+        }
+
+
     }
 
     private void onSecondaryPointerUp(MotionEvent ev) {

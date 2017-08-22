@@ -238,9 +238,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
 
     private void fling(int velocityY) {
-
-        System.out.println("-------->>into fling");
-
         if (animationScrollY != null && animationScrollY.isStarted()) {
             return;
         }
@@ -294,8 +291,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 int centerY = tem[1] + targetView.getHeight() / 2;
                 mMaxFlingScrollDesView = findScrollView(targetView, centerX, centerY, -1);
 
-                System.out.println("-----------------------------------" + mMaxFlingScrollDesView);
-
                 if (mMaxFlingScrollDesView != null) {
                     mMaxFlingScrollUp = integer;  // + targetView.getHeight();
                     break;
@@ -309,8 +304,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             mScroller.fling(0, currentScrollY, 0, velocityY, 0, 0, -1000000, 1000000, 0, 0);
             ViewCompat.postInvalidateOnAnimation(this);
         }
-
-
     }
 
 
@@ -604,12 +597,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
 
         if (action == MotionEvent.ACTION_DOWN && (getScrollY() < 0 || getScrollY() > mContentScroll)) {
             mPreScroll = true;
-            if (mVelocityTracker == null) {
-                mVelocityTracker = VelocityTracker.obtain();
-            } else {
-                mVelocityTracker.clear();
-            }
-            mVelocityTracker.addMovement(ev);
         }
 
         if (mPreScroll) {
@@ -632,6 +619,11 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     if (!mDraggedDispatch && Math.abs(yDiff) > mTouchSlop / 2) {
                         mDraggedDispatch = true;
                         mDragLastY = y;
+                        if (mVelocityTracker == null) {
+                            mVelocityTracker = VelocityTracker.obtain();
+                        } else {
+                            mVelocityTracker.clear();
+                        }
                     }
 
                     if (mDraggedDispatch) {
@@ -666,7 +658,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             if (tryBackToRefreshing() || tryBackToFreshFinish() || tryBackToLoading() || mDraggedDispatch || mDraggedIntercept || mShouldCancelMotionEvent) {
                 ev.setAction(MotionEvent.ACTION_CANCEL);
-
             }
         }
 
@@ -783,6 +774,7 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                         parent.requestDisallowInterceptTouchEvent(true);
                     }
                     mDraggedIntercept = true;
+                    mDragLastY = y;
                     mDragBeginDirect = -deltaY;
                     if (mVelocityTracker == null) {
                         mVelocityTracker = VelocityTracker.obtain();
@@ -806,8 +798,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     mVelocityTracker.computeCurrentVelocity(1000, 20000);
                     mVelocityTracker.getYVelocity();
                     int initialVelocity = (int) mVelocityTracker.getYVelocity();
-
-                    System.out.println("--------------------------------------->>>>>>>>>>>>>>>");
 
                     fling(-initialVelocity);
                 }
@@ -964,6 +954,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
     }
 
     private int offSetScroll(int deltaOriginY, boolean pre) {
+
+        if (deltaOriginY == 0) return 0;
+
         int currentScrollY = getScrollY();
 
         boolean progress = !pre;
@@ -983,28 +976,23 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             if (currentScrollY == scroll) {
                 progress = false;
             }
-//            if (currentScrollY > scroll) {
-//                progress = !(deltaOriginY > 0 && canChildScrollUp() || deltaOriginY < 0 && canChildScrollDown());
-//            }
         }
+
         if (!progress) {
             return 0;
         }
 
         int deltaY = deltaOriginY;
-        if (deltaOriginY == 0) return 0;
 
-        if (deltaOriginY < 0 && currentScrollY < -mOverScrollTopMiddle && (mOverScrollTop - mOverScrollTopMiddle != 0)) {                      //下拉刷新过度拉伸 阻尼效果
+        if (deltaOriginY < 0 && currentScrollY < -mOverScrollTopMiddle && (mOverScrollTop != mOverScrollTopMiddle)) {                      //下拉刷新过度拉伸 阻尼效果
             deltaY = (int) (deltaY * Math.pow((-mOverScrollTop - currentScrollY) * 1f
                     / (mOverScrollTop - mOverScrollTopMiddle), 3));
-            deltaY = deltaY < 0 ? deltaY : -deltaY;
         }
 
         if (deltaOriginY > 0 && currentScrollY > (mOverScrollBottomMiddle + mContentScroll) &&                                                //上拉加载过度拉伸 阻尼效果
-                (mOverScrollBottom - mOverScrollBottomMiddle) != 0) {
+                (mOverScrollBottom != mOverScrollBottomMiddle)) {
             deltaY = (int) (deltaY * Math.pow((mOverScrollBottom + mContentScroll - currentScrollY) * 1f
                     / (mOverScrollBottom - mOverScrollBottomMiddle), 3));
-            deltaY = deltaY > 0 ? deltaY : -deltaY;
         }
 
         int willTo = currentScrollY + deltaY;
@@ -1104,7 +1092,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             animationScrollY.setDuration(50 + Math.abs(500 * (-mOverScrollTopMiddle - scrollY) / mOverScrollTop));
             animationScrollY.start();
 
-            System.out.println("---------------->>>>>>>> inva");
             return true;
         }
         return false;
@@ -1160,7 +1147,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 animationScrollY.setDuration(320);
             }
             animationScrollY.start();
-            System.out.println("---------------->>>>>>>> inva2");
             return true;
         }
         return false;
@@ -1183,13 +1169,13 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         });
         animationScrollY.setDuration(50 + (int) ((scrollY - mContentScroll - mOverScrollBottomMiddle) * 250f / (mOverScrollBottom - mOverScrollBottomMiddle)));
         animationScrollY.start();
-        System.out.println("---------------->>>>>>>> inva3");
         return true;
     }
 
     private void stopAllScroll() {
         if (animationScrollY != null) {
             animationScrollY.cancel();
+            animationScrollY = null;
         }
         mScroller.abortAnimation();
     }

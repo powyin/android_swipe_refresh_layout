@@ -74,14 +74,14 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         findViewById(R.id.click_me_to_stop_head).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_fresh).setOnClickListener(this);
         findViewById(R.id.click_me_to_stop_foot_over).setOnClickListener(this);
-        listView = (ListView)findViewById(R.id.my_list);
-    //    mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
+    //    listView = (ListView)findViewById(R.id.my_list);
+        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycle);
         swipeRefresh = (SwipeRefresh)findViewById(R.id.re);
     }
 
     private void init(){
-     //   initRecycleView();
-        initListView();
+        initRecycleView();
+     //   initListView();
         swipeRefresh.setOnRefreshListener(new SwipeRefresh.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -97,22 +97,22 @@ public class SimpleSwipeRefresh extends Activity implements View.OnClickListener
         });
     }
 
-    private void initListView(){
-        multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
-
-        listView.setAdapter(multipleListAdapter);
-        for(int i=0;i<3;i++){
-            int rad = (int)(Math.random()*10)%3+1;
-            multipleListAdapter.addData(0,new DataModel(rad));
-        }
-
-        multipleListAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener() {
-            @Override
-            public void onClick(PowViewHolder holder, Object data, int index, int resId) {
-                System.out.println(".....................clkci" + holder + "   " + data + "   " + index + " " + resId);
-            }
-        });
-    }
+//    private void initListView(){
+//        multipleListAdapter = new  MultipleListAdapter<>(this, TypePowViewHolder_Text.class, TypePowViewHolder_Pic_1.class , TypePowViewHolder_Pic_4.class);
+//
+//        listView.setAdapter(multipleListAdapter);
+//        for(int i=0;i<3;i++){
+//            int rad = (int)(Math.random()*10)%3+1;
+//            multipleListAdapter.addData(0,new DataModel(rad));
+//        }
+//
+//        multipleListAdapter.setOnItemClickListener(new AdapterDelegate.OnItemClickListener() {
+//            @Override
+//            public void onClick(PowViewHolder holder, Object data, int index, int resId) {
+//                System.out.println(".....................clkci" + holder + "   " + data + "   " + index + " " + resId);
+//            }
+//        });
+//    }
 
     private void initRecycleView(){
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
