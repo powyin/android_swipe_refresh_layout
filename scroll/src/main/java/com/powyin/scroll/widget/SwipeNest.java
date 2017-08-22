@@ -987,12 +987,14 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
         if (deltaOriginY < 0 && currentScrollY < -mOverScrollTopMiddle && (mOverScrollTop != mOverScrollTopMiddle)) {                      //下拉刷新过度拉伸 阻尼效果
             deltaY = (int) (deltaY * Math.pow((-mOverScrollTop - currentScrollY) * 1f
                     / (mOverScrollTop - mOverScrollTopMiddle), 3));
+            deltaY = deltaY < 0 ? deltaY : -deltaY;
         }
 
         if (deltaOriginY > 0 && currentScrollY > (mOverScrollBottomMiddle + mContentScroll) &&                                                //上拉加载过度拉伸 阻尼效果
                 (mOverScrollBottom != mOverScrollBottomMiddle)) {
             deltaY = (int) (deltaY * Math.pow((mOverScrollBottom + mContentScroll - currentScrollY) * 1f
                     / (mOverScrollBottom - mOverScrollBottomMiddle), 3));
+            deltaY = deltaY > 0 ? deltaY : -deltaY;
         }
 
         int willTo = currentScrollY + deltaY;
