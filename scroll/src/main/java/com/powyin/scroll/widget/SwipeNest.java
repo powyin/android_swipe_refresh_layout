@@ -884,12 +884,12 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             if (0 > mPreScrollY) {                                                                                                                            //刷新下拉状态
                 int swipeViewVisibilityHei = 0 - mPreScrollY;
                 if (mFreshStatus == null) {
-                    if (mRefreshStatusContinueRunning) {
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, mOverScrollTop);
-                    } else if (mPreScrollY < -mOverScrollTopMiddle) {
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, mOverScrollTop);
-                    } else {
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei, mOverScrollTop);
+                    if (!mRefreshStatusContinueRunning) {
+                        if (mPreScrollY < -mOverScrollTopMiddle) {
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_OVER, swipeViewVisibilityHei, mOverScrollTop);
+                        } else {
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei, mOverScrollTop);
+                        }
                     }
                 }
             }
@@ -1052,11 +1052,9 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     if (!isCancel) {
-                        if (mFreshStatus == null) {
-                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, mOverScrollTop, mOverScrollTop);
-                        }
                         if (!mRefreshStatusContinueRunning) {
                             mRefreshStatusContinueRunning = true;
+                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, mOverScrollTop, mOverScrollTop);
                             if (mEmptyController != null) {
                                 mEmptyController.onSwipeStatue(null);
                             }
