@@ -891,18 +891,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     } else {
                         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, swipeViewVisibilityHei, mOverScrollTop);
                     }
-                } else {
-                    switch (mFreshStatus) {
-                        case SUCCESS:
-                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_OK, swipeViewVisibilityHei, mOverScrollTop);
-                            break;
-                        case ERROR:
-                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR, swipeViewVisibilityHei, mOverScrollTop);
-                            break;
-                        case ERROR_NET:
-                            mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_COMPLETE_ERROR_NET, swipeViewVisibilityHei, mOverScrollTop);
-                            break;
-                    }
                 }
             }
             // ----------------------------------------------------------------------------------------------------------------《《 下拉
@@ -1116,33 +1104,6 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     scrollTo(0, value);
                 }
             });
-            animationScrollY.addListener(new Animator.AnimatorListener() {
-                boolean isCancel;
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (!isCancel) {
-                        mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_TOAST, 0, mOverScrollTop);
-                    }
-                    isCancel = true;
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    isCancel = true;
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-            });
-
 
             if (scrollY == -mOverScrollTopMiddle) {
                 animationScrollY.setDuration(Math.abs(550 * (0 - scrollY) / mOverScrollTop));
