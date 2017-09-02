@@ -37,6 +37,7 @@ public class SimpleSwipeNest extends Activity implements View.OnClickListener{
                 break;
             case R.id.click_me_to_stop_head:
             //    swipeNest.finishRefresh();            //下拉刷新完成
+                swipeNest.setFreshResult(ISwipe.FreshStatus.SUCCESS);
                 break;
         }
     }

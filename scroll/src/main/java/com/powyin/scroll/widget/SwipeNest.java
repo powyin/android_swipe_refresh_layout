@@ -585,6 +585,8 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
                     break;
                 }
             }
+
+            stopAllScroll();
         }
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
@@ -874,13 +876,13 @@ public class SwipeNest extends ViewGroup implements NestedScrollingParent, ISwip
             mPreScrollY = scrollY;
 
             // ----------------------------------------------------------------------------------------------------------------》》下拉
-            if (0 > mPreScrollY && mPreScrollY > -mOverScrollTopMiddle && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
-                    || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                                 //重置下拉刷新状态
+            if (0 == mPreScrollY  && (mFreshStatus == ISwipe.FreshStatus.ERROR || mFreshStatus == FreshStatus.ERROR_NET
+                    || mFreshStatus == ISwipe.FreshStatus.SUCCESS) && !mRefreshStatusContinueRunning) {                                                       //重置下拉刷新状态
                 mFreshStatus = null;
             }
+
             if (0 > mPreScrollY) {                                                                                                                            //刷新下拉状态
                 int swipeViewVisibilityHei = 0 - mPreScrollY;
-
                 if (mFreshStatus == null) {
                     if (mRefreshStatusContinueRunning) {
                         mSwipeController.onSwipeStatue(SwipeController.SwipeStatus.SWIPE_HEAD_LOADING, swipeViewVisibilityHei, mOverScrollTop);

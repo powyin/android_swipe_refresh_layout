@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.powyin.scroll.R;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
 
     private PowViewHolder[] mHolderInstances;                                                                          // viewHolder 类实现实例
-    private Class<? extends PowViewHolder>[] mHolderClasses;                                                           // viewHolder class类
+    private Constructor<? extends PowViewHolder>[] mHolderConstructor;
     private Class[] mHolderGenericDataClass;                                                                           // viewHolder 携带泛型
     private Activity mActivity;
 
@@ -88,14 +89,23 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
         System.arraycopy(viewHolderClass, 0, arrClass, 0, viewHolderClass.length);
 
         this.mActivity = activity;
-
-        this.mHolderClasses = arrClass;
         this.mHolderInstances = new PowViewHolder[arrClass.length];
         this.mHolderGenericDataClass = new Class[arrClass.length];
+        this.mHolderConstructor = new Constructor[arrClass.length];
+
+        for(int i=0 ;i<arrClass.length;i++){
+            try {
+                mHolderConstructor[i] = arrClass[i].getConstructor(Activity.class, ViewGroup.class);
+                mHolderConstructor[i].setAccessible(true);
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
 
         for (int i = 0; i < arrClass.length; i++) {
             Type genericType;                                                                                          // class类(泛型修饰信息)
-            Class typeClass = mHolderClasses[i];                                                                       // class类
+            Class typeClass = arrClass[i];                                                                       // class类
             do {
                 genericType = typeClass.getGenericSuperclass();
                 typeClass = typeClass.getSuperclass();
@@ -106,9 +116,17 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
             }
             ParameterizedType paramType = (ParameterizedType) genericType;
             Type genericClass = paramType.getActualTypeArguments()[0];
-            mHolderGenericDataClass[i] = (Class) genericClass;                                                         //赋值 泛型类型(泛型类持有)
+
+            if (genericClass instanceof Class) {
+                mHolderGenericDataClass[i] = (Class) genericClass;
+            } else if (genericClass instanceof ParameterizedType) {
+                mHolderGenericDataClass[i] = (Class) ((ParameterizedType) genericClass).getRawType();
+            } else {
+                throw new RuntimeException("get genericClass error");
+            }
+
             try {
-                mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, null);         //赋值 holder实例
+                mHolderInstances[i] = mHolderConstructor[i].newInstance(mActivity, null);         //赋值 holder实例
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("参数类必须实现（Activity）单一参数的构造方法  或者  " + e.getMessage());
@@ -203,7 +221,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
                 default:
                     PowViewHolder holder;
                     try {
-                        holder = mHolderClasses[type - 5].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, parent);
+                        holder = mHolderConstructor[type - 5].newInstance(mActivity, parent);
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new RuntimeException(e.getMessage());
@@ -325,7 +343,7 @@ public class MultipleListAdapter<T> implements ListAdapter, AdapterDelegate<T> {
 
     @Override
     public int getViewTypeCount() {
-        return mHolderClasses.length + 5;
+        return mHolderConstructor.length + 5;
     }
 
 

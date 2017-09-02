@@ -67,6 +67,10 @@ public class SwipeControllerStyleNormal implements SwipeController {
 
     @Override
     public void onSwipeStatue(SwipeStatus status, int visibleHei, int wholeHei) {
+
+
+        System.out.println("------------------------>>>>>>"+status);
+
         switch (status) {
             case SWIPE_HEAD_OVER:
                 statusPre.setVisibility(View.VISIBLE);

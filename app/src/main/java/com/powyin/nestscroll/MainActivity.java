@@ -9,6 +9,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
+import com.powyin.scroll.adapter.AdapterDelegate;
+import com.powyin.scroll.adapter.MultipleListAdapter;
+import com.powyin.scroll.adapter.MultipleRecycleAdapter;
+import com.powyin.scroll.adapter.PowViewHolder;
+
+import java.util.List;
+
 /**
  * Created by MT3020 on 2016/3/10.
  */
@@ -21,9 +28,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         setContentView(R.layout.main_activity);
         findView();
 
-        FrameLayout view = null;
 
-
+        MultipleRecycleAdapter<List<String>> adapter = MultipleRecycleAdapter.getByViewHolder(this,Holder.class);
 
 
     }
@@ -64,6 +70,25 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 }
 
+
+
+class Holder extends PowViewHolder<List<String>>{
+
+
+    public Holder(Activity activity, ViewGroup viewGroup) {
+        super(activity, viewGroup);
+    }
+
+    @Override
+    protected int getItemViewRes() {
+        return R.layout.recycler_view_holder_item;
+    }
+
+    @Override
+    public void loadData(AdapterDelegate<? super List<String>> multipleAdapter, List<String> data, int position) {
+
+    }
+}
 
 
 

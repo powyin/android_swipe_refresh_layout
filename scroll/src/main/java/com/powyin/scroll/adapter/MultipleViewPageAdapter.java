@@ -6,6 +6,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
     }
 
     private PowViewHolder[] mHolderInstances;                                                                          // viewHolder 类实现实例
-    private Class<? extends PowViewHolder>[] mHolderClasses;                                                           // viewHolder class类
+    private Constructor<? extends PowViewHolder>[] mHolderConstructor;
     private Class[] mHolderGenericDataClass;                                                                           // viewHolder 携带泛型
     private Activity mActivity;
 
@@ -50,13 +51,22 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
         System.arraycopy(viewHolderClass, 0, arrClass, 0, viewHolderClass.length);
 
         this.mActivity = activity;
-        this.mHolderClasses = arrClass;
         this.mHolderInstances = new PowViewHolder[arrClass.length];
         this.mHolderGenericDataClass = new Class[arrClass.length];
 
+        for(int i=0 ;i<arrClass.length;i++){
+            try {
+                mHolderConstructor[i] = arrClass[i].getConstructor(Activity.class, ViewGroup.class);
+                mHolderConstructor[i].setAccessible(true);
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
         for (int i = 0; i < arrClass.length; i++) {
             Type genericType;                                                                                                                // class类(泛型修饰信息)
-            Class typeClass = mHolderClasses[i];                                                                                             // class类
+            Class typeClass = arrClass[i];                                                                                                   // class类
             do {
                 genericType = typeClass.getGenericSuperclass();
                 typeClass = typeClass.getSuperclass();
@@ -67,7 +77,15 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
             }
             ParameterizedType paramType = (ParameterizedType) genericType;
             Type genericClass = paramType.getActualTypeArguments()[0];
-            mHolderGenericDataClass[i] = (Class) genericClass;                                                                               //赋值 泛型类型(泛型类持有)
+
+            if (genericClass instanceof Class) {
+                mHolderGenericDataClass[i] = (Class) genericClass;
+            } else if (genericClass instanceof ParameterizedType) {
+                mHolderGenericDataClass[i] = (Class) ((ParameterizedType) genericClass).getRawType();
+            } else {
+                throw new RuntimeException("get genericClass error");
+            }
+
         }
 
 
@@ -100,7 +118,7 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
 
             if(mHolderInstances[i] == null){
                 try {
-                    mHolderInstances[i] = mHolderClasses[i].getConstructor(Activity.class, ViewGroup.class).newInstance(mActivity, null);
+                    mHolderInstances[i] = mHolderConstructor[i].newInstance(mActivity, null);
                     mHolderInstances[i].mViewHolder = null;
                     //赋值 holder实例
                 } catch (Exception e) {
