@@ -2,8 +2,6 @@ package com.powyin.scroll.adapter;
 
 import android.view.View;
 
-import com.powyin.scroll.widget.ISwipe;
-
 import java.util.List;
 
 /**
@@ -19,7 +17,7 @@ public interface AdapterDelegate<T> {
 
     // 点击
     interface OnItemClickListener<T>{
-        void onClick(PowViewHolder<T> holder , T data, int index , int resId  );
+        void onClick(PowViewHolder<T> holder, T data, int index, int resId);
 
     }
 
@@ -51,7 +49,7 @@ public interface AdapterDelegate<T> {
     void addDataAtLast(List<T> dataList);
 
     // 加入尾部数据
-    void addDataAtLast(List<T> dataList,  LoadedStatus status, int delayTime);
+    void addDataAtLast(List<T> dataList, LoadedStatus status, int delayTime);
 
     // 删除数据
     T removeData(int position);

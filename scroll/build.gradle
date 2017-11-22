@@ -2,19 +2,19 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "3.2.5"
+version = "3.2.8"
 
 android {
 
     resourcePrefix "powyin_scroll" //随意填写
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 325
-        versionName "325"
+        versionCode 328
+        versionName "328"
     }
     buildTypes {
         release {

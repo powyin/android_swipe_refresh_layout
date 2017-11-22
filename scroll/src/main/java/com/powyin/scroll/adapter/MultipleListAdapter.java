@@ -7,7 +7,6 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-
 import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.view.Gravity;

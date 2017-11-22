@@ -60,7 +60,7 @@ public class MultipleRecycleAdapter<T> extends RecyclerView.Adapter<RecyclerView
     private boolean mIsProgressLoadMore = false;
     private long mLoadViewBeginShowTime = -1;
 
-    private String mLoadCompleteInfo = "我是有底线的";
+    private String mLoadCompleteInfo = "load completed";
     private OnLoadMoreListener mOnLoadMoreListener;                                                                    // 显示更多监听
 
     OnItemClickListener<T> mOnItemClickListener;

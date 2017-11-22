@@ -2,7 +2,6 @@ package com.powyin.scroll.adapter;
 
 import android.app.Activity;
 import android.support.v4.view.PagerAdapter;
-
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -53,6 +52,7 @@ public class MultipleViewPageAdapter<T> extends PagerAdapter implements AdapterD
         this.mActivity = activity;
         this.mHolderInstances = new PowViewHolder[arrClass.length];
         this.mHolderGenericDataClass = new Class[arrClass.length];
+        this.mHolderConstructor = new Constructor[arrClass.length];
 
         for(int i=0 ;i<arrClass.length;i++){
             try {

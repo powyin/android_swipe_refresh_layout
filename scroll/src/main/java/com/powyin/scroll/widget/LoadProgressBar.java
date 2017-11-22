@@ -5,16 +5,10 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewParent;
-
-import com.powyin.scroll.widget.ISwipe;
-import com.powyin.scroll.widget.SwipeNest;
-import com.powyin.scroll.widget.SwipeRefresh;
 
 /**
  * Created by whoha on 2017/8/8.
