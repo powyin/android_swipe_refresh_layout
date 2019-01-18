@@ -82,5 +82,7 @@ ISwipe.setSwipeModel(SwipeControl.SwipeModel model)
 PowViewHolder<T> 此类抽象出获取ListAdapter.Item 与Recycle.Adapter.Item 与PagerAdapter.Item的必须条件;
 使用时必须确定泛型类型;
 AdapterDelegate<T> 此接口定义了 ListAdapter 与 RecycleView.Adatper 与 PagerAdapter 公共数据操作;
+
+http://raw.githubusercontent.com/powyin/SwipeRefreshLayout/master/file/cc.png
 ```        
         
