@@ -21,10 +21,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:26.0.0'
-    compile project(path: ':scroll')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:design:26.0.0'
+    implementation project(path: ':scroll')
 //    or
 //    compile 'com.github.powyin:scroll:3.2.7'
 
