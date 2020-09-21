@@ -1,0 +1,74 @@
+.head {
+  width: 100%;
+  height: 400rpx;
+  position: relative;
+  
+}
+.head ,page{
+  background-color: #f7f7f7;
+}
+.record, .dot {
+  height: 200rpx;
+  width: 200rpx;
+  border-radius: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-iteration-count: 1;
+}
+
+.record {
+  background: rgba(92, 212, 76);
+  z-index: 10;
+}
+
+.dot {
+  background: rgba(92, 212, 76, 0.7);
+  z-index: 9;
+}
+
+.dot-blowup {
+  animation: sploosh2 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  animation-fill-mode: forwards;
+}
+
+.dot-zoomout {
+  animation: sploosh3 1.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes sploosh2 {
+  0% {
+    box-shadow: 0 0 0 0px rgba(92, 212, 76, 0.7);
+    background: rgba(92, 212, 76, 0.7);
+  }
+
+  100% {
+    box-shadow: 0 0 0 15px rgba(92, 212, 76, 0.3);
+    background: rgba(92, 212, 76, 0.3);
+  }
+}
+
+@keyframes sploosh3 {
+  0% {
+     box-shadow: 0 0 0 15px rgba(92, 212, 76, 0.3);
+    background: rgba(92, 212, 76, 0.3);
+  }
+
+  100%{
+    box-shadow: 0 0 0 0px rgba(92, 212, 76, 0.7);
+    background: rgba(92, 212, 76, 0.7);
+  }
+}
+
+.record image {
+  height: 90rpx;
+  width: 90rpx;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  background: transparent;
+  transform: translate(-50%, -50%);
+}

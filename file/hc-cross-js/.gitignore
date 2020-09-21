@@ -1,0 +1,20 @@
+# Non-project-specific build files:
+build.xml
+local.properties
+.gradle
+.idea
+# Ant builds
+ant-build
+ant-gen
+# Eclipse builds
+gen
+out
+# Gradle builds
+/build
+*.log
+*.iml
+
+/node_modules
+/hooks
+/plugins
+/tool

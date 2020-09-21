@@ -1,0 +1,28 @@
+<!--index.wxml-->
+
+<view class="voice-style {{isSpeaking ? 'show' : ''}}" wx:if="{{isSpeaking}}">
+  <image wx:if="{{j==1}}" class="sound-style" src="/images/voice_icon_speech_sound_1.png"></image>
+  <image wx:if="{{j==2}}" class="sound-style" src="/images/voice_icon_speech_sound_2.png"></image>
+  <image wx:if="{{j==3}}" class="sound-style" src="/images/voice_icon_speech_sound_3.png"></image>
+  <image wx:if="{{j==4}}" class="sound-style" src="/images/voice_icon_speech_sound_4.png"></image>
+  <image wx:if="{{j==5}}" class="sound-style" src="/images/voice_icon_speech_sound_5.png"></image>
+</view>
+
+<view style='padding:30rpx; position: fixed;bottom: 0;left: 0;right: 0;'>
+  <view style='display: flex;align-items: center;' bindtap="playAudio">
+    <view style='flex: 1;font-size: 30rpx;color:#333; font-size: 30rpx;text-overflow: ellipsis; white-space:nowrap;overflow:hidden;'>存储路径:{{tempFilePath}}</view>
+    <view style='font-size: 30rpx;color:#333;margin:20rpx;'>{{audioSize}}KB</view>
+    <view class='equilizer' wx:if="{{isPlaying}}">
+      <view class="span line1"></view>
+      <view class="span line2"></view>
+      <view class="span line3"></view>
+      <view class="span line4"></view>
+    </view>
+  </view>
+  <button style='margin-top:20rpx;' bindtap="startRecord">开始录音</button>
+  <button style='margin-top:20rpx;' bindtap="stopRecord">停止录音</button>
+  <button style='margin-top:20rpx;' bindtap="playAudio">播放录音</button>
+  <button style='margin-top:20rpx;' bindlongtap="bindlongtap" bindtouchstart="bindTouchDown" bindtouchend="bindTouchUp">
+    长按录音
+  </button>
+</view>

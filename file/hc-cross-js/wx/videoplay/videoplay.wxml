@@ -1,0 +1,20 @@
+
+<video
+  id="myVideo" 
+  class="video" 
+  src="{{videoSrc}}" 
+  bindfullscreenchange="fullscreenchange" 
+  bindtimeupdate="onPlayTimeUpdate"
+  bindplay="onPlay"
+  bindended="onEnded"
+  bindpause="onPause"
+  
+  controls
+  enable-danmu 
+  vslide-gesture 
+  vslide-gesture-in-fullscreen 
+  autoplay 
+  enable-play-gesture
+  >
+
+	</video>
