@@ -17,7 +17,6 @@ dependencies {
 |---|---|----
 |![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
 
-
 ### SwipeNest UI
 
 |刷新（可自定义）|平滑各种View之间的滚动冲突|自定义刷新范例|
