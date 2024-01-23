@@ -6,7 +6,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-      compile 'com.github.powyin:scroll:3.2.5'
+      compile 'com.github.powyin:android_swipe_refresh_layout:3.3.0'
       compile 'com.android.support:recyclerview-v7:24.0.0'
 }
 ```
